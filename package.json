@@ -1,0 +1,35 @@
+{
+  "name": "storytel-web-client",
+  "version": "1.0.0",
+  "description": "Storytel Web Player - Web interface for Storytel audiobook player",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && npm install && npm start",
+    "client": "cd client && npm install && npm start",
+    "build": "cd client && npm run build",
+    "dev": "concurrently \"npm run server:dev\" \"npm run client\"",
+    "server:dev": "cd server && npm install && npm run dev",
+    "install-all": "npm install && cd server && npm install && cd ../client && npm install",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "debba",
+  "license": "ISC",
+  "dependencies": {
+    "concurrently": "^7.6.0"
+  },
+  "keywords": [
+    "storytel",
+    "audiobook",
+    "web",
+    "react",
+    "express"
+  ],
+  "devDependencies": {
+    "@babel/cli": "^7.28.3",
+    "@babel/core": "^7.28.4",
+    "@babel/node": "^7.28.0",
+    "@babel/preset-env": "^7.28.3",
+    "@babel/preset-react": "^7.27.1"
+  }
+}
