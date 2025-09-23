@@ -14,6 +14,7 @@ function PlayerView() {
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
     const [volume, setVolume] = useState(1);
+    const [chapters, setChapters] = useState([]);
 
     const book = location.state?.book;
     const bookmarkPos = location.state?.bookmarkPos;
@@ -24,6 +25,12 @@ function PlayerView() {
             loadAudioStream();
         }
     }, [bookId, bookmarkPos]);
+
+    useEffect(() => {
+        if (book) {
+            loadChapters(book.consumableId);
+        }
+    }, [book]);
 
     const loadAudioStream = async () => {
         try {
@@ -49,6 +56,22 @@ function PlayerView() {
             setIsLoading(false);
         }
     };
+
+    const loadChapters = async (
+        consumableId
+    ) => {
+        try {
+            const response = await api.get(`/bookmetadata/${consumableId}`);
+            const {data} = response;
+
+            if (data.formats && data.formats.length > 0) {
+                setChapters(data.formats[0].chapters);
+            }
+
+        }catch (error) {
+            setError(error.response?.data?.error || 'Failed to load chapters');
+        }
+    }
 
     const handlePlayPause = () => {
         if (!audioRef.current) return;
@@ -207,6 +230,7 @@ function PlayerView() {
                         />
 
                         {/* Player Controls */}
+
                         <div className="p-6 bg-gray-50">
                             {/* Progress Bar */}
                             <div className="mb-6">
@@ -301,14 +325,50 @@ function PlayerView() {
                                     />
                                 </div>
 
-                                <button
+                                {/*<button
                                     id="bookmark-btn"
                                     onClick={saveBookmark}
                                     className="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-colors"
                                 >
                                     Save Bookmark
-                                </button>
+                                </button>*/}
                             </div>
+
+                            {/* Chapters List */}
+                            {chapters && chapters.length > 0 && (
+                                <div className="mt-6">
+                                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Chapters</h3>
+                                    <div className="space-y-2 max-h-64 overflow-y-auto">
+                                        {chapters.map((chapter, index) => {
+                                            const chapterStartTime = chapters.slice(0, index).reduce((total, ch) => total + ch.durationInSeconds, 0);
+
+                                            return (
+                                                <div
+                                                    key={chapter.number}
+                                                    className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer"
+                                                    onClick={() => {
+                                                        if (audioRef.current) {
+                                                            audioRef.current.currentTime = chapterStartTime;
+                                                        }
+                                                    }}
+                                                >
+                                                    <div className="flex-1">
+                                                        <h4 className="font-medium text-gray-900">{chapter.title}</h4>
+                                                        <p className="text-sm text-gray-500">
+                                                            {formatTime(chapterStartTime)} • {formatTime(chapter.durationInSeconds)}
+                                                        </p>
+                                                    </div>
+                                                    <div className="text-gray-400">
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

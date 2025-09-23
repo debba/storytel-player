@@ -15,6 +15,7 @@ class StorytelClient {
 
         this.loginData = {
             accountInfo: {
+                jwt: '',
                 singleSignToken: ''
             }
         };
@@ -44,13 +45,17 @@ class StorytelClient {
         }
     }
 
-    async getBookInfoContent(
-        bookId
+    async getPlayBookMetaData(
+        consumableId
     ) {
-        const url = `https://api.storytel.net/playback-metadata/consumable/${bookId}?token=${this.loginData.accountInfo.singleSignToken}`;
+        const url = `https://api.storytel.net/playback-metadata/consumable/${consumableId}`;
 
         try {
-            const response = await this.client.get(url);
+            const response = await this.client.get(url, {
+                headers: {
+                    'Authorization': `Bearer ${this.loginData.accountInfo.jwt}`
+                }
+            });
             return response.data;
         } catch (error) {
             throw new Error(`Failed to get bookinfo: ${error.message}`);

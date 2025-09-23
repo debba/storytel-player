@@ -34,11 +34,10 @@ fastify.post('/api/login', async (request, reply) => {
 
         const storytelClient = new StorytelClient();
         const loginData = await storytelClient.login(email, password);
-        console.log(loginData);
-
         // Create JWT token with storytel client data
         const token = fastify.jwt.sign({
             storytelToken: loginData.accountInfo.singleSignToken,
+            jwt: loginData.accountInfo.jwt,
             email: email
         });
 
@@ -59,7 +58,7 @@ fastify.get('/api/bookshelf', {
 }, async (request, reply) => {
     try {
         const storytelClient = new StorytelClient();
-        // Set the login data from JWT token
+
         storytelClient.loginData = {
             accountInfo: {
                 singleSignToken: request.user.storytelToken
@@ -80,7 +79,8 @@ fastify.get('/api/bookshelf', {
                         position: bookEntry.abookmark ? bookEntry.abookmark.position : -1,
                         bookmarkId: bookEntry.abookmark ? bookEntry.abookmark.id : null,
                         bookmarkPos: bookEntry.abookmark ? bookEntry.abookmark.pos : null,
-                    }
+                    },
+                    consumableId: bookEntry.book.consumableId
                 });
             }
         });
@@ -132,6 +132,26 @@ fastify.post('/api/bookmark', {
         await storytelClient.setBookmark(bookId, position);
 
         reply.send({ success: true, message: 'Bookmark saved' });
+    } catch (error) {
+        reply.code(500).send({ error: error.message });
+    }
+});
+
+fastify.get('/api/bookmetadata/:consumableId', {
+    preHandler: fastify.authenticate
+}, async(request, reply) => {
+    try {
+
+        const { consumableId } = request.params;
+        const storytelClient = new StorytelClient();
+
+        storytelClient.loginData = {
+            accountInfo: {
+                jwt: request.user.jwt
+            }
+        };
+        const bookInfoContent = await storytelClient.getPlayBookMetaData(consumableId);
+        reply.send(bookInfoContent);
     } catch (error) {
         reply.code(500).send({ error: error.message });
     }
