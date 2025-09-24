@@ -19,7 +19,6 @@ function PlayerView() {
     const [showBookmarksModal, setShowBookmarksModal] = useState(false);
 
     const book = location.state?.book;
-    const savedPosition = location.state?.position || 0;
 
     useEffect(() => {
         if (bookId) {
@@ -31,6 +30,7 @@ function PlayerView() {
         if (book) {
             loadChapters(book.consumableId);
             loadBookmarks(book.consumableId);
+            goToPosition(book.consumableId);
         }
     }, [book]);
 
@@ -44,12 +44,6 @@ function PlayerView() {
             if (audioRef.current) {
                 audioRef.current.src = response.data.streamUrl;
                 audioRef.current.load();
-
-                // Set initial position if bookmark exists
-                if (savedPosition > 0) {
-                    const startTimeSeconds = Math.floor(savedPosition / 1000000);
-                    audioRef.current.currentTime = startTimeSeconds;
-                }
             }
         } catch (error) {
             setError(error.response?.data?.error || 'Failed to load audio stream');
@@ -82,6 +76,22 @@ function PlayerView() {
             const {data} = response;
 
             setBookmarks(data.bookmarks);
+
+        }catch (error) {
+            setError(error.response?.data?.error || 'Failed to load bookmarks');
+        }
+    }
+
+    const goToPosition = async (
+        consumableId
+    ) => {
+        try {
+            const response = await api.get(`/bookmark-positional/${consumableId}`);
+            const {data} = response;
+
+            if (data.length === 1 && 'position' in data[0]){
+                goToBookmark(data[0].position);
+            }
 
         }catch (error) {
             setError(error.response?.data?.error || 'Failed to load bookmarks');

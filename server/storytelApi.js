@@ -47,7 +47,7 @@ class StorytelClient {
                     'Authorization': `Bearer ${this.loginData.accountInfo.jwt}`
                 }
             });
-            return response.data;
+            return response.data.bookmarks;
         } catch (error) {
             throw new Error(`Failed to get bookmark positional: ${error.message}`);
         }

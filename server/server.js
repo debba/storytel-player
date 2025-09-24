@@ -138,6 +138,7 @@ fastify.post('/api/bookmark', {
     }
 });
 
+
 fastify.get('/api/bookmark-positional', {
     preHandler: fastify.authenticate
 }, async (request, reply) => {
@@ -153,6 +154,32 @@ fastify.get('/api/bookmark-positional', {
 
         const bookmarks = await storytelClient.getBookmarkPositional();
         reply.send(bookmarks);
+
+    } catch (error) {
+        reply.code(500).send({ error: error.message });
+    }
+});
+
+
+fastify.get('/api/bookmark-positional/:consumableId', {
+    preHandler: fastify.authenticate
+}, async (request, reply) => {
+    try {
+
+
+        const { consumableId } = request.params;
+
+        const storytelClient = new StorytelClient();
+        // Set the login data from JWT token
+        storytelClient.loginData = {
+            accountInfo: {
+                jwt: request.user.jwt
+            }
+        };
+
+        const bookmarks = await storytelClient.getBookmarkPositional();
+        const bookmark = bookmarks && bookmarks.filter(bookmark => bookmark.consumableId === consumableId);
+        reply.send(bookmark);
 
     } catch (error) {
         reply.code(500).send({ error: error.message });
