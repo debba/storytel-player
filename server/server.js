@@ -7,7 +7,8 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-t
 // Register plugins
 fastify.register(require('@fastify/cors'), {
     origin: 'http://localhost:3000',
-    credentials: true
+    credentials: true,
+    methods: ['POST', 'PATCH', 'PUT', 'DELETE'],
 });
 
 fastify.register(require('@fastify/jwt'), {
@@ -140,6 +141,29 @@ fastify.post('/api/bookmarks/:consumableId', {
         reply.code(500).send({ error: error.message });
     }
 });
+
+fastify.delete('/api/bookmarks/:consumableId/:bookmarkId', {
+    preHandler: fastify.authenticate
+}, async (request, reply) => {
+    try {
+
+        const { consumableId, bookmarkId } = request.params;
+        const storytelClient = new StorytelClient();
+        // Set the login data from JWT token
+        storytelClient.loginData = {
+            accountInfo: {
+                jwt: request.user.jwt
+            }
+        };
+
+        await storytelClient.deleteBookmark(consumableId, bookmarkId);
+
+        reply.send({ success: true, message: 'Bookmark removed' });
+    } catch (error) {
+        reply.code(500).send({ error: error.message });
+    }
+});
+
 
 
 fastify.get('/api/bookmark-positional', {

@@ -18,6 +18,8 @@ function PlayerView() {
     const [bookmarks, setBookmarks] = useState([]);
     const [showBookmarksModal, setShowBookmarksModal] = useState(false);
     const [showCreateBookmarkModal, setShowCreateBookmarkModal] = useState(false);
+    const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
+    const [bookmarkToDelete, setBookmarkToDelete] = useState(null);
     const [newBookmarkNote, setNewBookmarkNote] = useState('');
 
     const book = location.state?.book;
@@ -216,6 +218,19 @@ function PlayerView() {
             setShowCreateBookmarkModal(false);
         } catch (error) {
             console.error('Failed to create bookmark:', error);
+        }
+    };
+
+    const deleteBookmark = async () => {
+        if (!bookmarkToDelete || !book) return;
+
+        try {
+            await api.delete(`/bookmarks/${book.consumableId}/${bookmarkToDelete.id}`, {});
+            await loadBookmarks(book.consumableId);
+            setShowDeleteConfirmModal(false);
+            setBookmarkToDelete(null);
+        } catch (error) {
+            console.error('Failed to delete bookmark:', error);
         }
     };
 
@@ -436,10 +451,32 @@ function PlayerView() {
                                                                         {new Date(bookmark.insertTime).toLocaleDateString()}
                                                                     </div>
                                                                 </div>
-                                                                <div className="text-gray-400 ml-2">
-                                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                                                    </svg>
+                                                                <div className="flex space-x-2 ml-2">
+                                                                    <button
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            // TODO: Implement edit functionality
+                                                                        }}
+                                                                        className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                                                                        title="Modifica bookmark"
+                                                                    >
+                                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                                        </svg>
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            setBookmarkToDelete(bookmark);
+                                                                            setShowDeleteConfirmModal(true);
+                                                                        }}
+                                                                        className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                                                                        title="Elimina bookmark"
+                                                                    >
+                                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                                        </svg>
+                                                                    </button>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -520,6 +557,57 @@ function PlayerView() {
                                 </div>
                             )}
 
+                            {/* Delete Confirmation Modal */}
+                            {showDeleteConfirmModal && bookmarkToDelete && (
+                                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                                    <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
+                                        <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-red-100 rounded-full">
+                                            <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 15.5c-.77.833.192 2.5 1.732 2.5z" />
+                                            </svg>
+                                        </div>
+
+                                        <div className="text-center">
+                                            <h3 className="text-lg font-semibold text-gray-900 mb-2">Elimina Bookmark</h3>
+                                            <p className="text-gray-600 mb-2">
+                                                Sei sicuro di voler eliminare questo bookmark?
+                                            </p>
+                                            <div className="bg-gray-50 rounded-lg p-3 mb-4">
+                                                <div className="text-sm font-medium text-blue-600">
+                                                    {formatBookmarkTime(bookmarkToDelete.position)}
+                                                </div>
+                                                {bookmarkToDelete.note && (
+                                                    <div className="text-sm text-gray-600 mt-1">
+                                                        "{bookmarkToDelete.note}"
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <p className="text-sm text-gray-500 mb-6">
+                                                Questa azione non può essere annullata.
+                                            </p>
+                                        </div>
+
+                                        <div className="flex space-x-3">
+                                            <button
+                                                onClick={() => {
+                                                    setShowDeleteConfirmModal(false);
+                                                    setBookmarkToDelete(null);
+                                                }}
+                                                className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
+                                            >
+                                                Annulla
+                                            </button>
+                                            <button
+                                                onClick={deleteBookmark}
+                                                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                                            >
+                                                Elimina
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
                             {/* Chapters List */}
                             {chapters && chapters.length > 0 && (
                                 <div className="mt-6">
@@ -562,11 +650,6 @@ function PlayerView() {
                                                                     {formatTime(chapterStartTime)} • {formatTime(chapter.durationInSeconds)}
                                                                 </p>
                                                             )}
-                                                        </div>
-                                                        <div className="text-gray-400">
-                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                                            </svg>
                                                         </div>
                                                     </div>
                                                     {/* Barra di avanzamento del capitolo */}

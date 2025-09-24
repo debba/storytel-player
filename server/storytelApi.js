@@ -130,6 +130,28 @@ class StorytelClient {
             throw new Error(`Failed to set bookmark: ${error.message}`);
         }
     }
+
+    async deleteBookmark(consumableId, bookmarkId) {
+
+        const {bookmarks} = await this.getBookmark(consumableId);
+
+        if (!bookmarks || !bookmarks.some(bookmark => bookmark.id === bookmarkId)){
+            throw new Error(`Failed to remove bookmark: bookmark does not exists!`);
+        }
+
+        const url = `https://api.storytel.net/bookmarks/manual/${bookmarkId}?id=${bookmarkId}`;
+        try {
+            await this.client.delete(url,{
+                headers: {
+                    'Authorization': `Bearer ${this.loginData.accountInfo.jwt}`,
+                    'Accept': 'application/vnd.storytel.bookmark+json;v=2.0'
+                }
+            } );
+        } catch (error) {
+            throw new Error(`Failed to delete bookmark: ${error.message}`);
+        }
+    }
+
 }
 
 module.exports = StorytelClient;
