@@ -17,6 +17,8 @@ function PlayerView() {
     const [chapters, setChapters] = useState([]);
     const [bookmarks, setBookmarks] = useState([]);
     const [showBookmarksModal, setShowBookmarksModal] = useState(false);
+    const [showCreateBookmarkModal, setShowCreateBookmarkModal] = useState(false);
+    const [newBookmarkNote, setNewBookmarkNote] = useState('');
 
     const book = location.state?.book;
 
@@ -195,6 +197,25 @@ function PlayerView() {
             const seconds = Math.floor(position / 1000);
             audioRef.current.currentTime = seconds;
             setShowBookmarksModal(false);
+        }
+    };
+
+    const createBookmark = async () => {
+        if (!audioRef.current || !book) return;
+
+        try {
+            const positionInMilliseconds = Math.floor(audioRef.current.currentTime * 1000);
+
+            await api.post(`/bookmarks/${book.consumableId}`, {
+                position: positionInMilliseconds,
+                note: newBookmarkNote
+            });
+
+            await loadBookmarks(book.consumableId);
+            setNewBookmarkNote('');
+            setShowCreateBookmarkModal(false);
+        } catch (error) {
+            console.error('Failed to create bookmark:', error);
         }
     };
 
@@ -438,6 +459,7 @@ function PlayerView() {
                                             <button
                                                 onClick={() => {
                                                     setShowBookmarksModal(false);
+                                                    setShowCreateBookmarkModal(true);
                                                 }}
                                                 className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                                             >
@@ -448,6 +470,55 @@ function PlayerView() {
                                 </div>
                             )}
 
+                            {/* Create Bookmark Modal */}
+                            {showCreateBookmarkModal && (
+                                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                                    <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                                        <div className="flex justify-between items-center mb-4">
+                                            <h3 className="text-lg font-semibold text-gray-900">Crea Nuovo Bookmark</h3>
+                                            <button
+                                                onClick={() => setShowCreateBookmarkModal(false)}
+                                                className="text-gray-400 hover:text-gray-600"
+                                            >
+                                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
+                                        </div>
+
+                                        <div className="mb-4">
+                                            <p className="text-sm text-gray-600 mb-2">
+                                                Posizione attuale: {formatTime(currentTime)}
+                                            </p>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Nota (opzionale)
+                                            </label>
+                                            <textarea
+                                                value={newBookmarkNote}
+                                                onChange={(e) => setNewBookmarkNote(e.target.value)}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                rows="3"
+                                                placeholder="Aggiungi una nota a questo bookmark..."
+                                            />
+                                        </div>
+
+                                        <div className="flex space-x-3">
+                                            <button
+                                                onClick={() => setShowCreateBookmarkModal(false)}
+                                                className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
+                                            >
+                                                Annulla
+                                            </button>
+                                            <button
+                                                onClick={createBookmark}
+                                                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                                            >
+                                                Salva Bookmark
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
 
                             {/* Chapters List */}
                             {chapters && chapters.length > 0 && (
@@ -456,28 +527,61 @@ function PlayerView() {
                                     <div className="space-y-2 max-h-64 overflow-y-auto">
                                         {chapters.map((chapter, index) => {
                                             const chapterStartTime = chapters.slice(0, index).reduce((total, ch) => total + ch.durationInSeconds, 0);
+                                            const chapterEndTime = chapterStartTime + chapter.durationInSeconds;
+
+                                            // Calcola il progresso del capitolo corrente
+                                            const isCurrentChapter = currentTime >= chapterStartTime && currentTime < chapterEndTime;
+                                            const chapterProgress = isCurrentChapter
+                                                ? ((currentTime - chapterStartTime) / chapter.durationInSeconds) * 100
+                                                : 0;
 
                                             return (
                                                 <div
                                                     key={chapter.number}
-                                                    className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer"
+                                                    className="bg-white rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer overflow-hidden"
                                                     onClick={() => {
                                                         if (audioRef.current) {
                                                             audioRef.current.currentTime = chapterStartTime;
                                                         }
                                                     }}
                                                 >
-                                                    <div className="flex-1">
-                                                        <h4 className="font-medium text-gray-900">{chapter.title}</h4>
-                                                        <p className="text-sm text-gray-500">
-                                                            {formatTime(chapterStartTime)} • {formatTime(chapter.durationInSeconds)}
-                                                        </p>
+                                                    <div className="flex items-center justify-between p-3">
+                                                        <div className="flex-1">
+                                                            <h4 className="font-medium text-gray-900">{chapter.title}</h4>
+                                                            {isCurrentChapter ? (
+                                                                <div className="flex justify-between items-center">
+                                                                    <p className="text-sm text-gray-500">
+                                                                        {formatTime(currentTime - chapterStartTime)}
+                                                                    </p>
+                                                                    <p className="text-sm text-gray-500">
+                                                                        {formatTime(chapter.durationInSeconds - (currentTime - chapterStartTime))}
+                                                                    </p>
+                                                                </div>
+                                                            ) : (
+                                                                <p className="text-sm text-gray-500">
+                                                                    {formatTime(chapterStartTime)} • {formatTime(chapter.durationInSeconds)}
+                                                                </p>
+                                                            )}
+                                                        </div>
+                                                        <div className="text-gray-400">
+                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                                            </svg>
+                                                        </div>
                                                     </div>
-                                                    <div className="text-gray-400">
-                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                                        </svg>
-                                                    </div>
+                                                    {/* Barra di avanzamento del capitolo */}
+                                                    {isCurrentChapter && (
+                                                        <div className="relative h-1 bg-gray-200">
+                                                            <div
+                                                                className="absolute top-0 left-0 h-full bg-red-500 transition-all duration-300"
+                                                                style={{ width: `${Math.max(chapterProgress, 0)}%` }}
+                                                            />
+                                                            <div
+                                                                className="absolute top-0 h-full w-1 bg-red-600"
+                                                                style={{ left: `${Math.max(chapterProgress, 0)}%` }}
+                                                            />
+                                                        </div>
+                                                    )}
                                                 </div>
                                             );
                                         })}

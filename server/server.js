@@ -116,21 +116,24 @@ fastify.post('/api/stream', {
 });
 
 // Route per salvare bookmark
-fastify.post('/api/bookmark', {
+fastify.post('/api/bookmarks/:consumableId', {
     preHandler: fastify.authenticate
 }, async (request, reply) => {
     try {
-        const { bookId, position } = request.body;
+
+        const { consumableId } = request.params;
+
+        const { position, note } = request.body;
 
         const storytelClient = new StorytelClient();
         // Set the login data from JWT token
         storytelClient.loginData = {
             accountInfo: {
-                singleSignToken: request.user.storytelToken
+                jwt: request.user.jwt
             }
         };
 
-        await storytelClient.setBookmark(bookId, position);
+        await storytelClient.setBookmark(consumableId, position, note);
 
         reply.send({ success: true, message: 'Bookmark saved' });
     } catch (error) {

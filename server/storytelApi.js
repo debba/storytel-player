@@ -112,20 +112,20 @@ class StorytelClient {
         }
     }
 
-    async setBookmark(bookId, position) {
-        const microsecToSec = 1000000;
-        const params = new URLSearchParams({
-            token: this.loginData.accountInfo.singleSignToken,
-            bookId: bookId,
-            bookName: 'test',
-            pos: (position * microsecToSec).toString(),
-            type: '1'
-        });
-
-        const url = 'https://www.storytel.se/api/setABookmark.action';
-
+    async setBookmark(consumableId, position, note) {
+        const url = 'https://api.storytel.net/bookmarks/manual';
         try {
-            await this.client.post(url, params);
+            await this.client.post(url,{
+                position,
+                consumableId,
+                note,
+                type: "abook"
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${this.loginData.accountInfo.jwt}`,
+                    'Accept': 'application/vnd.storytel.bookmark+json;v=2.0'
+                }
+            } );
         } catch (error) {
             throw new Error(`Failed to set bookmark: ${error.message}`);
         }
