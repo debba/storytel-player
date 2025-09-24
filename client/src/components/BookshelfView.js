@@ -27,9 +27,7 @@ function BookshelfView() {
   const handleBookSelect = (book) => {
     navigate(`/player/${book.data.id}`, {
       state: {
-        book: book,
-        bookmarkPos: book.data.bookmarkPos,
-        position: book.data.position
+        book: book
       }
     });
   };
