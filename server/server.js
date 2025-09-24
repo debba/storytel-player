@@ -164,6 +164,29 @@ fastify.delete('/api/bookmarks/:consumableId/:bookmarkId', {
     }
 });
 
+fastify.put('/api/bookmarks/:consumableId/:bookmarkId', {
+    preHandler: fastify.authenticate
+}, async (request, reply) => {
+    try {
+
+        const { consumableId, bookmarkId } = request.params;
+        const storytelClient = new StorytelClient();
+        // Set the login data from JWT token
+        storytelClient.loginData = {
+            accountInfo: {
+                jwt: request.user.jwt
+            }
+        };
+
+        await storytelClient.updateBookmark(consumableId, bookmarkId, request.body);
+
+        reply.send({ success: true, message: 'Bookmark removed' });
+    } catch (error) {
+        reply.code(500).send({ error: error.message });
+    }
+});
+
+
 
 
 fastify.get('/api/bookmark-positional', {
@@ -204,9 +227,8 @@ fastify.get('/api/bookmark-positional/:consumableId', {
             }
         };
 
-        const bookmarks = await storytelClient.getBookmarkPositional();
-        const bookmark = bookmarks && bookmarks.filter(bookmark => bookmark.consumableId === consumableId);
-        reply.send(bookmark);
+        const bookmarks = await storytelClient.getBookmarkPositional(consumableId);
+        reply.send(bookmarks);
 
     } catch (error) {
         reply.code(500).send({ error: error.message });

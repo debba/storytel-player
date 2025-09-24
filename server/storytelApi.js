@@ -38,11 +38,16 @@ class StorytelClient {
         }
     }
 
-    async getBookmarkPositional() {
-        const url = `https://api.storytel.net/bookmarks/positional?kidsMode=false&orderBy=updated&pageSizeHint=1&orderDirection=desc`;
+    async getBookmarkPositional(
+        consumableId = null
+    ) {
+        const url = `https://api.storytel.net/bookmarks/positional?kidsMode=false&orderBy=updated&orderDirection=desc`;
 
         try {
             const response = await this.client.get(url, {
+                params: {
+                    ...consumableId && {consumableIds: consumableId},
+                },
                 headers: {
                     'Authorization': `Bearer ${this.loginData.accountInfo.jwt}`
                 }
@@ -130,6 +135,28 @@ class StorytelClient {
             throw new Error(`Failed to set bookmark: ${error.message}`);
         }
     }
+
+    async updateBookmark(consumableId, bookmarkId, bookmarkData) {
+
+        const {bookmarks} = await this.getBookmark(consumableId);
+
+        if (!bookmarks || !bookmarks.some(bookmark => bookmark.id === bookmarkId)){
+            throw new Error(`Failed to remove bookmark: bookmark does not exists!`);
+        }
+
+        const url = `https://api.storytel.net/bookmarks/manual/${bookmarkId}?id=${bookmarkId}`;
+        try {
+            await this.client.put(url,bookmarkData, {
+                headers: {
+                    'Authorization': `Bearer ${this.loginData.accountInfo.jwt}`,
+                    'Accept': 'application/vnd.storytel.bookmark+json;v=2.0'
+                }
+            } );
+        } catch (error) {
+            throw new Error(`Failed to update bookmark: ${error.message}`);
+        }
+    }
+
 
     async deleteBookmark(consumableId, bookmarkId) {
 

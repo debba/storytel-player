@@ -14,13 +14,18 @@ function PlayerView() {
     const [currentTime, setCurrentTime] = useState(0);
     const [duration, setDuration] = useState(0);
     const [volume, setVolume] = useState(1);
+    const [isMuted, setIsMuted] = useState(false);
+    const [previousVolume, setPreviousVolume] = useState(1);
     const [chapters, setChapters] = useState([]);
     const [bookmarks, setBookmarks] = useState([]);
     const [showBookmarksModal, setShowBookmarksModal] = useState(false);
     const [showCreateBookmarkModal, setShowCreateBookmarkModal] = useState(false);
     const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
+    const [showEditBookmarkModal, setShowEditBookmarkModal] = useState(false);
     const [bookmarkToDelete, setBookmarkToDelete] = useState(null);
+    const [bookmarkToEdit, setBookmarkToEdit] = useState(null);
     const [newBookmarkNote, setNewBookmarkNote] = useState('');
+    const [editBookmarkNote, setEditBookmarkNote] = useState('');
 
     const book = location.state?.book;
 
@@ -139,6 +144,26 @@ function PlayerView() {
         if (audioRef.current) {
             audioRef.current.volume = newVolume;
         }
+        if (newVolume > 0) {
+            setIsMuted(false);
+        }
+    };
+
+    const toggleMute = () => {
+        if (!audioRef.current) return;
+
+        if (isMuted) {
+            // Unmute: ripristina il volume precedente
+            audioRef.current.volume = previousVolume;
+            setVolume(previousVolume);
+            setIsMuted(false);
+        } else {
+            // Mute: salva il volume attuale e imposta a 0
+            setPreviousVolume(volume);
+            audioRef.current.volume = 0;
+            setVolume(0);
+            setIsMuted(true);
+        }
     };
 
     const skipForward = () => {
@@ -231,6 +256,25 @@ function PlayerView() {
             setBookmarkToDelete(null);
         } catch (error) {
             console.error('Failed to delete bookmark:', error);
+        }
+    };
+
+    const editBookmark = async () => {
+        if (!bookmarkToEdit || !book) return;
+
+        try {
+            await api.put(`/bookmarks/${book.consumableId}/${bookmarkToEdit.id}`, {
+                position: bookmarkToEdit.position,
+                note: editBookmarkNote,
+                type: 'abook'
+            });
+
+            await loadBookmarks(book.consumableId);
+            setShowEditBookmarkModal(false);
+            setBookmarkToEdit(null);
+            setEditBookmarkNote('');
+        } catch (error) {
+            console.error('Failed to edit bookmark:', error);
         }
     };
 
@@ -386,12 +430,23 @@ function PlayerView() {
                             {/* Volume and Bookmark */}
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center space-x-2">
-                                    <svg className="w-5 h-5 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 16">
-                                        <g fill="#000">
-                                            <path d="M6 1h2v14H6l-4-4H0V5h2zM14 8a4 4 0 0 0-4-4V2a6 6 0 0 1 0 12v-2a4 4 0 0 0 4-4"></path>
-                                            <path d="M12 8a2 2 0 0 1-2 2V6a2 2 0 0 1 2 2"></path>
-                                        </g>
-                                    </svg>
+                                    <button onClick={toggleMute} className="p-1 rounded hover:bg-gray-200 transition-colors">
+                                        {isMuted || volume === 0 ? (
+                                            <svg className="w-5 h-5 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 16">
+                                                <g fill="#000">
+                                                    <path d="M6 1h2v14H6l-4-4H0V5h2z"></path>
+                                                    <path d="M10.5 8.5l1.5-1.5m0 3l-1.5-1.5m-1.5-1.5L8 10m0-2l1-1.5"></path>
+                                                </g>
+                                            </svg>
+                                        ) : (
+                                            <svg className="w-5 h-5 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 16">
+                                                <g fill="#000">
+                                                    <path d="M6 1h2v14H6l-4-4H0V5h2zM14 8a4 4 0 0 0-4-4V2a6 6 0 0 1 0 12v-2a4 4 0 0 0 4-4"></path>
+                                                    <path d="M12 8a2 2 0 0 1-2 2V6a2 2 0 0 1 2 2"></path>
+                                                </g>
+                                            </svg>
+                                        )}
+                                    </button>
                                     <input
                                         type="range"
                                         min="0"
@@ -455,7 +510,9 @@ function PlayerView() {
                                                                     <button
                                                                         onClick={(e) => {
                                                                             e.stopPropagation();
-                                                                            // TODO: Implement edit functionality
+                                                                            setBookmarkToEdit(bookmark);
+                                                                            setEditBookmarkNote(bookmark.note || '');
+                                                                            setShowEditBookmarkModal(true);
                                                                         }}
                                                                         className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
                                                                         title="Modifica bookmark"
@@ -602,6 +659,64 @@ function PlayerView() {
                                                 className="flex-1 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
                                             >
                                                 Elimina
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Edit Bookmark Modal */}
+                            {showEditBookmarkModal && bookmarkToEdit && (
+                                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                                    <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                                        <div className="flex justify-between items-center mb-4">
+                                            <h3 className="text-lg font-semibold text-gray-900">Modifica Bookmark</h3>
+                                            <button
+                                                onClick={() => {
+                                                    setShowEditBookmarkModal(false);
+                                                    setBookmarkToEdit(null);
+                                                    setEditBookmarkNote('');
+                                                }}
+                                                className="text-gray-400 hover:text-gray-600"
+                                            >
+                                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
+                                        </div>
+
+                                        <div className="mb-4">
+                                            <p className="text-sm text-gray-600 mb-4">
+                                                Posizione: <span className="font-medium text-blue-600">{formatBookmarkTime(bookmarkToEdit.position)}</span>
+                                            </p>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Nota
+                                            </label>
+                                            <textarea
+                                                value={editBookmarkNote}
+                                                onChange={(e) => setEditBookmarkNote(e.target.value)}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                rows="3"
+                                                placeholder="Modifica la nota per questo bookmark..."
+                                            />
+                                        </div>
+
+                                        <div className="flex space-x-3">
+                                            <button
+                                                onClick={() => {
+                                                    setShowEditBookmarkModal(false);
+                                                    setBookmarkToEdit(null);
+                                                    setEditBookmarkNote('');
+                                                }}
+                                                className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
+                                            >
+                                                Annulla
+                                            </button>
+                                            <button
+                                                onClick={editBookmark}
+                                                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                                            >
+                                                Salva Modifiche
                                             </button>
                                         </div>
                                     </div>
