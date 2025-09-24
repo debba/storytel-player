@@ -1,15 +1,19 @@
 const axios = require('axios');
-const { encryptPassword } = require('./passwordCrypt');
+const {encryptPassword} = require('./passwordCrypt');
 
 class StorytelClient {
     constructor() {
         this.client = axios.create({
             headers: {
-                'User-Agent': 'okhttp/3.12.8'
+                'x-storytel-terminal': 'ios',
+                'user-agent': 'Storytel/25.38.0 (iOS 26.0; iPhone16,2) Release/924.1'
             },
             maxRedirects: 0,
             validateStatus: function (status) {
                 return status < 400;
+            },
+            params: {
+                version: '25.38.0'
             }
         });
 
@@ -31,6 +35,21 @@ class StorytelClient {
             return this.loginData;
         } catch (error) {
             throw new Error(`Login failed: ${error.message}`);
+        }
+    }
+
+    async getBookmarkPositional() {
+        const url = `https://api.storytel.net/bookmarks/positional?kidsMode=false&orderBy=updated&pageSizeHint=1&orderDirection=desc`;
+
+        try {
+            const response = await this.client.get(url, {
+                headers: {
+                    'Authorization': `Bearer ${this.loginData.accountInfo.jwt}`
+                }
+            });
+            return response.data;
+        } catch (error) {
+            throw new Error(`Failed to get bookmark positional: ${error.message}`);
         }
     }
 
@@ -74,6 +93,22 @@ class StorytelClient {
                 return error.response.headers.location;
             }
             throw new Error(`Failed to get stream URL: ${error.message}`);
+        }
+    }
+
+    async getBookmark(consumableId) {
+        const url = `https://api.storytel.net/bookmarks/manual?type=abook&consumableId=${consumableId}`;
+
+        try {
+            const response = await this.client.get(url, {
+                headers: {
+                    'Authorization': `Bearer ${this.loginData.accountInfo.jwt}`,
+                    'Accept': 'application/vnd.storytel.bookmark+json;v=2.0'
+                }
+            });
+            return response.data;
+        } catch (error) {
+            throw new Error(`Failed to get bookmark: ${error.message}`);
         }
     }
 

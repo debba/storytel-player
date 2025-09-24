@@ -80,7 +80,8 @@ fastify.get('/api/bookshelf', {
                         bookmarkId: bookEntry.abookmark ? bookEntry.abookmark.id : null,
                         bookmarkPos: bookEntry.abookmark ? bookEntry.abookmark.pos : null,
                     },
-                    consumableId: bookEntry.book.consumableId
+                    consumableId: bookEntry.book.consumableId,
+                    bookMark: bookEntry
                 });
             }
         });
@@ -132,6 +133,50 @@ fastify.post('/api/bookmark', {
         await storytelClient.setBookmark(bookId, position);
 
         reply.send({ success: true, message: 'Bookmark saved' });
+    } catch (error) {
+        reply.code(500).send({ error: error.message });
+    }
+});
+
+fastify.get('/api/bookmark-positional', {
+    preHandler: fastify.authenticate
+}, async (request, reply) => {
+    try {
+
+        const storytelClient = new StorytelClient();
+        // Set the login data from JWT token
+        storytelClient.loginData = {
+            accountInfo: {
+                jwt: request.user.jwt
+            }
+        };
+
+        const bookmarks = await storytelClient.getBookmarkPositional();
+        reply.send(bookmarks);
+
+    } catch (error) {
+        reply.code(500).send({ error: error.message });
+    }
+});
+
+fastify.get('/api/bookmarks/:consumableId', {
+    preHandler: fastify.authenticate
+}, async (request, reply) => {
+    try {
+
+        const storytelClient = new StorytelClient();
+        const { consumableId } = request.params;
+
+        // Set the login data from JWT token
+        storytelClient.loginData = {
+            accountInfo: {
+                jwt: request.user.jwt
+            }
+        };
+
+        const bookmarks = await storytelClient.getBookmark(consumableId);
+        reply.send(bookmarks);
+
     } catch (error) {
         reply.code(500).send({ error: error.message });
     }

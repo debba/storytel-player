@@ -17,14 +17,13 @@ function PlayerView() {
     const [chapters, setChapters] = useState([]);
 
     const book = location.state?.book;
-    const bookmarkPos = location.state?.bookmarkPos;
     const savedPosition = location.state?.position || 0;
 
     useEffect(() => {
         if (bookId) {
             loadAudioStream();
         }
-    }, [bookId, bookmarkPos]);
+    }, [bookId]);
 
     useEffect(() => {
         if (book) {
@@ -36,8 +35,7 @@ function PlayerView() {
         try {
             setIsLoading(true);
             const response = await api.post('/stream', {
-                bookId,
-                bookmarkPos
+                bookId
             });
 
             if (audioRef.current) {
