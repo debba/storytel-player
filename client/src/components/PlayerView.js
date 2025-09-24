@@ -27,6 +27,8 @@ function PlayerView() {
     const [newBookmarkNote, setNewBookmarkNote] = useState('');
     const [editBookmarkNote, setEditBookmarkNote] = useState('');
 
+    const positionUpdateIntervalRef = useRef(null);
+
     const book = location.state?.book;
 
     useEffect(() => {
@@ -41,6 +43,12 @@ function PlayerView() {
             loadBookmarks(book.consumableId);
             goToPosition(book.consumableId);
         }
+
+        return () => {
+            if (positionUpdateIntervalRef.current) {
+                clearInterval(positionUpdateIntervalRef.current);
+            }
+        };
     }, [book]);
 
     const loadAudioStream = async () => {
@@ -107,13 +115,32 @@ function PlayerView() {
         }
     }
 
+    const updatePosition = async () => {
+        if (!audioRef.current || !book?.consumableId) return;
+
+        try {
+            const position = Math.floor(audioRef.current.currentTime * 1000);
+            await api.put(`/bookmark-positional/${book.consumableId}`, {
+                position: position
+            });
+        } catch (error) {
+            console.error('Failed to update position:', error);
+        }
+    };
+
     const handlePlayPause = () => {
         if (!audioRef.current) return;
 
         if (isPlaying) {
             audioRef.current.pause();
+            updatePosition();
+            if (positionUpdateIntervalRef.current) {
+                clearInterval(positionUpdateIntervalRef.current);
+                positionUpdateIntervalRef.current = null;
+            }
         } else {
             audioRef.current.play();
+            positionUpdateIntervalRef.current = setInterval(updatePosition, 30000);
         }
         setIsPlaying(!isPlaying);
     };
@@ -346,8 +373,18 @@ function PlayerView() {
                             ref={audioRef}
                             onTimeUpdate={handleTimeUpdate}
                             onLoadedMetadata={handleLoadedMetadata}
-                            onPlay={() => setIsPlaying(true)}
-                            onPause={() => setIsPlaying(false)}
+                            onPlay={() => {
+                                setIsPlaying(true);
+                                positionUpdateIntervalRef.current = setInterval(updatePosition, 30000);
+                            }}
+                            onPause={() => {
+                                setIsPlaying(false);
+                                updatePosition();
+                                if (positionUpdateIntervalRef.current) {
+                                    clearInterval(positionUpdateIntervalRef.current);
+                                    positionUpdateIntervalRef.current = null;
+                                }
+                            }}
                             className="hidden"
                         />
 

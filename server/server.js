@@ -256,8 +256,8 @@ fastify.put('/api/bookmark-positional/:consumableId', {
         };
 
         const deviceId = process.env.DEVICE_ID || crypto.randomUUID().toUpperCase();
-        const bookmarks = await storytelClient.updateBookmarkPositional(consumableId, position, deviceId);
-        reply.send(bookmarks);
+        const updated = await storytelClient.updateBookmarkPositional(consumableId, position, deviceId);
+        reply.send(updated);
 
     } catch (error) {
         reply.code(500).send({ error: error.message });
