@@ -1,6 +1,8 @@
 const fastify = require('fastify')({ logger: true });
 const StorytelClient = require('./storytelApi');
 
+require('dotenv').config();
+
 const PORT = process.env.PORT || 3001;
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-this-in-production';
 
@@ -228,6 +230,33 @@ fastify.get('/api/bookmark-positional/:consumableId', {
         };
 
         const bookmarks = await storytelClient.getBookmarkPositional(consumableId);
+        reply.send(bookmarks);
+
+    } catch (error) {
+        reply.code(500).send({ error: error.message });
+    }
+});
+
+
+fastify.put('/api/bookmark-positional/:consumableId', {
+    preHandler: fastify.authenticate
+}, async (request, reply) => {
+    try {
+
+
+        const { consumableId } = request.params;
+        const {position} = request.body;
+
+        const storytelClient = new StorytelClient();
+        // Set the login data from JWT token
+        storytelClient.loginData = {
+            accountInfo: {
+                jwt: request.user.jwt
+            }
+        };
+
+        const deviceId = process.env.DEVICE_ID || crypto.randomUUID().toUpperCase();
+        const bookmarks = await storytelClient.updateBookmarkPositional(consumableId, position, deviceId);
         reply.send(bookmarks);
 
     } catch (error) {
