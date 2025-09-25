@@ -69,27 +69,7 @@ fastify.get('/api/bookshelf', {
         };
 
         const bookshelf = await storytelClient.getBookshelf();
-        const bookList = [];
-
-        bookshelf.books.forEach(bookEntry => {
-            if (bookEntry.abook) {
-                bookList.push({
-                    name: bookEntry.book.name,
-                    author: bookEntry.book.authors[0]?.name || 'Unknown',
-                    cover: bookEntry.book.cover,
-                    data: {
-                        id: bookEntry.abook.id,
-                        position: bookEntry.abookmark ? bookEntry.abookmark.position : -1,
-                        bookmarkId: bookEntry.abookmark ? bookEntry.abookmark.id : null,
-                        bookmarkPos: bookEntry.abookmark ? bookEntry.abookmark.pos : null,
-                    },
-                    consumableId: bookEntry.book.consumableId,
-                    bookMark: bookEntry
-                });
-            }
-        });
-
-        reply.send({ books: bookList });
+        reply.send(bookshelf);
     } catch (error) {
         reply.code(500).send({ error: error.message });
     }
@@ -100,7 +80,7 @@ fastify.post('/api/stream', {
     preHandler: fastify.authenticate
 }, async (request, reply) => {
     try {
-        const { bookId, bookmarkPos } = request.body;
+        const { bookId } = request.body;
 
         const storytelClient = new StorytelClient();
         // Set the login data from JWT token
@@ -109,8 +89,6 @@ fastify.post('/api/stream', {
                 singleSignToken: request.user.storytelToken
             }
         };
-        storytelClient.currentAbookmarkPos = bookmarkPos;
-
         const streamUrl = await storytelClient.getStreamUrl(bookId);
         reply.send({ streamUrl });
     } catch (error) {

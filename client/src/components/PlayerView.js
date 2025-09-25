@@ -40,9 +40,9 @@ function PlayerView() {
 
     useEffect(() => {
         if (book) {
-            loadChapters(book.consumableId);
-            loadBookmarks(book.consumableId);
-            goToPosition(book.consumableId);
+            loadChapters(book.book.consumableId);
+            loadBookmarks(book.book.consumableId);
+            goToPosition(book.book.consumableId);
         }
 
         return () => {
@@ -111,11 +111,11 @@ function PlayerView() {
     }
 
     const updatePosition = async () => {
-        if (!audioRef.current || !book?.consumableId) return;
+        if (!audioRef.current || !book?.book?.consumableId) return;
 
         try {
             const position = Math.floor(audioRef.current.currentTime * 1000);
-            await api.put(`/bookmark-positional/${book.consumableId}`, {
+            await api.put(`/bookmark-positional/${book.book.consumableId}`, {
                 position: position
             });
         } catch (error) {
@@ -350,7 +350,7 @@ function PlayerView() {
                     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
                         {/* Book Info */}
                         <div className="p-6 flex items-center space-x-6">
-                            {book?.cover && (
+                            {book.cover && (
                                 <img
                                     src={"https://www.storytel.com" + book.cover}
                                     alt={book.name}

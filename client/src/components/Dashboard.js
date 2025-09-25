@@ -1,45 +1,85 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import BookshelfView from "./BookshelfView";
+import api from '../services/api';
+import BookCard from './BookCard';
+import PersistentPlayer from './PersistentPlayer';
+import LoadingState from './LoadingState';
+import ErrorState from './ErrorState';
+import DashboardHeader from './DashboardHeader';
 
 function Dashboard({ onLogout }) {
   const navigate = useNavigate();
+  const [books, setBooks] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [currentBook, setCurrentBook] = useState(null);
+
+  useEffect(() => {
+    loadBookshelf();
+  }, []);
+
+  const loadBookshelf = async () => {
+    try {
+      setIsLoading(true);
+      const response = await api.get('/bookshelf');
+      setBooks(response.data.books);
+    } catch (error) {
+      setError(error.response?.data?.error || 'Failed to load bookshelf');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleBookSelect = (book) => {
+    setCurrentBook(book);
+    navigate(`/player/${book.abook.id}`, {
+      state: {
+        book: book
+      }
+    });
+  };
+
+  const handlePlayerPlayPause = (isPlaying) => {
+    // Handle play/pause logic for persistent player
+    console.log('Player state:', isPlaying);
+  };
+
+  if (isLoading) {
+    return <LoadingState message="Loading your library..." />;
+  }
+
+  if (error) {
+    return <ErrorState error={error} onRetry={() => window.location.reload()} />;
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-gray-900">Storytel</h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={onLogout}
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-black text-white">
+      <DashboardHeader onLogout={onLogout} />
 
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          <div className="text-center">
-            <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-              Welcome to Your Storytel Library
-            </h2>
-            <p className="mt-4 text-lg text-gray-600">
-              Access your audiobooks and continue your listening journey
-            </p>
-            <div className="mt-10">
-              <BookshelfView />
-            </div>
+      {/* Main Content */}
+      <main className="max-w-4xl mx-auto py-6 px-4 pb-32">
+        {books.length === 0 ? (
+          <div className="text-center py-20">
+            <div className="text-gray-400 text-xl mb-4">No books found</div>
+            <p className="text-gray-500">Your library appears to be empty.</p>
           </div>
-        </div>
+        ) : (
+          <div className="space-y-8">
+            {books.map((book) => (
+              <BookCard
+                key={book.abook.id}
+                book={book}
+                onBookSelect={handleBookSelect}
+              />
+            ))}
+          </div>
+        )}
       </main>
+
+      <PersistentPlayer
+        currentBook={currentBook}
+        onPlayPause={handlePlayerPlayPause}
+      />
     </div>
   );
 }

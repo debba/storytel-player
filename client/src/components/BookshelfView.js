@@ -25,7 +25,7 @@ function BookshelfView() {
   };
 
   const handleBookSelect = (book) => {
-    navigate(`/player/${book.data.id}`, {
+    navigate(`/player/${book.abook.id}`, {
       state: {
         book: book
       }
@@ -70,7 +70,7 @@ function BookshelfView() {
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                   {books.map((book) => (
                       <div
-                          key={book.data.id}
+                          key={book.abook.id}
                           onClick={() => handleBookSelect(book)}
                           className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow group"
                       >
