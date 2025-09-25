@@ -19,7 +19,8 @@
     "electron:dist": "npm run build && npm run server:build && electron-builder",
     "preelectron:pack": "npm run build && npm run server:build",
     "preelectron:dist": "npm run build && npm run server:build",
-    "server:build": "cd server && npm run build"
+    "server:build": "cd server && npm run build",
+    "clean": "rm -rf dist; rm -rf server/dist; rm -rf client/build"
   },
   "author": "debba",
   "license": "ISC",
