@@ -1,6 +1,12 @@
 import React, {useState, useEffect, useRef} from 'react';
 import {useParams, useLocation, useNavigate} from 'react-router-dom';
 import api from '../services/api';
+import LoadingState from './LoadingState';
+import ErrorState from './ErrorState';
+import BookmarkModals from "./BookmarkModals";
+import PlaybackSpeedModal from "./PlaybackSpeedModal";
+import GotoModal from "./GotoModal";
+import ChaptersList from "./ChaptersList";
 
 function PlayerView() {
     const {bookId} = useParams();
@@ -27,6 +33,12 @@ function PlayerView() {
     const [bookmarkToEdit, setBookmarkToEdit] = useState(null);
     const [newBookmarkNote, setNewBookmarkNote] = useState('');
     const [editBookmarkNote, setEditBookmarkNote] = useState('');
+    const [playbackRate, setPlaybackRate] = useState(1.0);
+    const [showPlaybackSpeedModal, setShowPlaybackSpeedModal] = useState(false);
+    const [showGotoModal, setShowGotoModal] = useState(false);
+    const [gotoHours, setGotoHours] = useState(0);
+    const [gotoMinutes, setGotoMinutes] = useState(0);
+    const [gotoSeconds, setGotoSeconds] = useState(0);
 
     const positionUpdateIntervalRef = useRef(null);
 
@@ -142,6 +154,31 @@ function PlayerView() {
         setIsPlaying(!isPlaying);
     };
 
+    const handlePlaybackRateChange = (newRate) => {
+        setPlaybackRate(newRate);
+        if (audioRef.current) {
+            audioRef.current.playbackRate = newRate;
+        }
+        setShowPlaybackSpeedModal(false);
+    };
+
+    const handleGotoTime = () => {
+        if (!audioRef.current) return;
+
+        const totalSeconds = (gotoHours * 3600) + (gotoMinutes * 60) + gotoSeconds;
+        const adjustedSeconds = totalSeconds * playbackRate; // Adjust for playback speed
+
+        if (adjustedSeconds >= 0 && adjustedSeconds <= duration) {
+            audioRef.current.currentTime = adjustedSeconds;
+            setCurrentTime(adjustedSeconds);
+        }
+
+        setShowGotoModal(false);
+        setGotoHours(0);
+        setGotoMinutes(0);
+        setGotoSeconds(0);
+    };
+
     const handleTimeUpdate = () => {
         if (audioRef.current) {
             setCurrentTime(audioRef.current.currentTime);
@@ -251,18 +288,53 @@ function PlayerView() {
         }
     };
 
+    const handleChapterClick = (chapterStartTime) => {
+        if (audioRef.current) {
+            audioRef.current.currentTime = chapterStartTime;
+        }
+    };
+
+    const handleShowEditBookmarkModal = (bookmark) => {
+        setBookmarkToEdit(bookmark);
+        setEditBookmarkNote(bookmark.note || '');
+        setShowEditBookmarkModal(true);
+        setShowBookmarksModal(false);
+    };
+
+    const handleShowDeleteConfirmModal = (bookmark) => {
+        setBookmarkToDelete(bookmark);
+        setShowDeleteConfirmModal(true);
+        setShowBookmarksModal(false);
+    };
+
+    const handleShowCreateBookmarkModal = () => {
+        setShowBookmarksModal(false);
+        setShowCreateBookmarkModal(true);
+    };
+
+    const handleCloseEditBookmarkModal = () => {
+        setShowEditBookmarkModal(false);
+        setBookmarkToEdit(null);
+        setEditBookmarkNote('');
+    };
+
+    const handleCloseDeleteConfirmModal = () => {
+        setShowDeleteConfirmModal(false);
+        setBookmarkToDelete(null);
+    };
+
     const createBookmark = async () => {
         if (!audioRef.current || !book) return;
 
         try {
             const positionInMilliseconds = Math.floor(audioRef.current.currentTime * 1000);
 
-            await api.post(`/bookmarks/${book.consumableId}`, {
+            await api.post(`/bookmarks/${book.book.consumableId}`, {
                 position: positionInMilliseconds,
                 note: newBookmarkNote
             });
 
-            await loadBookmarks(book.consumableId);
+            await loadBookmarks(book.book.consumableId);
             setNewBookmarkNote('');
             setShowCreateBookmarkModal(false);
         } catch (error) {
@@ -274,8 +346,8 @@ function PlayerView() {
         if (!bookmarkToDelete || !book) return;
 
         try {
-            await api.delete(`/bookmarks/${book.consumableId}/${bookmarkToDelete.id}`, {});
-            await loadBookmarks(book.consumableId);
+            await api.delete(`/bookmarks/${book.book.consumableId}/${bookmarkToDelete.id}`, {});
+            await loadBookmarks(book.book.consumableId);
             setShowDeleteConfirmModal(false);
             setBookmarkToDelete(null);
         } catch (error) {
@@ -287,13 +359,13 @@ function PlayerView() {
         if (!bookmarkToEdit || !book) return;
 
         try {
-            await api.put(`/bookmarks/${book.consumableId}/${bookmarkToEdit.id}`, {
+            await api.put(`/bookmarks/${book.book.consumableId}/${bookmarkToEdit.id}`, {
                 position: bookmarkToEdit.position,
                 note: editBookmarkNote,
                 type: 'abook'
             });
 
-            await loadBookmarks(book.consumableId);
+            await loadBookmarks(book.book.consumableId);
             setShowEditBookmarkModal(false);
             setBookmarkToEdit(null);
             setEditBookmarkNote('');
@@ -303,65 +375,53 @@ function PlayerView() {
     };
 
     if (isLoading) {
-        return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <div className="text-xl text-gray-600">Loading audio...</div>
-            </div>
-        );
+        return <LoadingState message="Loading audio..." />;
     }
 
     if (error) {
-        return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <div className="text-center">
-                    <div className="text-red-600 text-xl mb-4">{error}</div>
-                    <button
-                        onClick={() => navigate('/')}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
-                    >
-                        Back to Library
-                    </button>
-                </div>
-            </div>
-        );
+        return <ErrorState error={error} onRetry={() => navigate('/')} />;
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <nav className="bg-white shadow-sm">
+        <div className="min-h-screen bg-black text-white">
+            <nav className="bg-black border-b border-gray-800">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-16">
                         <div className="flex items-center">
                             <button
                                 onClick={() => navigate('/')}
-                                className="text-gray-600 hover:text-gray-900 mr-4"
+                                className="text-gray-400 hover:text-white mr-4"
                             >
                                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                                           d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                                 </svg>
                             </button>
-                            <h1 className="text-2xl font-bold text-gray-900">Now Playing</h1>
+                            <h1 className="text-2xl font-bold text-white">Now Playing</h1>
                         </div>
                     </div>
                 </div>
             </nav>
 
-            <main className="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
+            <main className="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8 pb-6">
                 <div className="px-4 py-6 sm:px-0">
-                    <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+                    <div className="bg-gray-900 rounded-lg shadow-lg overflow-hidden border border-gray-800">
                         {/* Book Info */}
-                        <div className="p-6 flex items-center space-x-6">
+                        <div className="p-6 flex items-center space-x-6 border-b border-gray-800">
                             {book.book.cover && (
                                 <img
                                     src={"https://www.storytel.com" + book.book.cover}
                                     alt={book.book.name}
-                                    className="w-24 h-24 rounded-lg shadow-md"
+                                    className="w-32 h-44 object-cover rounded-lg shadow-md"
                                 />
                             )}
-                            <div>
-                                <h2 className="text-2xl font-bold text-gray-900">{book.book.name}</h2>
-                                <p className="text-lg text-gray-600">{book.book.authorsAsString}</p>
+                            <div className="flex-1">
+                                <h2 className="text-2xl font-bold text-white mb-2">{book.book.name}</h2>
+                                <p className="text-lg text-gray-300 mb-1">Scritto da: {book.book.authorsAsString}</p>
+                                <p className="text-lg text-gray-300 mb-3">Letto da: {book.abook.narratorAsString}</p>
+                                <div className="flex items-center space-x-4">
+                                    <span className="text-sm text-orange-400">Velocità: {playbackRate}x</span>
+                                </div>
                             </div>
                         </div>
 
@@ -373,6 +433,7 @@ function PlayerView() {
                             onLoadedMetadata={handleLoadedMetadata}
                             onPlay={() => {
                                 setIsPlaying(true);
+                                audioRef.current.playbackRate = playbackRate;
                                 positionUpdateIntervalRef.current = setInterval(updatePosition, 30000);
                             }}
                             onPause={() => {
@@ -383,12 +444,17 @@ function PlayerView() {
                                     positionUpdateIntervalRef.current = null;
                                 }
                             }}
+                            onRateChange={() => {
+                                if (audioRef.current) {
+                                    audioRef.current.playbackRate = playbackRate;
+                                }
+                            }}
                             className="hidden"
                         />
 
                         {/* Player Controls */}
 
-                        <div className="p-6 bg-gray-50">
+                        <div className="p-6 bg-gray-900">
                             {/* Progress Bar */}
                             <div className="mb-6">
                                 <input
@@ -397,11 +463,14 @@ function PlayerView() {
                                     max={duration || 0}
                                     value={currentTime}
                                     onChange={handleSeek}
-                                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                    className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                                    style={{
+                                        background: `linear-gradient(to right, #ea580c 0%, #ea580c ${((currentTime / (duration || 1)) * 100)}%, #374151 ${((currentTime / (duration || 1)) * 100)}%, #374151 100%)`
+                                    }}
                                 />
-                                <div className="flex justify-between text-sm text-gray-600 mt-2">
-                                    <span>{formatTime(currentTime)}</span>
-                                    <span>{formatTime(duration)}</span>
+                                <div className="flex justify-between text-sm text-gray-400 mt-2">
+                                    <span>{formatTime(currentTime / playbackRate)}</span>
+                                    <span>{formatTime(duration / playbackRate)}</span>
                                 </div>
                             </div>
 
@@ -409,7 +478,7 @@ function PlayerView() {
                             <div className="flex items-center justify-center space-x-6 mb-6">
                                 <button
                                     onClick={skipBackward}
-                                    className="p-3 bg-gray-200 rounded-full hover:bg-gray-300 transition-colors"
+                                    className="p-3 bg-gray-800 rounded-full hover:bg-gray-700 transition-colors text-white"
                                 >
                                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -419,41 +488,22 @@ function PlayerView() {
 
                                 <button
                                     onClick={handlePlayPause}
-                                    className="p-4 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
+                                    className="p-4 bg-orange-600 text-white rounded-full hover:bg-orange-700 transition-colors"
                                 >
                                     {isPlaying ? (
-
-                                        <svg className="w-8 h-8" fill="#fff" version="1.1" viewBox="0 0 124.5 124.5">
-                                            <g strokeWidth="0"></g>
-                                            <g strokeLinecap="round"
-                                               strokeLinejoin="round"></g>
-                                            <g>
-                                                <g>
-                                                    <path
-                                                        d="M116.35,124.5c3.3,0,6-2.699,6-6V6c0-3.3-2.7-6-6-6h-36c-3.3,0-6,2.7-6,6v112.5c0,3.301,2.7,6,6,6H116.35z"></path>
-                                                    <path
-                                                        d="M44.15,124.5c3.3,0,6-2.699,6-6V6c0-3.3-2.7-6-6-6h-36c-3.3,0-6,2.7-6,6v112.5c0,3.301,2.7,6,6,6H44.15z"></path>
-                                                </g>
-                                            </g>
+                                        <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
                                         </svg>
                                         ) : (
-                                        <svg className="w-8 h-8" fill="#fff" version="1.1"
-                                        viewBox="0 0 124.512 124.512">
-                                        <g strokeWidth="0"></g>
-                                        <g strokeLinecap="round" strokeLinejoin="round"></g>
-                                        <g>
-                                        <g>
-                                        <path
-                                        d="M113.956,57.006l-97.4-56.2c-4-2.3-9,0.6-9,5.2v112.5c0,4.6,5,7.5,9,5.2l97.4-56.2 C117.956,65.105,117.956,59.306,113.956,57.006z"></path>
-                                        </g>
-                                        </g>
+                                        <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M8 5v14l11-7z"/>
                                         </svg>
                                         )}
                                 </button>
 
                                 <button
                                     onClick={skipForward}
-                                    className="p-3 bg-gray-200 rounded-full hover:bg-gray-300 transition-colors"
+                                    className="p-3 bg-gray-800 rounded-full hover:bg-gray-700 transition-colors text-white"
                                 >
                                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -462,366 +512,114 @@ function PlayerView() {
                                 </button>
                             </div>
 
-                            {/* Volume and Bookmark */}
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center space-x-2">
-                                    <button onClick={toggleMute} className="p-1 rounded hover:bg-gray-200 transition-colors">
-                                        {isMuted || volume === 0 ? (
-                                            <svg className="w-5 h-5 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 16">
-                                                <g fill="#000">
-                                                    <path d="M6 1h2v14H6l-4-4H0V5h2z"></path>
-                                                    <path d="M10.5 8.5l1.5-1.5m0 3l-1.5-1.5m-1.5-1.5L8 10m0-2l1-1.5"></path>
-                                                </g>
-                                            </svg>
-                                        ) : (
-                                            <svg className="w-5 h-5 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 16">
-                                                <g fill="#000">
-                                                    <path d="M6 1h2v14H6l-4-4H0V5h2zM14 8a4 4 0 0 0-4-4V2a6 6 0 0 1 0 12v-2a4 4 0 0 0 4-4"></path>
-                                                    <path d="M12 8a2 2 0 0 1-2 2V6a2 2 0 0 1 2 2"></path>
-                                                </g>
-                                            </svg>
-                                        )}
+                            {/* Volume, Speed, Goto and Bookmark */}
+                            <div className="flex items-center justify-between flex-wrap gap-4">
+                                <div className="flex items-center space-x-4">
+                                    {/* Volume Control */}
+                                    <div className="flex items-center space-x-2">
+                                        <button onClick={toggleMute} className="p-1 rounded hover:bg-gray-800 transition-colors">
+                                            {isMuted || volume === 0 ? (
+                                                <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+                                                </svg>
+                                            ) : (
+                                                <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                                                </svg>
+                                            )}
+                                        </button>
+                                        <input
+                                            type="range"
+                                            min="0"
+                                            max="1"
+                                            step="0.1"
+                                            value={volume}
+                                            onChange={handleVolumeChange}
+                                            className="w-20 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                                        />
+                                    </div>
+
+                                    {/* Playback Speed */}
+                                    <button
+                                        onClick={() => setShowPlaybackSpeedModal(true)}
+                                        className="px-3 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors text-sm"
+                                    >
+                                        {playbackRate}x
                                     </button>
-                                    <input
-                                        type="range"
-                                        min="0"
-                                        max="1"
-                                        step="0.1"
-                                        value={volume}
-                                        onChange={handleVolumeChange}
-                                        className="w-20 h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                                    />
+
+                                    {/* Goto Time */}
+                                    <button
+                                        onClick={() => setShowGotoModal(true)}
+                                        className="px-3 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors text-sm"
+                                    >
+                                        Goto
+                                    </button>
                                 </div>
 
                                 <button
                                     id="bookmark-btn"
                                     onClick={() => setShowBookmarksModal(true)}
-                                    className="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-colors"
+                                    className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors"
                                 >
                                     Bookmarks ({bookmarks.length})
                                 </button>
                             </div>
 
-                            {/* Bookmarks Modal */}
-                            {showBookmarksModal && (
-                                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                                    <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 max-h-96 flex flex-col">
-                                        <div className="flex justify-between items-center mb-4">
-                                            <h3 className="text-lg font-semibold text-gray-900">I tuoi Bookmarks</h3>
-                                            <button
-                                                onClick={() => setShowBookmarksModal(false)}
-                                                className="text-gray-400 hover:text-gray-600"
-                                            >
-                                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                                </svg>
-                                            </button>
-                                        </div>
+                            <PlaybackSpeedModal
+                                isOpen={showPlaybackSpeedModal}
+                                playbackRate={playbackRate}
+                                onClose={() => setShowPlaybackSpeedModal(false)}
+                                onRateChange={handlePlaybackRateChange}
+                            />
 
-                                        <div className="flex-1 overflow-y-auto">
-                                            {bookmarks && bookmarks.length > 0 ? (
-                                                <div className="space-y-3">
-                                                    {bookmarks.map((bookmark) => (
-                                                        <div
-                                                            key={bookmark.id}
-                                                            onClick={() => goToBookmark(bookmark.position)}
-                                                            className="p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors border border-gray-200"
-                                                        >
-                                                            <div className="flex justify-between items-start">
-                                                                <div className="flex-1">
-                                                                    <div className="text-sm font-medium text-blue-600">
-                                                                        {formatBookmarkTime(bookmark.position)}
-                                                                    </div>
-                                                                    {bookmark.note && (
-                                                                        <div className="text-sm text-gray-600 mt-1">
-                                                                            {bookmark.note}
-                                                                        </div>
-                                                                    )}
-                                                                    <div className="text-xs text-gray-400 mt-1">
-                                                                        {new Date(bookmark.insertTime).toLocaleDateString()}
-                                                                    </div>
-                                                                </div>
-                                                                <div className="flex space-x-2 ml-2">
-                                                                    <button
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            setBookmarkToEdit(bookmark);
-                                                                            setEditBookmarkNote(bookmark.note || '');
-                                                                            setShowEditBookmarkModal(true);
-                                                                        }}
-                                                                        className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
-                                                                        title="Modifica bookmark"
-                                                                    >
-                                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                                                        </svg>
-                                                                    </button>
-                                                                    <button
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            setBookmarkToDelete(bookmark);
-                                                                            setShowDeleteConfirmModal(true);
-                                                                        }}
-                                                                        className="p-1 text-gray-400 hover:text-red-600 transition-colors"
-                                                                        title="Elimina bookmark"
-                                                                    >
-                                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                                        </svg>
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            ) : (
-                                                <div className="text-center text-gray-500 py-8">
-                                                    <svg className="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                                                    </svg>
-                                                    <p>Nessun bookmark salvato</p>
-                                                </div>
-                                            )}
-                                        </div>
+                            <GotoModal
+                                isOpen={showGotoModal}
+                                playbackRate={playbackRate}
+                                gotoHours={gotoHours}
+                                gotoMinutes={gotoMinutes}
+                                gotoSeconds={gotoSeconds}
+                                onClose={() => setShowGotoModal(false)}
+                                onHoursChange={setGotoHours}
+                                onMinutesChange={setGotoMinutes}
+                                onSecondsChange={setGotoSeconds}
+                                onGoto={handleGotoTime}
+                            />
 
-                                        <div className="mt-4 pt-4 border-t border-gray-200">
-                                            <button
-                                                onClick={() => {
-                                                    setShowBookmarksModal(false);
-                                                    setShowCreateBookmarkModal(true);
-                                                }}
-                                                className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-                                            >
-                                                Crea Nuovo Bookmark
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Create Bookmark Modal */}
-                            {showCreateBookmarkModal && (
-                                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                                    <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-                                        <div className="flex justify-between items-center mb-4">
-                                            <h3 className="text-lg font-semibold text-gray-900">Crea Nuovo Bookmark</h3>
-                                            <button
-                                                onClick={() => setShowCreateBookmarkModal(false)}
-                                                className="text-gray-400 hover:text-gray-600"
-                                            >
-                                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                                </svg>
-                                            </button>
-                                        </div>
-
-                                        <div className="mb-4">
-                                            <p className="text-sm text-gray-600 mb-2">
-                                                Posizione attuale: {formatTime(currentTime)}
-                                            </p>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                Nota (opzionale)
-                                            </label>
-                                            <textarea
-                                                value={newBookmarkNote}
-                                                onChange={(e) => setNewBookmarkNote(e.target.value)}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                                rows="3"
-                                                placeholder="Aggiungi una nota a questo bookmark..."
-                                            />
-                                        </div>
-
-                                        <div className="flex space-x-3">
-                                            <button
-                                                onClick={() => setShowCreateBookmarkModal(false)}
-                                                className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
-                                            >
-                                                Annulla
-                                            </button>
-                                            <button
-                                                onClick={createBookmark}
-                                                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-                                            >
-                                                Salva Bookmark
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Delete Confirmation Modal */}
-                            {showDeleteConfirmModal && bookmarkToDelete && (
-                                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                                    <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
-                                        <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-red-100 rounded-full">
-                                            <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 15.5c-.77.833.192 2.5 1.732 2.5z" />
-                                            </svg>
-                                        </div>
-
-                                        <div className="text-center">
-                                            <h3 className="text-lg font-semibold text-gray-900 mb-2">Elimina Bookmark</h3>
-                                            <p className="text-gray-600 mb-2">
-                                                Sei sicuro di voler eliminare questo bookmark?
-                                            </p>
-                                            <div className="bg-gray-50 rounded-lg p-3 mb-4">
-                                                <div className="text-sm font-medium text-blue-600">
-                                                    {formatBookmarkTime(bookmarkToDelete.position)}
-                                                </div>
-                                                {bookmarkToDelete.note && (
-                                                    <div className="text-sm text-gray-600 mt-1">
-                                                        "{bookmarkToDelete.note}"
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <p className="text-sm text-gray-500 mb-6">
-                                                Questa azione non può essere annullata.
-                                            </p>
-                                        </div>
-
-                                        <div className="flex space-x-3">
-                                            <button
-                                                onClick={() => {
-                                                    setShowDeleteConfirmModal(false);
-                                                    setBookmarkToDelete(null);
-                                                }}
-                                                className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
-                                            >
-                                                Annulla
-                                            </button>
-                                            <button
-                                                onClick={deleteBookmark}
-                                                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
-                                            >
-                                                Elimina
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Edit Bookmark Modal */}
-                            {showEditBookmarkModal && bookmarkToEdit && (
-                                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                                    <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-                                        <div className="flex justify-between items-center mb-4">
-                                            <h3 className="text-lg font-semibold text-gray-900">Modifica Bookmark</h3>
-                                            <button
-                                                onClick={() => {
-                                                    setShowEditBookmarkModal(false);
-                                                    setBookmarkToEdit(null);
-                                                    setEditBookmarkNote('');
-                                                }}
-                                                className="text-gray-400 hover:text-gray-600"
-                                            >
-                                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                                </svg>
-                                            </button>
-                                        </div>
-
-                                        <div className="mb-4">
-                                            <p className="text-sm text-gray-600 mb-4">
-                                                Posizione: <span className="font-medium text-blue-600">{formatBookmarkTime(bookmarkToEdit.position)}</span>
-                                            </p>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                Nota
-                                            </label>
-                                            <textarea
-                                                value={editBookmarkNote}
-                                                onChange={(e) => setEditBookmarkNote(e.target.value)}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                                rows="3"
-                                                placeholder="Modifica la nota per questo bookmark..."
-                                            />
-                                        </div>
-
-                                        <div className="flex space-x-3">
-                                            <button
-                                                onClick={() => {
-                                                    setShowEditBookmarkModal(false);
-                                                    setBookmarkToEdit(null);
-                                                    setEditBookmarkNote('');
-                                                }}
-                                                className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
-                                            >
-                                                Annulla
-                                            </button>
-                                            <button
-                                                onClick={editBookmark}
-                                                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-                                            >
-                                                Salva Modifiche
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Chapters List */}
-                            {chapters && chapters.length > 0 && (
-                                <div className="mt-6">
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Chapters</h3>
-                                    <div className="space-y-2 max-h-64 overflow-y-auto">
-                                        {chapters.map((chapter, index) => {
-                                            const chapterStartTime = chapters.slice(0, index).reduce((total, ch) => total + ch.durationInSeconds, 0);
-                                            const chapterEndTime = chapterStartTime + chapter.durationInSeconds;
-
-                                            // Calcola il progresso del capitolo corrente
-                                            const isCurrentChapter = currentTime >= chapterStartTime && currentTime < chapterEndTime;
-                                            const chapterProgress = isCurrentChapter
-                                                ? ((currentTime - chapterStartTime) / chapter.durationInSeconds) * 100
-                                                : 0;
-
-                                            return (
-                                                <div
-                                                    key={chapter.number}
-                                                    className="bg-white rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer overflow-hidden"
-                                                    onClick={() => {
-                                                        if (audioRef.current) {
-                                                            audioRef.current.currentTime = chapterStartTime;
-                                                        }
-                                                    }}
-                                                >
-                                                    <div className="flex items-center justify-between p-3">
-                                                        <div className="flex-1">
-                                                            <h4 className="font-medium text-gray-900">{chapter.title}</h4>
-                                                            {isCurrentChapter ? (
-                                                                <div className="flex justify-between items-center">
-                                                                    <p className="text-sm text-gray-500">
-                                                                        {formatTime(currentTime - chapterStartTime)}
-                                                                    </p>
-                                                                    <p className="text-sm text-gray-500">
-                                                                        {formatTime(chapter.durationInSeconds - (currentTime - chapterStartTime))}
-                                                                    </p>
-                                                                </div>
-                                                            ) : (
-                                                                <p className="text-sm text-gray-500">
-                                                                    {formatTime(chapterStartTime)} • {formatTime(chapter.durationInSeconds)}
-                                                                </p>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                    {/* Barra di avanzamento del capitolo */}
-                                                    {isCurrentChapter && (
-                                                        <div className="relative h-1 bg-gray-200">
-                                                            <div
-                                                                className="absolute top-0 left-0 h-full bg-red-500 transition-all duration-300"
-                                                                style={{ width: `${Math.max(chapterProgress, 0)}%` }}
-                                                            />
-                                                            <div
-                                                                className="absolute top-0 h-full w-1 bg-red-600"
-                                                                style={{ left: `${Math.max(chapterProgress, 0)}%` }}
-                                                            />
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            )}
                         </div>
+
+                        <BookmarkModals
+                            showBookmarksModal={showBookmarksModal}
+                            bookmarks={bookmarks}
+                            onCloseBookmarksModal={() => setShowBookmarksModal(false)}
+                            onShowCreateBookmarkModal={handleShowCreateBookmarkModal}
+                            onGoToBookmark={goToBookmark}
+                            onShowEditBookmarkModal={handleShowEditBookmarkModal}
+                            onShowDeleteConfirmModal={handleShowDeleteConfirmModal}
+                            showCreateBookmarkModal={showCreateBookmarkModal}
+                            newBookmarkNote={newBookmarkNote}
+                            currentTime={currentTime}
+                            playbackRate={playbackRate}
+                            onCloseCreateBookmarkModal={() => setShowCreateBookmarkModal(false)}
+                            onNewBookmarkNoteChange={setNewBookmarkNote}
+                            onCreateBookmark={createBookmark}
+                            showEditBookmarkModal={showEditBookmarkModal}
+                            bookmarkToEdit={bookmarkToEdit}
+                            editBookmarkNote={editBookmarkNote}
+                            onCloseEditBookmarkModal={handleCloseEditBookmarkModal}
+                            onEditBookmarkNoteChange={setEditBookmarkNote}
+                            onEditBookmark={editBookmark}
+                            showDeleteConfirmModal={showDeleteConfirmModal}
+                            bookmarkToDelete={bookmarkToDelete}
+                            onCloseDeleteConfirmModal={handleCloseDeleteConfirmModal}
+                            onDeleteBookmark={deleteBookmark}
+                        />
+
+                        <ChaptersList
+                            chapters={chapters}
+                            currentTime={currentTime}
+                            playbackRate={playbackRate}
+                            onChapterClick={handleChapterClick}
+                        />
                     </div>
                 </div>
             </main>
