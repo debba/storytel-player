@@ -23,3 +23,19 @@ code {
 .audio-player audio {
   width: 100%;
 }
+
+/* CSS della scrollbar semitrasparente */
+::-webkit-scrollbar {
+    width: 2px;
+}
+::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.1);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.4);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0,0,0,0.6);
+}

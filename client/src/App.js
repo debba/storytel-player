@@ -57,7 +57,7 @@ function App() {
 
   return (
     <Router>
-      <div className="min-h-screen bg-gray-100">
+      <div className="scrollable in-h-screen bg-gray-100">
         <Routes>
           <Route
             path="/login"

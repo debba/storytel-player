@@ -57,12 +57,14 @@ function PlayerView() {
             loadChapters(book.book.consumableId);
             loadBookmarks(book.book.consumableId);
             goToPosition(book.book.consumableId);
+            document.title = book.book.name;
         }
 
         return () => {
             if (positionUpdateIntervalRef.current) {
                 clearInterval(positionUpdateIntervalRef.current);
             }
+            document.title = 'Storytel Client';
         };
     }, [book]);
 
