@@ -6,7 +6,8 @@ import ErrorState from './ErrorState';
 import BookmarkModals from "./BookmarkModals";
 import PlaybackSpeedModal from "./PlaybackSpeedModal";
 import GotoModal from "./GotoModal";
-import ChaptersList from "./ChaptersList";
+import ChaptersModal from "./ChaptersModal";
+import PlayerControls from "./PlayerControls";
 
 function PlayerView() {
     const {bookId} = useParams();
@@ -39,6 +40,7 @@ function PlayerView() {
     const [gotoHours, setGotoHours] = useState(0);
     const [gotoMinutes, setGotoMinutes] = useState(0);
     const [gotoSeconds, setGotoSeconds] = useState(0);
+    const [showChaptersModal, setShowChaptersModal] = useState(false);
 
     const positionUpdateIntervalRef = useRef(null);
 
@@ -556,13 +558,24 @@ function PlayerView() {
                                     </button>
                                 </div>
 
-                                <button
-                                    id="bookmark-btn"
-                                    onClick={() => setShowBookmarksModal(true)}
-                                    className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors"
-                                >
-                                    Bookmarks ({bookmarks.length})
-                                </button>
+                                <div className="flex items-center space-x-3">
+                                    {chapters && chapters.length > 0 && (
+                                        <button
+                                            onClick={() => setShowChaptersModal(true)}
+                                            className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors"
+                                        >
+                                            Capitoli ({chapters.length})
+                                        </button>
+                                    )}
+
+                                    <button
+                                        id="bookmark-btn"
+                                        onClick={() => setShowBookmarksModal(true)}
+                                        className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors"
+                                    >
+                                        Bookmarks ({bookmarks.length})
+                                    </button>
+                                </div>
                             </div>
 
                             <PlaybackSpeedModal
@@ -583,6 +596,15 @@ function PlayerView() {
                                 onMinutesChange={setGotoMinutes}
                                 onSecondsChange={setGotoSeconds}
                                 onGoto={handleGotoTime}
+                            />
+
+                            <ChaptersModal
+                                isOpen={showChaptersModal}
+                                chapters={chapters}
+                                currentTime={currentTime}
+                                playbackRate={playbackRate}
+                                onClose={() => setShowChaptersModal(false)}
+                                onChapterClick={handleChapterClick}
                             />
 
                         </div>
@@ -614,12 +636,6 @@ function PlayerView() {
                             onDeleteBookmark={deleteBookmark}
                         />
 
-                        <ChaptersList
-                            chapters={chapters}
-                            currentTime={currentTime}
-                            playbackRate={playbackRate}
-                            onChapterClick={handleChapterClick}
-                        />
                     </div>
                 </div>
             </main>

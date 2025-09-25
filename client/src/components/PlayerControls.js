@@ -8,6 +8,7 @@ function PlayerControls({
   volume,
   isMuted,
   bookmarksCount,
+  chaptersCount,
   onSeek,
   onPlayPause,
   onSkipBackward,
@@ -16,7 +17,8 @@ function PlayerControls({
   onToggleMute,
   onShowPlaybackSpeed,
   onShowGoto,
-  onShowBookmarks
+  onShowBookmarks,
+  onShowChapters
 }) {
   const formatTime = (seconds) => {
     const hours = Math.floor(seconds / 3600);
@@ -88,7 +90,7 @@ function PlayerControls({
         </button>
       </div>
 
-      {/* Volume, Speed, Goto and Bookmark */}
+      {/* Volume, Speed, Goto, Chapters and Bookmark */}
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center space-x-4">
           {/* Volume Control */}
@@ -132,12 +134,23 @@ function PlayerControls({
           </button>
         </div>
 
-        <button
-          onClick={onShowBookmarks}
-          className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors"
-        >
-          Bookmarks ({bookmarksCount})
-        </button>
+        <div className="flex items-center space-x-3">
+          {chaptersCount > 0 && (
+            <button
+              onClick={onShowChapters}
+              className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors"
+            >
+              Capitoli ({chaptersCount})
+            </button>
+          )}
+
+          <button
+            onClick={onShowBookmarks}
+            className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors"
+          >
+            Bookmarks ({bookmarksCount})
+          </button>
+        </div>
       </div>
     </div>
   );
