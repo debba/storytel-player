@@ -4,8 +4,11 @@
   "description": "Storytel Web Server",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
+    "start": "node dist/server.js",
+    "dev": "nodemon server.js",
+    "build": "node build.js",
+    "build:prod": "NODE_ENV=production node build.js",
+    "build:watch": "nodemon --exec \"node build.js\" --ext js --ignore dist/"
   },
   "dependencies": {
     "@fastify/cors": "^11.1.0",
@@ -16,6 +19,7 @@
     "fastify": "^5.6.1"
   },
   "devDependencies": {
+    "esbuild": "^0.19.12",
     "nodemon": "^3.0.1"
   }
 }

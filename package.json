@@ -1,7 +1,7 @@
 {
-  "name": "storytel-web-client",
+  "name": "storytel-player",
   "version": "1.0.0",
-  "description": "Storytel Web Player - Web interface for Storytel audiobook player",
+  "description": "Storytel Player - Web interface for Storytel audiobook player",
   "main": "electron.js",
   "homepage": "./",
   "scripts": {
@@ -16,9 +16,10 @@
     "electron": "electron .",
     "electron:dev": "NODE_ENV=development electron .",
     "electron:pack": "electron-builder",
-    "electron:dist": "npm run build && electron-builder",
-    "preelectron:pack": "npm run build",
-    "preelectron:dist": "npm run build"
+    "electron:dist": "npm run build && npm run server:build && electron-builder",
+    "preelectron:pack": "npm run build && npm run server:build",
+    "preelectron:dist": "npm run build && npm run server:build",
+    "server:build": "cd server && npm run build"
   },
   "author": "debba",
   "license": "ISC",
@@ -42,15 +43,18 @@
     "electron-builder": "^26.0.12"
   },
   "build": {
-    "appId": "com.storytel.webclient",
-    "productName": "Storytel Web Client",
+    "appId": "com.storytel.player",
+    "productName": "Storytel Player",
     "directories": {
       "output": "dist"
     },
+    "asarUnpack": [
+      "server/**"
+    ],
     "files": [
       "electron.js",
       "client/build/**/*",
-      "server/**/*",
+      "server/dist/**/*",
       "node_modules/**/*"
     ],
     "mac": {

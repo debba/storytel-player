@@ -65,9 +65,12 @@ function startDevelopmentServers() {
 }
 
 function startProductionServer() {
-    // Start Fastify server
-    serverProcess = spawn('npm', ['run', 'server'], {
-        cwd: __dirname,
+    // Start Fastify server using esbuild bundle
+    const serverPath = app.isPackaged
+        ? path.join(process.resourcesPath, 'app.asar.unpacked', 'server', 'dist', 'server.js')
+        : path.join(__dirname, 'server', 'dist', 'server.js');
+
+    serverProcess = spawn('node', [serverPath], {
         stdio: 'inherit'
     });
 
