@@ -8,6 +8,7 @@ let serverProcess;
 let clientProcess;
 
 function createWindow() {
+
     mainWindow = new BrowserWindow({
         width: 480,
         height: 800,
@@ -21,9 +22,7 @@ function createWindow() {
         },
         maximizable: false,
         alwaysOnTop: true,
-        icon: nativeImage.createFromPath(
-            path.join(__dirname, 'assets/icon.png')
-        ),
+        icon: path.join(__dirname, 'client/public/assets/icon.png'),
         show: false,
     });
 

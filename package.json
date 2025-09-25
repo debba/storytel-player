@@ -1,7 +1,8 @@
 {
   "name": "storytel-player",
   "version": "1.0.0",
-  "description": "Storytel Player - Web interface for Storytel audiobook player",
+  "email": "andrea@debbaweb.it",
+  "description": "Storytel Player - Storytel audiobook player for desktop",
   "main": "electron.js",
   "homepage": "./",
   "scripts": {
@@ -22,7 +23,7 @@
     "server:build": "cd server && npm run build",
     "clean": "rm -rf dist; rm -rf server/dist; rm -rf client/build"
   },
-  "author": "debba",
+  "author": "debba <andrea@debbaweb.it>",
   "license": "ISC",
   "dependencies": {
     "concurrently": "^7.6.0"
@@ -59,13 +60,15 @@
       "node_modules/**/*"
     ],
     "mac": {
-      "category": "public.app-category.entertainment"
+      "category": "public.app-category.audio"
     },
     "win": {
       "target": "nsis"
     },
     "linux": {
-      "target": "AppImage"
+      "category": "multimedia",
+      "target": ["pacman"],
+      "icon": "client/public/assets/icon.png"
     }
   }
 }
