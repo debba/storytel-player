@@ -7,6 +7,7 @@ function PlayerView() {
     const location = useLocation();
     const navigate = useNavigate();
     const audioRef = useRef(null);
+    const [audioSrc, setAudioSrc] = useState(null);
 
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
@@ -54,16 +55,10 @@ function PlayerView() {
     const loadAudioStream = async () => {
         try {
             setIsLoading(true);
-            const response = await api.post('/stream', {
-                bookId
-            });
-
-            if (audioRef.current) {
-                audioRef.current.src = response.data.streamUrl;
-                audioRef.current.load();
-            }
-        } catch (error) {
-            setError(error.response?.data?.error || 'Failed to load audio stream');
+            const response = await api.post('/stream', { bookId });
+            setAudioSrc(response.data.streamUrl);
+        } catch (err) {
+            setError(err.response?.data?.error || 'Failed to load audio stream');
         } finally {
             setIsLoading(false);
         }
@@ -319,7 +314,7 @@ function PlayerView() {
                 <div className="text-center">
                     <div className="text-red-600 text-xl mb-4">{error}</div>
                     <button
-                        onClick={() => navigate('/bookshelf')}
+                        onClick={() => navigate('/')}
                         className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
                     >
                         Back to Library
@@ -336,7 +331,7 @@ function PlayerView() {
                     <div className="flex justify-between h-16">
                         <div className="flex items-center">
                             <button
-                                onClick={() => navigate('/bookshelf')}
+                                onClick={() => navigate('/')}
                                 className="text-gray-600 hover:text-gray-900 mr-4"
                             >
                                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -371,6 +366,7 @@ function PlayerView() {
                         {/* Audio Element */}
                         <audio
                             ref={audioRef}
+                            src={audioSrc}
                             onTimeUpdate={handleTimeUpdate}
                             onLoadedMetadata={handleLoadedMetadata}
                             onPlay={() => {

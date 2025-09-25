@@ -2,7 +2,8 @@
   "name": "storytel-web-client",
   "version": "1.0.0",
   "description": "Storytel Web Player - Web interface for Storytel audiobook player",
-  "main": "index.js",
+  "main": "electron.js",
+  "homepage": "./",
   "scripts": {
     "start": "concurrently \"npm run server\" \"npm run client\"",
     "server": "cd server && npm install && npm start",
@@ -11,7 +12,13 @@
     "dev": "concurrently \"npm run server:dev\" \"npm run client\"",
     "server:dev": "cd server && npm install && npm run dev",
     "install-all": "npm install && cd server && npm install && cd ../client && npm install",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "electron": "electron .",
+    "electron:dev": "NODE_ENV=development electron .",
+    "electron:pack": "electron-builder",
+    "electron:dist": "npm run build && electron-builder",
+    "preelectron:pack": "npm run build",
+    "preelectron:dist": "npm run build"
   },
   "author": "debba",
   "license": "ISC",
@@ -30,6 +37,30 @@
     "@babel/core": "^7.28.4",
     "@babel/node": "^7.28.0",
     "@babel/preset-env": "^7.28.3",
-    "@babel/preset-react": "^7.27.1"
+    "@babel/preset-react": "^7.27.1",
+    "electron": "^38.1.2",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.storytel.webclient",
+    "productName": "Storytel Web Client",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "electron.js",
+      "client/build/**/*",
+      "server/**/*",
+      "node_modules/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.entertainment"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
   }
 }

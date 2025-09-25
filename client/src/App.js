@@ -81,16 +81,6 @@ function App() {
             }
           />
           <Route
-            path="/bookshelf"
-            element={
-              isAuthenticated ? (
-                <BookshelfView />
-              ) : (
-                <Navigate to="/login" replace />
-              )
-            }
-          />
-          <Route
             path="/player/:bookId"
             element={
               isAuthenticated ? (
