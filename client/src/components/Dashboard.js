@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import api from '../services/api';
 import BookCard from './BookCard';
-import PersistentPlayer from './PersistentPlayer';
 import LoadingState from './LoadingState';
 import ErrorState from './ErrorState';
 import DashboardHeader from './DashboardHeader';
@@ -75,11 +74,6 @@ function Dashboard({ onLogout }) {
           </div>
         )}
       </main>
-
-      <PersistentPlayer
-        currentBook={currentBook}
-        onPlayPause={handlePlayerPlayPause}
-      />
     </div>
   );
 }

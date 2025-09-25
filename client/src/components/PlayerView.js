@@ -46,8 +46,6 @@ function PlayerView() {
 
     const book = location.state?.book;
 
-    console.log({book})
-
     useEffect(() => {
         if (bookId) {
             loadAudioStream();
@@ -562,18 +560,31 @@ function PlayerView() {
                                     {chapters && chapters.length > 0 && (
                                         <button
                                             onClick={() => setShowChaptersModal(true)}
-                                            className="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors"
+                                            className="px-2 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors"
                                         >
-                                            Capitoli ({chapters.length})
+                                            <svg className="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                                                <g>
+                                                    <path fill="currentColor"></path>
+                                                    <g>
+                                                        <path fill="currentColor" d="M16.002 22.002h25.997v4H16.002zM16.002 11.995h25.997v4H16.002zM16.002 32.008h25.997v4H16.002zM6 12h4v4H6zM6 22.006h4v4H6zM6 32.013h4v4H6z"></path>
+                                                    </g>
+                                                </g>
+                                            </svg>
                                         </button>
                                     )}
 
                                     <button
                                         id="bookmark-btn"
                                         onClick={() => setShowBookmarksModal(true)}
-                                        className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors"
+                                        className="px-2 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors"
                                     >
-                                        Bookmarks ({bookmarks.length})
+                                        <svg xmlns="http://www.w3.org/2000/svg"                        className="w-6 h-6"
+                                             fill="currentColor" viewBox="0 0 16 16">
+                                            <path
+                                                fill="currentColor"
+                                                d="M2 0h12v16h-2l-4-4-4 4H2z"
+                                            ></path>
+                                        </svg>
                                     </button>
                                 </div>
                             </div>
