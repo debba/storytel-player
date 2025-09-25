@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LoginForm from './components/LoginForm';
 import Dashboard from './components/Dashboard';
-import BookshelfView from './components/BookshelfView';
 import PlayerView from './components/PlayerView';
 import api from './services/api';
 

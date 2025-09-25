@@ -32,6 +32,8 @@ function PlayerView() {
 
     const book = location.state?.book;
 
+    console.log({book})
+
     useEffect(() => {
         if (bookId) {
             loadAudioStream();
@@ -350,16 +352,16 @@ function PlayerView() {
                     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
                         {/* Book Info */}
                         <div className="p-6 flex items-center space-x-6">
-                            {book.cover && (
+                            {book.book.cover && (
                                 <img
-                                    src={"https://www.storytel.com" + book.cover}
-                                    alt={book.name}
+                                    src={"https://www.storytel.com" + book.book.cover}
+                                    alt={book.book.name}
                                     className="w-24 h-24 rounded-lg shadow-md"
                                 />
                             )}
                             <div>
-                                <h2 className="text-2xl font-bold text-gray-900">{book?.name}</h2>
-                                <p className="text-lg text-gray-600">{book?.author}</p>
+                                <h2 className="text-2xl font-bold text-gray-900">{book.book.name}</h2>
+                                <p className="text-lg text-gray-600">{book.book.authorsAsString}</p>
                             </div>
                         </div>
 

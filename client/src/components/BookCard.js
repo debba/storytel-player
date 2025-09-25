@@ -18,7 +18,6 @@ function BookCard({ book, onBookSelect }) {
 
   const category = getCategoryLabel(book);
   const remainingTime = totalDuration - position;
-  console.log({remainingTime})
 
   return (
 
