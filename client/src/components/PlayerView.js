@@ -68,6 +68,19 @@ function PlayerView() {
         };
     }, [book]);
 
+    // Tray event listeners
+    useEffect(() => {
+        if (window.trayControls) {
+            window.trayControls.onPlayPause(() => {
+                handlePlayPause();
+            });
+
+            window.trayControls.onSetSpeed((event, speed) => {
+                handlePlaybackRateChange(speed);
+            });
+        }
+    }, [isPlaying, playbackRate]);
+
     const loadAudioStream = async () => {
         try {
             setIsLoading(true);
