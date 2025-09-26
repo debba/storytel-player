@@ -1,6 +1,6 @@
 {
   "name": "storytel-player",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "email": "andrea@debbaweb.it",
   "description": "Storytel Player - Storytel audiobook player for desktop",
   "main": "electron.js",
@@ -26,7 +26,8 @@
   "author": "debba <andrea@debbaweb.it>",
   "license": "ISC",
   "dependencies": {
-    "concurrently": "^7.6.0"
+    "concurrently": "^7.6.0",
+    "electron-store": "^10.1.0"
   },
   "keywords": [
     "storytel",
@@ -67,7 +68,9 @@
     },
     "linux": {
       "category": "multimedia",
-      "target": ["pacman"],
+      "target": [
+        "pacman"
+      ],
       "icon": "client/public/assets/icon.png"
     }
   }

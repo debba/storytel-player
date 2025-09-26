@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import storage from "../utils/storage";
 
 function LoginForm({ onLogin }) {
   const [email, setEmail] = useState('');
@@ -23,7 +24,7 @@ function LoginForm({ onLogin }) {
     try {
       const response = await api.post('/login', { email, password });
       const { token } = response.data;
-      localStorage.setItem('token', token);
+      await storage.set('token', token);
       onLogin();
       navigate('/');
     } catch (error) {

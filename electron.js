@@ -1,7 +1,9 @@
-const {app, BrowserWindow, Menu, nativeImage} = require('electron');
+const {app, BrowserWindow, Menu, ipcMain} = require('electron');
 const {spawn} = require('child_process');
 const path = require('path');
 const isDev = process.env.NODE_ENV === 'development';
+const {default: Store} = require('electron-store');
+const store = new Store();
 
 let mainWindow;
 let serverProcess;
@@ -14,11 +16,11 @@ function createWindow() {
         height: 800,
         resizable: false,
         webPreferences: {
-            nodeIntegration: false,
+            nodeIntegration: true,
             contextIsolation: true,
             devTools: isDev,
-            enableRemoteModule: false,
-            webSecurity: true,
+            partition: 'persist:storytel-app',
+            preload: path.join(__dirname, 'preload.js')
         },
         maximizable: false,
         alwaysOnTop: true,
@@ -51,16 +53,8 @@ function startDevelopmentServers() {
         stdio: 'inherit'
     });
 
-    // Start React development server
-    clientProcess = spawn('npm', ['run', 'client'], {
-        cwd: __dirname,
-        stdio: 'inherit'
-    });
+    mainWindow.loadFile(path.join(__dirname, 'client/build/index.html'));
 
-    // Wait for servers to start, then load the React app
-    setTimeout(() => {
-        mainWindow.loadURL('http://localhost:3000');
-    }, 5000);
 }
 
 function startProductionServer() {
@@ -78,6 +72,11 @@ function startProductionServer() {
 }
 
 app.whenReady().then(createWindow);
+
+ipcMain.handle('store-get', (event, key) =>  store.get(key));
+ipcMain.handle('store-set', (event, key, value) => store.set(key, value));
+ipcMain.handle('store-remove', (event, key) => store.delete(key));
+
 
 app.on('window-all-closed', () => {
     // Kill server processes

@@ -4,6 +4,7 @@ import LoginForm from './components/LoginForm';
 import Dashboard from './components/Dashboard';
 import PlayerView from './components/PlayerView';
 import api from './services/api';
+import storage from "./utils/storage";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -15,7 +16,7 @@ function App() {
 
   const checkAuthStatus = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = storage.get('token');
       if (!token) {
         setIsAuthenticated(false);
         setIsLoading(false);
@@ -26,7 +27,7 @@ function App() {
       setIsAuthenticated(response.data.authenticated);
     } catch (error) {
       setIsAuthenticated(false);
-      localStorage.removeItem('token');
+      storage.remove('token');
     } finally {
       setIsLoading(false);
     }
@@ -42,7 +43,7 @@ function App() {
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
-      localStorage.removeItem('token');
+      storage.remove('token');
       setIsAuthenticated(false);
     }
   };
