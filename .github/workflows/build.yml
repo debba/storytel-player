@@ -43,7 +43,7 @@ jobs:
       run: npm run electron:pack
 
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: storytel-player-${{ matrix.os }}
         path: dist/
