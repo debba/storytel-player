@@ -1,4 +1,4 @@
-# Storytel Player
+# Storytel Unofficial Player
 
 A desktop application for playing Storytel audiobooks, built with React, Fastify, and Electron.
 
