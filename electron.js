@@ -8,6 +8,10 @@ const store = new Store();
 let mainWindow;
 let clientProcess;
 let tray;
+let currentPlayingState = {
+    isPlaying: false,
+    bookTitle: null
+};
 
 const isDebug = process.env.IS_DEBUG === 'true';
 
@@ -79,81 +83,7 @@ function createTray() {
     const iconPath = path.join(__dirname, 'assets/icon.png');
     tray = new Tray(iconPath);
 
-    const contextMenu = Menu.buildFromTemplate([
-        {
-            label: 'Show App',
-            click: () => {
-                if (mainWindow) {
-                    mainWindow.show();
-                    mainWindow.focus();
-                }
-            }
-        },
-        { type: 'separator' },
-        {
-            label: 'Play/Pause',
-            click: () => {
-                if (mainWindow) {
-                    mainWindow.webContents.send('tray-play-pause');
-                }
-            }
-        },
-        {
-            label: 'Playback Speed',
-            submenu: [
-                {
-                    label: '0.5x',
-                    click: () => {
-                        if (mainWindow) {
-                            mainWindow.webContents.send('tray-set-speed', 0.5);
-                        }
-                    }
-                },
-                {
-                    label: '1.0x',
-                    click: () => {
-                        if (mainWindow) {
-                            mainWindow.webContents.send('tray-set-speed', 1.0);
-                        }
-                    }
-                },
-                {
-                    label: '1.25x',
-                    click: () => {
-                        if (mainWindow) {
-                            mainWindow.webContents.send('tray-set-speed', 1.25);
-                        }
-                    }
-                },
-                {
-                    label: '1.75x',
-                    click: () => {
-                        if (mainWindow) {
-                            mainWindow.webContents.send('tray-set-speed', 1.75);
-                        }
-                    }
-                },
-                {
-                    label: '2.0x',
-                    click: () => {
-                        if (mainWindow) {
-                            mainWindow.webContents.send('tray-set-speed', 2.0);
-                        }
-                    }
-                }
-            ]
-        },
-        { type: 'separator' },
-        {
-            label: 'Quit',
-            click: () => {
-                app.isQuitting = true;
-                app.quit();
-            }
-        }
-    ]);
-
-    tray.setContextMenu(contextMenu);
+    updateTrayMenu();
     tray.setToolTip('Storytel Player');
 
     tray.on('double-click', () => {
@@ -166,6 +96,102 @@ function createTray() {
             }
         }
     });
+}
+
+function updateTrayMenu() {
+    if (!tray) return;
+
+    const menuTemplate = [
+        {
+            label: currentPlayingState.bookTitle || 'No book playing now',
+            enabled: false
+        },
+        { type: 'separator' },
+        {
+            label: 'Show App',
+            click: () => {
+                if (mainWindow) {
+                    mainWindow.show();
+                    mainWindow.focus();
+                }
+            }
+        }
+    ];
+
+    // Add playback controls only if something is playing
+    if (currentPlayingState.isPlaying || currentPlayingState.bookTitle) {
+        menuTemplate.push(
+            { type: 'separator' },
+            {
+                label: 'Play/Pause',
+                click: () => {
+                    if (mainWindow) {
+                        mainWindow.webContents.send('tray-play-pause');
+                    }
+                }
+            },
+            {
+                label: 'Playback Speed',
+                submenu: [
+                    {
+                        label: '0.5x',
+                        click: () => {
+                            if (mainWindow) {
+                                mainWindow.webContents.send('tray-set-speed', 0.5);
+                            }
+                        }
+                    },
+                    {
+                        label: '1.0x',
+                        click: () => {
+                            if (mainWindow) {
+                                mainWindow.webContents.send('tray-set-speed', 1.0);
+                            }
+                        }
+                    },
+                    {
+                        label: '1.25x',
+                        click: () => {
+                            if (mainWindow) {
+                                mainWindow.webContents.send('tray-set-speed', 1.25);
+                            }
+                        }
+                    },
+                    {
+                        label: '1.75x',
+                        click: () => {
+                            if (mainWindow) {
+                                mainWindow.webContents.send('tray-set-speed', 1.75);
+                            }
+                        }
+                    },
+                    {
+                        label: '2.0x',
+                        click: () => {
+                            if (mainWindow) {
+                                mainWindow.webContents.send('tray-set-speed', 2.0);
+                            }
+                        }
+                    }
+                ]
+            }
+        );
+    }
+
+    // Always show quit option
+    menuTemplate.push(
+        { type: 'separator' },
+        {
+            label: 'Quit',
+            click: () => {
+                app.isQuitting = true;
+                app.quit();
+            }
+        }
+    );
+
+    const contextMenu = Menu.buildFromTemplate(menuTemplate);
+    tray.setContextMenu(contextMenu);
 }
 
 app.whenReady().then(() => {
@@ -228,13 +254,20 @@ async function handleEvents(){
         });
         return objectClonable(res);
     });
+
+    ipcMain.on('update-playing-state', (event, { isPlaying, bookTitle }) => {
+        currentPlayingState.isPlaying = isPlaying;
+        currentPlayingState.bookTitle = bookTitle;
+        updateTrayMenu();
+    });
 }
 
 
-app.on('window-all-closed', () => {
-    // Don't quit the app when all windows are closed, just hide to tray
-    // Only quit when explicitly requested through tray menu
+app.on('window-all-closed', async () => {
+
     if (app.isQuitting) {
+
+        await mainWindow.webContents.send('tray-play-pause');
 
         if (clientProcess) {
             clientProcess.kill();
@@ -243,6 +276,7 @@ app.on('window-all-closed', () => {
             app.quit();
         }
     }
+
 });
 
 app.on('activate', () => {

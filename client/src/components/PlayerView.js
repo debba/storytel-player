@@ -65,6 +65,10 @@ function PlayerView() {
                 clearInterval(positionUpdateIntervalRef.current);
             }
             document.title = 'Storytel Client';
+            // Clear tray when leaving PlayerView
+            if (window.trayControls && window.trayControls.updatePlayingState) {
+                window.trayControls.updatePlayingState(false, null);
+            }
         };
     }, [book]);
 
@@ -80,6 +84,14 @@ function PlayerView() {
             });
         }
     }, [isPlaying, playbackRate]);
+
+    // Update tray with current playing state and book title
+    useEffect(() => {
+        if (window.trayControls && window.trayControls.updatePlayingState) {
+            const bookTitle = book?.book?.name || null;
+            window.trayControls.updatePlayingState(isPlaying, bookTitle);
+        }
+    }, [isPlaying, book]);
 
     const loadAudioStream = async () => {
         try {
@@ -432,8 +444,8 @@ function PlayerView() {
                             )}
                             <div className="flex-1">
                                 <h2 className="text-2xl font-bold text-white mb-2">{book.book.name}</h2>
-                                <p className="text-lg text-gray-300 mb-1">Scritto da: {book.book.authorsAsString}</p>
-                                <p className="text-lg text-gray-300 mb-3">Letto da: {book.abook.narratorAsString}</p>
+                                <p className="text-lg text-gray-300 mb-1">Author: {book.book.authorsAsString}</p>
+                                <p className="text-lg text-gray-300 mb-3">Narrator: {book.abook.narratorAsString}</p>
                                 <div className="flex items-center space-x-4">
                                     <span className="text-sm text-orange-400">Velocità: {playbackRate}x</span>
                                 </div>

@@ -9,6 +9,7 @@ contextBridge.exposeInMainWorld('electronStore', {
 contextBridge.exposeInMainWorld('trayControls', {
     onPlayPause: (callback) => ipcRenderer.on('tray-play-pause', callback),
     onSetSpeed: (callback) => ipcRenderer.on('tray-set-speed', callback),
+    updatePlayingState: (isPlaying, bookTitle) => ipcRenderer.send('update-playing-state', { isPlaying, bookTitle }),
 });
 
 contextBridge.exposeInMainWorld('electronApi', {
