@@ -1,10 +1,8 @@
-const fastify = require('fastify')({ logger: true });
+const fastify = require('fastify')({ logger: process.env.NODE_ENV !== 'production' });
 const StorytelClient = require('./storytelApi');
+const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-this-in-production';
 
 require('dotenv').config();
-
-const PORT = process.env.PORT || 3001;
-const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-this-in-production';
 
 // Register plugins
 fastify.register(require('@fastify/cors'), {
@@ -295,14 +293,4 @@ fastify.get('/api/auth/status', async (request, reply) => {
     }
 });
 
-const start = async () => {
-    try {
-        await fastify.listen({ port: PORT, host: '0.0.0.0' });
-        console.log(`Storytel server running on port ${PORT}`);
-    } catch (err) {
-        fastify.log.error(err);
-        process.exit(1);
-    }
-};
-
-module.exports = { start };
+module.exports = fastify;

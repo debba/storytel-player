@@ -10,3 +10,10 @@ contextBridge.exposeInMainWorld('trayControls', {
     onPlayPause: (callback) => ipcRenderer.on('tray-play-pause', callback),
     onSetSpeed: (callback) => ipcRenderer.on('tray-set-speed', callback),
 });
+
+contextBridge.exposeInMainWorld('electronApi', {
+    get: (url, data, config) => ipcRenderer.invoke('api:get', url, config),
+    post: (url, data, config) => ipcRenderer.invoke('api:post', url, data, config),
+    put: (url, data, config) => ipcRenderer.invoke('api:put', url, data, config),
+    delete: (url, data,  config) => ipcRenderer.invoke('api:delete', url, config)
+});

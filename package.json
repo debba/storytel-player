@@ -49,14 +49,17 @@
     "appId": "com.storytel.player",
     "productName": "Storytel Player",
     "directories": {
-      "output": "dist"
+      "output": "dist",
+      "buildResources": "assets"
     },
     "asarUnpack": [
       "server/**"
     ],
     "files": [
-      "electron.js",
+      "assets/**/*",
       "client/build/**/*",
+      "electron.js",
+      "preload.js",
       "server/dist/**/*",
       "node_modules/**/*"
     ],

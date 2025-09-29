@@ -6,9 +6,10 @@ const {default: Store} = require('electron-store');
 const store = new Store();
 
 let mainWindow;
-let serverProcess;
 let clientProcess;
 let tray;
+
+const isDebug = process.env.IS_DEBUG === 'true';
 
 function createWindow() {
 
@@ -19,22 +20,23 @@ function createWindow() {
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: true,
-            devTools: isDev,
+            devTools: isDev || isDebug,
             partition: 'persist:storytel-app',
             preload: path.join(__dirname, 'preload.js')
         },
         maximizable: false,
         alwaysOnTop: true,
-        icon: path.join(__dirname, 'client/public/assets/icon.png'),
+        icon: path.join(__dirname, 'assets/icon.png'),
         show: false,
     });
 
-    // Start Fastify server
     if (isDev) {
         startDevelopmentServers();
     } else {
-        Menu.setApplicationMenu(null);
-        mainWindow.setMenu(null);
+        if (!isDebug) {
+            Menu.setApplicationMenu(null);
+            mainWindow.setMenu(null);
+        }
         startProductionServer();
     }
 
@@ -55,12 +57,6 @@ function createWindow() {
 }
 
 function startDevelopmentServers() {
-    // Start Fastify server
-    serverProcess = spawn('npm', ['run', 'server:dev'], {
-        cwd: __dirname,
-        stdio: 'inherit'
-    });
-
     // Start React development server
     clientProcess = spawn('npm', ['run', 'client'], {
         cwd: __dirname,
@@ -75,21 +71,12 @@ function startDevelopmentServers() {
 }
 
 function startProductionServer() {
-    // Start Fastify server using esbuild bundle
-    const serverPath = app.isPackaged
-        ? path.join(process.resourcesPath, 'app.asar.unpacked', 'server', 'dist', 'server.js')
-        : path.join(__dirname, 'server', 'dist', 'server.js');
-
-    serverProcess = spawn('node', [serverPath], {
-        stdio: 'inherit'
-    });
-
     // Load the built React app
     mainWindow.loadFile(path.join(__dirname, 'client/build/index.html'));
 }
 
 function createTray() {
-    const iconPath = path.join(__dirname, 'client/public/assets/icon.png');
+    const iconPath = path.join(__dirname, 'assets/icon.png');
     tray = new Tray(iconPath);
 
     const contextMenu = Menu.buildFromTemplate([
@@ -184,25 +171,74 @@ function createTray() {
 app.whenReady().then(() => {
     createWindow();
     createTray();
+    handleEvents();
 });
 
-ipcMain.handle('store-get', (event, key) =>  store.get(key));
-ipcMain.handle('store-set', (event, key, value) => store.set(key, value));
-ipcMain.handle('store-remove', (event, key) => store.delete(key));
+async function handleEvents(){
+
+    const serverPath = path.join(__dirname, 'server', 'dist', 'server.js');
+
+    const server = require(serverPath);
+    await server.ready();
+
+    const objectClonable = (res) => {
+        return {
+            data: res.json()
+        }
+    }
+
+    ipcMain.handle('store-get', (event, key) =>  store.get(key));
+    ipcMain.handle('store-set', (event, key, value) => store.set(key, value));
+    ipcMain.handle('store-remove', (event, key) => store.delete(key));
+
+    ipcMain.handle('api:get', async (_event, url, config = {}) => {
+        const res = await server.inject({
+            method: 'GET',
+            url,
+            headers: config?.headers || {}
+        });
+        return objectClonable(res);
+    });
+
+    ipcMain.handle('api:post', async (_event, url, data = {}, config = {}) => {
+        const res = await server.inject({
+            method: 'POST',
+            url,
+            payload: data,
+            headers: config?.headers || {}
+        });
+        return objectClonable(res);
+    });
+
+    ipcMain.handle('api:put', async (_event, url, data = {}, config = {}) => {
+        const res = await server.inject({
+            method: 'PUT',
+            url,
+            payload: data,
+            headers: config?.headers || {}
+        });
+        return objectClonable(res);
+    });
+
+    ipcMain.handle('api:delete', async (_event, url, config = {}) => {
+        const res = await server.inject({
+            method: 'DELETE',
+            url,
+            headers: config.headers || {}
+        });
+        return objectClonable(res);
+    });
+}
 
 
 app.on('window-all-closed', () => {
     // Don't quit the app when all windows are closed, just hide to tray
     // Only quit when explicitly requested through tray menu
     if (app.isQuitting) {
-        // Kill server processes
-        if (serverProcess) {
-            serverProcess.kill();
-        }
+
         if (clientProcess) {
             clientProcess.kill();
         }
-
         if (process.platform !== 'darwin') {
             app.quit();
         }
