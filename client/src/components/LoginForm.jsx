@@ -36,21 +36,14 @@ function LoginForm({ onLogin }) {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <nav className="bg-black border-b border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-white">Storytel</h1>
-            </div>
-          </div>
-        </div>
-      </nav>
-
       <main className="max-w-4xl mx-auto py-6 px-4">
         <div className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
           <div className="max-w-md w-full space-y-8 p-8 bg-gray-900 rounded-lg shadow-lg border border-gray-800">
             <div>
-              <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
+                <div className="flex justify-center">
+                    <img src={'assets/icon.png'} alt={"Storytel"} className="w-12 h-12"/>
+                </div>
+                <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
                 Sign in to Storytel
               </h2>
               <p className="mt-2 text-center text-sm text-gray-400">
