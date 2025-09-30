@@ -13,11 +13,12 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.8.1",
+    "vite": "^7.1.7",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc && VITE_REACT_APP_USE_MEMORY_ROUTER=true vite build",
     "preview": "vite preview"
   },
   "eslintConfig": {
@@ -39,6 +40,7 @@
     ]
   },
   "devDependencies": {
+    "@types/node": "^24.6.0",
     "@types/react": "^19.1.16",
     "@types/react-dom": "^19.1.9",
     "autoprefixer": "^10.4.14",

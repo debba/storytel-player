@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import {Routes, Route, Navigate, MemoryRouter, BrowserRouter} from 'react-router-dom';
 import LoginForm from './components/LoginForm';
 import Dashboard from './components/Dashboard';
 import PlayerView from './components/PlayerView';
 import api from './utils/api';
 import storage from "./utils/storage";
+
+const useMemoryRouter = import.meta.env.VITE_REACT_APP_USE_MEMORY_ROUTER === 'true';
+const Router = useMemoryRouter ? MemoryRouter : BrowserRouter;
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);

@@ -5,11 +5,11 @@ export default defineConfig({
     plugins: [
         react()
     ],
-    base: '/',
+    base: './',
     server: {
         port: 3000
     },
     build: {
-        outDir: 'build', // CRA's default build output
+        outDir: 'build'
     },
 });
