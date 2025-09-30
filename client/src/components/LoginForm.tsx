@@ -3,14 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 import storage from "../utils/storage";
 
-function LoginForm({ onLogin }) {
+// TODO: Define proper interface for LoginForm props
+function LoginForm({ onLogin }: { onLogin: any }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
 
     if (!email || !password) {
@@ -27,7 +28,7 @@ function LoginForm({ onLogin }) {
       await storage.set('token', token);
       onLogin();
       navigate('/');
-    } catch (error) {
+    } catch (error: any) {
       setError(error.response?.data?.error || 'Login failed');
     } finally {
       setIsLoading(false);

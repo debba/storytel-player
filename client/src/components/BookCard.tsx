@@ -1,8 +1,13 @@
 import React from 'react';
-import {formatTime} from "../utils/helpers";
+import {formatMicrosecondsTime, formatTime} from "../utils/helpers";
 import {BookShelfEntity} from "../interfaces/books";
 
-function BookCard({ book, onBookSelect } : {book:BookShelfEntity}) {
+interface BookCardProps {
+  book: BookShelfEntity;
+  onBookSelect: (book: BookShelfEntity) => void;
+}
+
+function BookCard({ book, onBookSelect } : BookCardProps) {
 
   const position = book.abookMark ?  book.abookMark.pos : 0;
   const totalDuration = book.abook.time;
@@ -33,7 +38,7 @@ function BookCard({ book, onBookSelect } : {book:BookShelfEntity}) {
             <p className="text-lg text-gray-300 mb-1">Author: {book.book.authorsAsString}</p>
             <p className="text-lg text-gray-300 mb-3">Narrator: {book.abook.narratorAsString}</p>
             <p className="text-lg text-orange-400 mb-4">
-              {remainingTime > 0 ? formatTime(remainingTime) : 'Completed'}
+              {remainingTime > 0 ? formatMicrosecondsTime(remainingTime) : 'Completed'}
             </p>
           </div>
 

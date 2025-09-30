@@ -7,7 +7,11 @@ import ErrorState from './ErrorState';
 import DashboardHeader from './DashboardHeader';
 import {BookShelfEntity, BookShelfResponse} from "../interfaces/books";
 
-function Dashboard({onLogout}) {
+interface DashboardProps {
+    onLogout: () => void;
+}
+
+function Dashboard({onLogout}: DashboardProps) {
     const navigate = useNavigate();
     const [books, setBooks] = useState<BookShelfEntity[]>([]);
     const [isLoading, setIsLoading] = useState(true);

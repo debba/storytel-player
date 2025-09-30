@@ -1,5 +1,18 @@
 import React from 'react';
 
+interface GotoModalProps {
+  isOpen: boolean;
+  playbackRate: number;
+  gotoHours: number;
+  gotoMinutes: number;
+  gotoSeconds: number;
+  onClose: () => void;
+  onHoursChange: (hours: number) => void;
+  onMinutesChange: (minutes: number) => void;
+  onSecondsChange: (seconds: number) => void;
+  onGoto: () => void;
+}
+
 function GotoModal({
   isOpen,
   playbackRate,
@@ -11,7 +24,7 @@ function GotoModal({
   onMinutesChange,
   onSecondsChange,
   onGoto
-}) {
+}: GotoModalProps) {
   if (!isOpen) return null;
 
   return (

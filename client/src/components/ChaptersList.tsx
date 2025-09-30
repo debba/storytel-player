@@ -1,7 +1,15 @@
 import React from 'react';
+import { Chapter } from '../interfaces/chapters';
 
-function ChaptersList({ chapters, currentTime, playbackRate, onChapterClick }) {
-  const formatTime = (seconds) => {
+interface ChaptersListProps {
+  chapters: Chapter[];
+  currentTime: number;
+  playbackRate: number;
+  onChapterClick: (chapterStartTime: number) => void;
+}
+
+function ChaptersList({ chapters, currentTime, playbackRate, onChapterClick }: ChaptersListProps) {
+  const formatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     const secs = Math.floor(seconds % 60);

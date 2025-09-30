@@ -1,7 +1,17 @@
 import React from 'react';
+import { Chapter } from '../interfaces/chapters';
 
-function ChaptersModal({ isOpen, chapters, currentTime, playbackRate, onClose, onChapterClick }) {
-  const formatTime = (seconds) => {
+interface ChaptersModalProps {
+  isOpen: boolean;
+  chapters: Chapter[];
+  currentTime: number;
+  playbackRate: number;
+  onClose: () => void;
+  onChapterClick: (chapterStartTime: number) => void;
+}
+
+function ChaptersModal({ isOpen, chapters, currentTime, playbackRate, onClose, onChapterClick }: ChaptersModalProps) {
+  const formatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     const secs = Math.floor(seconds % 60);

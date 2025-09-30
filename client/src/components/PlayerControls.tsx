@@ -1,5 +1,26 @@
 import React from 'react';
 
+interface PlayerControlsProps {
+  currentTime: number;
+  duration: number;
+  playbackRate: number;
+  isPlaying: boolean;
+  volume: number;
+  isMuted: boolean;
+  bookmarksCount: number;
+  chaptersCount: number;
+  onSeek: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onPlayPause: () => void;
+  onSkipBackward: () => void;
+  onSkipForward: () => void;
+  onVolumeChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onToggleMute: () => void;
+  onShowPlaybackSpeed: () => void;
+  onShowGoto: () => void;
+  onShowBookmarks: () => void;
+  onShowChapters: () => void;
+}
+
 function PlayerControls({
   currentTime,
   duration,
@@ -19,8 +40,8 @@ function PlayerControls({
   onShowGoto,
   onShowBookmarks,
   onShowChapters
-}) {
-  const formatTime = (seconds) => {
+}: PlayerControlsProps) {
+  const formatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     const secs = Math.floor(seconds % 60);

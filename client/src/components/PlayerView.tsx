@@ -8,13 +8,17 @@ import PlaybackSpeedModal from "./PlaybackSpeedModal";
 import GotoModal from "./GotoModal";
 import ChaptersModal from "./ChaptersModal";
 import {formatTime} from "../utils/helpers";
+import { BookShelfEntity } from "../interfaces/books";
+import { Bookmark } from "../interfaces/bookmarks";
+import { Chapter } from "../interfaces/chapters";
+import "../types/window.d.ts";
 
 function PlayerView() {
     const {bookId} = useParams();
     const location = useLocation();
     const navigate = useNavigate();
-    const audioRef = useRef(null);
-    const [audioSrc, setAudioSrc] = useState(null);
+    const audioRef = useRef<HTMLAudioElement>(null);
+    const [audioSrc, setAudioSrc] = useState<string | null>(null);
 
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
@@ -24,14 +28,14 @@ function PlayerView() {
     const [volume, setVolume] = useState(1);
     const [isMuted, setIsMuted] = useState(false);
     const [previousVolume, setPreviousVolume] = useState(1);
-    const [chapters, setChapters] = useState([]);
-    const [bookmarks, setBookmarks] = useState([]);
+    const [chapters, setChapters] = useState<Chapter[]>([]);
+    const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
     const [showBookmarksModal, setShowBookmarksModal] = useState(false);
     const [showCreateBookmarkModal, setShowCreateBookmarkModal] = useState(false);
     const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
     const [showEditBookmarkModal, setShowEditBookmarkModal] = useState(false);
-    const [bookmarkToDelete, setBookmarkToDelete] = useState(null);
-    const [bookmarkToEdit, setBookmarkToEdit] = useState(null);
+    const [bookmarkToDelete, setBookmarkToDelete] = useState<Bookmark | null>(null);
+    const [bookmarkToEdit, setBookmarkToEdit] = useState<Bookmark | null>(null);
     const [newBookmarkNote, setNewBookmarkNote] = useState('');
     const [editBookmarkNote, setEditBookmarkNote] = useState('');
     const [playbackRate, setPlaybackRate] = useState(1.0);
@@ -42,30 +46,32 @@ function PlayerView() {
     const [gotoSeconds, setGotoSeconds] = useState(0);
     const [showChaptersModal, setShowChaptersModal] = useState(false);
 
-    const positionUpdateIntervalRef = useRef(null);
+    // TODO: Add proper type definition for NodeJS namespace or use number for timeout
+    const positionUpdateIntervalRef = useRef<any>(null);
 
-    const book = location.state?.book;
+    // TODO: Add proper type for location state
+    const book: BookShelfEntity = location.state?.book;
 
     const loadAudioStream = useCallback(async () => {
         try {
             setIsLoading(true);
             const response = await api.post('/stream', { bookId });
             setAudioSrc(response.data.streamUrl);
-        } catch (err) {
+        } catch (err: any) {
             setError(err.response?.data?.error || 'Failed to load audio stream');
         } finally {
             setIsLoading(false);
         }
     }, [bookId]);
 
-    const goToBookmark = useCallback((position) => {
+    const goToBookmark = useCallback((position: number) => {
         if (audioRef.current) {
             audioRef.current.currentTime = Math.floor(position / 1000);
             setShowBookmarksModal(false);
         }
     }, [setShowBookmarksModal]);
 
-    const goToPosition = useCallback(async (consumableId) => {
+    const goToPosition = useCallback(async (consumableId: string) => {
         try {
             const response = await api.get(`/bookmark-positional/${consumableId}`);
             const { data } = response;
@@ -73,12 +79,12 @@ function PlayerView() {
             if (data.length === 1 && 'position' in data[0]) {
                 goToBookmark(data[0].position);
             }
-        } catch (error) {
+        } catch (error: any) {
             setError(error.response?.data?.error || 'Failed to load bookmarks');
         }
     }, [goToBookmark]);
 
-    const loadChapters = useCallback(async (consumableId) => {
+    const loadChapters = useCallback(async (consumableId: string) => {
         try {
             const response = await api.get(`/bookmetadata/${consumableId}`);
             const { data } = response;
@@ -86,18 +92,18 @@ function PlayerView() {
             if (data.formats && data.formats.length > 0) {
                 setChapters(data.formats[0].chapters);
             }
-        } catch (error) {
+        } catch (error: any) {
             setError(error.response?.data?.error || 'Failed to load chapters');
         }
     }, []);
 
-    const loadBookmarks = useCallback(async (consumableId) => {
+    const loadBookmarks = useCallback(async (consumableId: string) => {
         try {
             const response = await api.get(`/bookmarks/${consumableId}`);
             const { data } = response;
 
             setBookmarks(data.bookmarks);
-        } catch (error) {
+        } catch (error: any) {
             setError(error.response?.data?.error || 'Failed to load bookmarks');
         }
     }, []);
@@ -159,7 +165,7 @@ function PlayerView() {
         setIsPlaying(!isPlaying);
     }, [isPlaying, updatePosition]);
 
-    const handlePlaybackRateChange = useCallback((newRate) => {
+    const handlePlaybackRateChange = useCallback((newRate: number) => {
         setPlaybackRate(newRate);
         if (audioRef.current) {
             audioRef.current.playbackRate = newRate;
@@ -170,11 +176,12 @@ function PlayerView() {
     // Tray event listeners
     useEffect(() => {
         if (window.trayControls) {
-            window.trayControls.onPlayPause(() => {
+            // TODO: Add proper type checking for trayControls methods
+            window.trayControls.onPlayPause?.(() => {
                 handlePlayPause();
             });
 
-            window.trayControls.onSetSpeed((event, speed) => {
+            window.trayControls.onSetSpeed?.((event: any, speed: number) => {
                 handlePlaybackRateChange(speed);
             });
         }
@@ -217,7 +224,7 @@ function PlayerView() {
         }
     };
 
-    const handleSeek = (e) => {
+    const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!audioRef.current) return;
 
         const seekTime = parseFloat(e.target.value);
@@ -225,7 +232,7 @@ function PlayerView() {
         setCurrentTime(seekTime);
     };
 
-    const handleVolumeChange = (e) => {
+    const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newVolume = parseFloat(e.target.value);
         setVolume(newVolume);
         if (audioRef.current) {
@@ -265,20 +272,20 @@ function PlayerView() {
         }
     };
 
-    const handleChapterClick = (chapterStartTime) => {
+    const handleChapterClick = (chapterStartTime: number) => {
         if (audioRef.current) {
             audioRef.current.currentTime = chapterStartTime;
         }
     };
 
-    const handleShowEditBookmarkModal = (bookmark) => {
+    const handleShowEditBookmarkModal = (bookmark: Bookmark) => {
         setBookmarkToEdit(bookmark);
         setEditBookmarkNote(bookmark.note || '');
         setShowEditBookmarkModal(true);
         setShowBookmarksModal(false);
     };
 
-    const handleShowDeleteConfirmModal = (bookmark) => {
+    const handleShowDeleteConfirmModal = (bookmark: Bookmark) => {
         setBookmarkToDelete(bookmark);
         setShowDeleteConfirmModal(true);
         setShowBookmarksModal(false);
@@ -405,12 +412,14 @@ function PlayerView() {
                         {/* Audio Element */}
                         <audio
                             ref={audioRef}
-                            src={audioSrc}
+                            src={audioSrc || undefined}
                             onTimeUpdate={handleTimeUpdate}
                             onLoadedMetadata={handleLoadedMetadata}
                             onPlay={() => {
                                 setIsPlaying(true);
-                                audioRef.current.playbackRate = playbackRate;
+                                if (audioRef.current) {
+                                    audioRef.current.playbackRate = playbackRate;
+                                }
                                 positionUpdateIntervalRef.current = setInterval(updatePosition, 30000);
                             }}
                             onPause={() => {

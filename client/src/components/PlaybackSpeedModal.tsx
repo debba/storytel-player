@@ -1,6 +1,13 @@
 import React from 'react';
 
-function PlaybackSpeedModal({ isOpen, playbackRate, onClose, onRateChange }) {
+interface PlaybackSpeedModalProps {
+  isOpen: boolean;
+  playbackRate: number;
+  onClose: () => void;
+  onRateChange: (rate: number) => void;
+}
+
+function PlaybackSpeedModal({ isOpen, playbackRate, onClose, onRateChange }: PlaybackSpeedModalProps) {
   if (!isOpen) return null;
 
   return (

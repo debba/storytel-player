@@ -1,5 +1,40 @@
 import React from 'react';
 import {formatTime} from "../utils/helpers";
+import { Bookmark } from "../interfaces/bookmarks";
+
+interface BookmarkModalsProps {
+  // Bookmarks Modal
+  showBookmarksModal: boolean;
+  bookmarks: Bookmark[];
+  onCloseBookmarksModal: () => void;
+  onShowCreateBookmarkModal: () => void;
+  onGoToBookmark: (position: number) => void;
+  onShowEditBookmarkModal: (bookmark: Bookmark) => void;
+  onShowDeleteConfirmModal: (bookmark: Bookmark) => void;
+
+  // Create Bookmark Modal
+  showCreateBookmarkModal: boolean;
+  newBookmarkNote: string;
+  currentTime: number;
+  playbackRate: number;
+  onCloseCreateBookmarkModal: () => void;
+  onNewBookmarkNoteChange: (note: string) => void;
+  onCreateBookmark: () => void;
+
+  // Edit Bookmark Modal
+  showEditBookmarkModal: boolean;
+  bookmarkToEdit: Bookmark | null;
+  editBookmarkNote: string;
+  onCloseEditBookmarkModal: () => void;
+  onEditBookmarkNoteChange: (note: string) => void;
+  onEditBookmark: () => void;
+
+  // Delete Confirmation Modal
+  showDeleteConfirmModal: boolean;
+  bookmarkToDelete: Bookmark | null;
+  onCloseDeleteConfirmModal: () => void;
+  onDeleteBookmark: () => void;
+}
 
 function BookmarkModals({
   // Bookmarks Modal
@@ -33,7 +68,7 @@ function BookmarkModals({
   bookmarkToDelete,
   onCloseDeleteConfirmModal,
   onDeleteBookmark
-}) {
+}: BookmarkModalsProps) {
 
 
   return (
@@ -156,7 +191,7 @@ function BookmarkModals({
                 value={newBookmarkNote}
                 onChange={(e) => onNewBookmarkNoteChange(e.target.value)}
                 className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-white"
-                rows="3"
+                rows={3}
                 placeholder="Aggiungi una nota a questo bookmark..."
               />
             </div>
@@ -206,7 +241,7 @@ function BookmarkModals({
                 value={editBookmarkNote}
                 onChange={(e) => onEditBookmarkNoteChange(e.target.value)}
                 className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-white"
-                rows="3"
+                rows={3}
                 placeholder="Modifica la nota per questo bookmark..."
               />
             </div>

@@ -1,6 +1,7 @@
 import React from 'react';
 
-function ErrorState({ error, onRetry }) {
+// TODO: Define proper interface for ErrorState props
+function ErrorState({ error, onRetry }: { error: any; onRetry?: any }) {
   return (
     <div className="min-h-screen bg-black flex items-center justify-center">
       <div className="text-center max-w-md mx-auto px-4">

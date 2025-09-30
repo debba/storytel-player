@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
-function PersistentPlayer({ currentBook, onPlayPause }) {
+// TODO: Define proper interface for PersistentPlayer props
+function PersistentPlayer({ currentBook, onPlayPause }: { currentBook: any; onPlayPause?: any }) {
   const [isPlaying, setIsPlaying] = useState(false);
 
   if (!currentBook) return null;
