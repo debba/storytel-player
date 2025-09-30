@@ -21,6 +21,7 @@ function PlayerView() {
     const [audioSrc, setAudioSrc] = useState<string | null>(null);
 
     const [isLoading, setIsLoading] = useState(true);
+    const [isLoadingBookData, setIsLoadingBookData] = useState(true);
     const [error, setError] = useState('');
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
@@ -116,12 +117,23 @@ function PlayerView() {
     }, [bookId, loadAudioStream]);
 
     useEffect(() => {
-        if (book) {
-            loadChapters(book.book.consumableId);
-            loadBookmarks(book.book.consumableId);
-            goToPosition(book.book.consumableId);
-            document.title = book.book.name;
-        }
+        const loadBookData = async () => {
+            if (book) {
+                setIsLoadingBookData(true);
+                try {
+                    await Promise.all([
+                        loadChapters(book.book.consumableId),
+                        loadBookmarks(book.book.consumableId),
+                        goToPosition(book.book.consumableId)
+                    ]);
+                } finally {
+                    setIsLoadingBookData(false);
+                }
+                document.title = book.book.name;
+            }
+        };
+
+        loadBookData();
 
         return () => {
             if (positionUpdateIntervalRef.current) {
@@ -133,7 +145,7 @@ function PlayerView() {
                 window.trayControls.updatePlayingState(false, null);
             }
         };
-    }, [book, goToBookmark, goToPosition, loadChapters, loadBookmarks]);
+    }, [book, goToPosition, loadChapters, loadBookmarks]);
 
     const updatePosition = useCallback(async () => {
         if (!audioRef.current || !book?.book?.consumableId) return;
@@ -358,8 +370,8 @@ function PlayerView() {
         }
     };
 
-    if (isLoading) {
-        return <LoadingState message="Loading audio..." />;
+    if (isLoading || isLoadingBookData) {
+        return <LoadingState message={isLoading ? "Loading audio..." : "Loading book data..."} />;
     }
 
     if (error) {
