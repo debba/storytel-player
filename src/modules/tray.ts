@@ -39,12 +39,21 @@ export class TrayManager {
     this.updateMenu();
   }
 
+  private truncateTitle(title: string, maxLength: number = 50): string {
+    if (title.length <= maxLength) return title;
+    return title.substring(0, maxLength - 3) + '...';
+  }
+
   updateMenu(): void {
     if (!this.tray) return;
 
+    const displayTitle = this.currentPlayingState.bookTitle
+      ? this.truncateTitle(this.currentPlayingState.bookTitle)
+      : 'No book playing now';
+
     const menuTemplate: Electron.MenuItemConstructorOptions[] = [
       {
-        label: this.currentPlayingState.bookTitle || 'No book playing now',
+        label: displayTitle,
         enabled: false,
       },
       { type: 'separator' },

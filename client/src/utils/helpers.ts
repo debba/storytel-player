@@ -14,5 +14,5 @@ export const formatMicrosecondsTime = (microseconds: number) => {
     const totalSeconds = Math.floor(microseconds / 1000 / 1000);
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
-    return `${hours} h ${minutes} min remaining`;
+    return `${hours} h ${minutes} min`;
 };
