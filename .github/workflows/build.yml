@@ -12,6 +12,9 @@ on:
       - master
       - main
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -21,32 +24,32 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
 
-    - name: Install dependencies
-      run: npm run install-all
+      - name: Install dependencies
+        run: npm run install-all
 
-    - name: Build application
-      run: npm run build
+      - name: Build application
+        run: npm run build
 
-    - name: Build server
-      run: npm run server:build
+      - name: Build server
+        run: npm run server:build
 
-    - name: Package Electron app
-      run: npm run electron:pack
+      - name: Package Electron app
+        run: npm run electron:pack
 
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: storytel-player-${{ matrix.os }}
-        path: dist/
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: storytel-player-${{ matrix.os }}
+          path: dist/
 
   release:
     needs: build
@@ -54,32 +57,32 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v')
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
 
-    - name: Install dependencies
-      run: npm run install-all
+      - name: Install dependencies
+        run: npm run install-all
 
-    - name: Build and create distributables
-      run: npm run electron:dist
+      - name: Build and create distributables
+        run: npm run electron:dist
 
-    - name: Create Release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: |
-          dist/*.exe
-          dist/*.dmg
-          dist/*.pkg.tar.xz
-          dist/*.AppImage
-          dist/*.deb
-          dist/*.rpm
-        draft: false
-        prerelease: false
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/*.exe
+            dist/*.dmg
+            dist/*.pkg.tar.xz
+            dist/*.AppImage
+            dist/*.deb
+            dist/*.rpm
+          draft: false
+          prerelease: false
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
