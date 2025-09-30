@@ -27,12 +27,11 @@ interface ApiConfig {
 }
 
 contextBridge.exposeInMainWorld('electronApi', {
-  get: (url: string, config?: ApiConfig): Promise<any> =>
-    ipcRenderer.invoke('api:get', url, config),
-  post: (url: string, data?: any, config?: ApiConfig): Promise<any> =>
+  get: (url: string, _: any, config?: ApiConfig): Promise<any> => ipcRenderer.invoke('api:get', url, config),
+  post: (url: string, data: any, config?: ApiConfig): Promise<any> =>
     ipcRenderer.invoke('api:post', url, data, config),
-  put: (url: string, data?: any, config?: ApiConfig): Promise<any> =>
+  put: (url: string, data: any, config?: ApiConfig): Promise<any> =>
     ipcRenderer.invoke('api:put', url, data, config),
-  delete: (url: string, config?: ApiConfig): Promise<any> =>
+  delete: (url: string, _: any, config?: ApiConfig): Promise<any> =>
     ipcRenderer.invoke('api:delete', url, config),
 });

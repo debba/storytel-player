@@ -28,6 +28,7 @@
   "author": "debba <andrea@debbaweb.it>",
   "license": "ISC",
   "dependencies": {
+    "@types/electron": "^1.4.38",
     "concurrently": "^7.6.0",
     "electron-store": "^10.1.0"
   },

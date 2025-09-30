@@ -7,7 +7,6 @@ export class ServerManager {
     const serverPath = path.join(__dirname, '../../../server/dist/server.js');
     const { default: server } = await import(serverPath);
     this.server = server;
-    await this.server.ready();
   }
 
   async injectRequest(

@@ -73,6 +73,7 @@ export class TrayManager {
       {
         label: 'Quit',
         click: () => {
+            app.isQuitting = true;
           app.quit();
         },
       }
