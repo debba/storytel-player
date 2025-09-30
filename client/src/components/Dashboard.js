@@ -11,7 +11,7 @@ function Dashboard({onLogout}) {
     const [books, setBooks] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
-    const [currentBook, setCurrentBook] = useState(null);
+    const [, setCurrentBook] = useState(null);
     const [filterStatus, setFilterStatus] = useState(-1)
     const [filteredBooks, setFilteredBooks] = useState([]);
 

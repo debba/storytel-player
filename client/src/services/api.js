@@ -42,8 +42,6 @@ const ipcApi = {
     },
 };
 
-console.log(window.electronApi);
-
 const api = typeof window !== "undefined" && window.electronApi ? ipcApi : axiosApi;
 
 export default api;

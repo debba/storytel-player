@@ -35,8 +35,8 @@ function BookCard({ book, onBookSelect }) {
         <div className="flex-1 min-w-0">
           <div className="mb-2">
             <h2 className="text-2xl font-bold text-white mb-1">{book.book.name}</h2>
-            <p className="text-lg text-gray-300 mb-1">Scritto da: {book.book.authorsAsString}</p>
-            <p className="text-lg text-gray-300 mb-3">Letto da: {book.abook.narratorAsString}</p>
+            <p className="text-lg text-gray-300 mb-1">Author: {book.book.authorsAsString}</p>
+            <p className="text-lg text-gray-300 mb-3">Narrator: {book.abook.narratorAsString}</p>
             <p className="text-lg text-orange-400 mb-4">
               {remainingTime > 0 ? formatTime(remainingTime) : 'Completed'}
             </p>

@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import {useParams, useLocation, useNavigate} from 'react-router-dom';
 import api from '../services/api';
 import LoadingState from './LoadingState';
@@ -7,7 +7,7 @@ import BookmarkModals from "./BookmarkModals";
 import PlaybackSpeedModal from "./PlaybackSpeedModal";
 import GotoModal from "./GotoModal";
 import ChaptersModal from "./ChaptersModal";
-import PlayerControls from "./PlayerControls";
+import {formatTime} from "../utils/helpers";
 
 function PlayerView() {
     const {bookId} = useParams();
@@ -46,11 +46,69 @@ function PlayerView() {
 
     const book = location.state?.book;
 
+    const loadAudioStream = useCallback(async () => {
+        try {
+            setIsLoading(true);
+            const response = await api.post('/stream', { bookId });
+            setAudioSrc(response.data.streamUrl);
+        } catch (err) {
+            setError(err.response?.data?.error || 'Failed to load audio stream');
+        } finally {
+            setIsLoading(false);
+        }
+    }, [bookId]);
+
+    const goToBookmark = useCallback((position) => {
+        if (audioRef.current) {
+            const seconds = Math.floor(position / 1000);
+            audioRef.current.currentTime = seconds;
+            setShowBookmarksModal(false);
+        }
+    }, [setShowBookmarksModal]);
+
+    const goToPosition = useCallback(async (consumableId) => {
+        try {
+            const response = await api.get(`/bookmark-positional/${consumableId}`);
+            const { data } = response;
+
+            if (data.length === 1 && 'position' in data[0]) {
+                goToBookmark(data[0].position);
+            }
+        } catch (error) {
+            setError(error.response?.data?.error || 'Failed to load bookmarks');
+        }
+    }, [goToBookmark]);
+
+    const loadChapters = useCallback(async (consumableId) => {
+        try {
+            const response = await api.get(`/bookmetadata/${consumableId}`);
+            const { data } = response;
+
+            if (data.formats && data.formats.length > 0) {
+                setChapters(data.formats[0].chapters);
+            }
+        } catch (error) {
+            setError(error.response?.data?.error || 'Failed to load chapters');
+        }
+    }, []);
+
+    const loadBookmarks = useCallback(async (consumableId) => {
+        try {
+            const response = await api.get(`/bookmarks/${consumableId}`);
+            const { data } = response;
+
+            setBookmarks(data.bookmarks);
+        } catch (error) {
+            setError(error.response?.data?.error || 'Failed to load bookmarks');
+        }
+    }, []);
+
+
     useEffect(() => {
         if (bookId) {
             loadAudioStream();
         }
-    }, [bookId]);
+    }, [bookId, loadAudioStream]);
 
     useEffect(() => {
         if (book) {
@@ -70,88 +128,9 @@ function PlayerView() {
                 window.trayControls.updatePlayingState(false, null);
             }
         };
-    }, [book]);
+    }, [book, goToBookmark, goToPosition, loadChapters, loadBookmarks]);
 
-    // Tray event listeners
-    useEffect(() => {
-        if (window.trayControls) {
-            window.trayControls.onPlayPause(() => {
-                handlePlayPause();
-            });
-
-            window.trayControls.onSetSpeed((event, speed) => {
-                handlePlaybackRateChange(speed);
-            });
-        }
-    }, [isPlaying, playbackRate]);
-
-    // Update tray with current playing state and book title
-    useEffect(() => {
-        if (window.trayControls && window.trayControls.updatePlayingState) {
-            const bookTitle = book?.book?.name || null;
-            window.trayControls.updatePlayingState(isPlaying, bookTitle);
-        }
-    }, [isPlaying, book]);
-
-    const loadAudioStream = async () => {
-        try {
-            setIsLoading(true);
-            const response = await api.post('/stream', { bookId });
-            setAudioSrc(response.data.streamUrl);
-        } catch (err) {
-            setError(err.response?.data?.error || 'Failed to load audio stream');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const loadChapters = async (
-        consumableId
-    ) => {
-        try {
-            const response = await api.get(`/bookmetadata/${consumableId}`);
-            const {data} = response;
-
-            if (data.formats && data.formats.length > 0) {
-                setChapters(data.formats[0].chapters);
-            }
-
-        }catch (error) {
-            setError(error.response?.data?.error || 'Failed to load chapters');
-        }
-    }
-
-    const loadBookmarks = async (
-        consumableId
-    ) => {
-        try {
-            const response = await api.get(`/bookmarks/${consumableId}`);
-            const {data} = response;
-
-            setBookmarks(data.bookmarks);
-
-        }catch (error) {
-            setError(error.response?.data?.error || 'Failed to load bookmarks');
-        }
-    }
-
-    const goToPosition = async (
-        consumableId
-    ) => {
-        try {
-            const response = await api.get(`/bookmark-positional/${consumableId}`);
-            const {data} = response;
-
-            if (data.length === 1 && 'position' in data[0]){
-                goToBookmark(data[0].position);
-            }
-
-        }catch (error) {
-            setError(error.response?.data?.error || 'Failed to load bookmarks');
-        }
-    }
-
-    const updatePosition = async () => {
+    const updatePosition = useCallback(async () => {
         if (!audioRef.current || !book?.book?.consumableId) return;
 
         try {
@@ -162,9 +141,9 @@ function PlayerView() {
         } catch (error) {
             console.error('Failed to update position:', error);
         }
-    };
+    }, [book]);
 
-    const handlePlayPause = () => {
+    const handlePlayPause = useCallback(() => {
         if (!audioRef.current) return;
 
         if (isPlaying) {
@@ -179,15 +158,36 @@ function PlayerView() {
             positionUpdateIntervalRef.current = setInterval(updatePosition, 30000);
         }
         setIsPlaying(!isPlaying);
-    };
+    }, [isPlaying, updatePosition]);
 
-    const handlePlaybackRateChange = (newRate) => {
+    const handlePlaybackRateChange = useCallback((newRate) => {
         setPlaybackRate(newRate);
         if (audioRef.current) {
             audioRef.current.playbackRate = newRate;
         }
         setShowPlaybackSpeedModal(false);
-    };
+    }, []);
+
+    // Tray event listeners
+    useEffect(() => {
+        if (window.trayControls) {
+            window.trayControls.onPlayPause(() => {
+                handlePlayPause();
+            });
+
+            window.trayControls.onSetSpeed((event, speed) => {
+                handlePlaybackRateChange(speed);
+            });
+        }
+    }, [handlePlayPause, handlePlaybackRateChange]);
+
+    // Update tray with current playing state and book title
+    useEffect(() => {
+        if (window.trayControls && window.trayControls.updatePlayingState) {
+            const bookTitle = book?.book?.name || null;
+            window.trayControls.updatePlayingState(isPlaying, bookTitle);
+        }
+    }, [isPlaying, book]);
 
     const handleGotoTime = () => {
         if (!audioRef.current) return;
@@ -263,55 +263,6 @@ function PlayerView() {
     const skipBackward = () => {
         if (audioRef.current) {
             audioRef.current.currentTime = Math.max(audioRef.current.currentTime - 15, 0);
-        }
-    };
-
-    const saveBookmark = async () => {
-        if (!audioRef.current) return;
-
-        try {
-            await api.post('/bookmark', {
-                bookId: bookId,
-                position: Math.floor(audioRef.current.currentTime)
-            });
-
-            const button = document.getElementById('bookmark-btn');
-            if (button) {
-                button.classList.add('bg-green-600');
-                setTimeout(() => {
-                    button.classList.remove('bg-green-600');
-                }, 1000);
-            }
-        } catch (error) {
-            console.error('Failed to save bookmark:', error);
-        }
-    };
-
-    const formatTime = (seconds) => {
-        const hours = Math.floor(seconds / 3600);
-        const minutes = Math.floor((seconds % 3600) / 60);
-        const secs = Math.floor(seconds % 60);
-
-        if (hours > 0) {
-            return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-        }
-        return `${minutes}:${secs.toString().padStart(2, '0')}`;
-    };
-
-    const formatBookmarkTime = (position) => {
-        const totalSeconds = Math.floor(position / 1000);
-        const hours = Math.floor(totalSeconds / 3600);
-        const minutes = Math.floor((totalSeconds % 3600) / 60);
-        const seconds = totalSeconds % 60;
-
-        return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    };
-
-    const goToBookmark = (position) => {
-        if (audioRef.current) {
-            const seconds = Math.floor(position / 1000);
-            audioRef.current.currentTime = seconds;
-            setShowBookmarksModal(false);
         }
     };
 
