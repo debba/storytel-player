@@ -39,3 +39,28 @@ code {
 ::-webkit-scrollbar-thumb:hover {
     background: rgba(0,0,0,0.6);
 }
+
+/* Animazione marquee per titoli lunghi */
+@keyframes marquee-scroll {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(calc(-100% + 100vw - 120px));
+    }
+}
+
+@keyframes marquee {
+    0% {
+        transform: translateX(0%);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+.animate-marquee {
+    animation: marquee 15s linear infinite;
+}
+.animate-marquee:hover {
+    animation-play-state: paused;
+}

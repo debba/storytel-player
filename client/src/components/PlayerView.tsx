@@ -109,7 +109,6 @@ function PlayerView() {
         }
     }, []);
 
-
     useEffect(() => {
         if (bookId) {
             loadAudioStream();
@@ -124,7 +123,6 @@ function PlayerView() {
                     await Promise.all([
                         loadChapters(book.book.consumableId),
                         loadBookmarks(book.book.consumableId),
-                        goToPosition(book.book.consumableId)
                     ]);
                 } finally {
                     setIsLoadingBookData(false);
@@ -145,7 +143,7 @@ function PlayerView() {
                 window.trayControls.updatePlayingState(false, null);
             }
         };
-    }, [book, goToPosition, loadChapters, loadBookmarks]);
+    }, [book, loadChapters, loadBookmarks]);
 
     const updatePosition = useCallback(async () => {
         if (!audioRef.current || !book?.book?.consumableId) return;
@@ -230,8 +228,9 @@ function PlayerView() {
         }
     };
 
-    const handleLoadedMetadata = () => {
+    const handleLoadedMetadata = async() => {
         if (audioRef.current) {
+            await goToPosition(book.book.consumableId);
             setDuration(audioRef.current.duration);
         }
     };
@@ -383,22 +382,30 @@ function PlayerView() {
             <nav className="bg-black border-b border-gray-800">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between h-16">
-                        <div className="flex items-center">
+                        <div className="flex items-center min-w-0 flex-1 gap-4">
                             <button
                                 onClick={() => navigate('/')}
-                                className="text-gray-400 hover:text-white mr-4"
+                                className="text-gray-400 hover:text-white flex-shrink-0"
                             >
                                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                                           d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                                 </svg>
                             </button>
-                            <h1 className="text-2xl font-bold text-white">Now Playing</h1>
+                            <div className="text-sm font-bold text-white flex items-baseline gap-2 min-w-0 flex-1">
+                                <span className="flex-shrink-0 text-xl">Now Playing:</span>
+                                <div className="overflow-hidden relative flex-1">
+                                    <div
+                                        className={`whitespace-nowrap inline-flex animate-marquee`}
+                                    >
+                                        <span>{book.book.name}</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </nav>
-
             <main className="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8 pb-6">
                 <div className="px-4 py-6 sm:px-0">
                     <div className="bg-gray-900 rounded-lg shadow-lg overflow-hidden border border-gray-800">
