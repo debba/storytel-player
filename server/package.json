@@ -2,24 +2,29 @@
   "name": "storytel-server",
   "version": "1.0.0",
   "description": "Storytel Web Server",
-  "main": "server.js",
+  "main": "server.ts",
   "scripts": {
     "start": "node dist/server.js",
-    "dev": "nodemon server.js",
-    "build": "node build.js",
-    "build:prod": "NODE_ENV=production node build.js",
-    "build:watch": "nodemon --exec \"node build.js\" --ext js --ignore dist/"
+    "dev": "tsx watch server.ts",
+    "build": "tsx build.ts",
+    "build:prod": "NODE_ENV=production tsx build.ts",
+    "build:watch": "nodemon --exec \"tsx build.ts\" --ext ts --ignore dist/"
   },
   "dependencies": {
     "@fastify/cors": "^11.1.0",
-    "@fastify/jwt": "^10.0.0",
     "axios": "^1.6.0",
     "crypto": "^1.0.1",
-    "dotenv": "^17.2.2",
-    "fastify": "^5.6.1"
+    "dotenv": "^17.2.2"
   },
   "devDependencies": {
+    "@fastify/jwt": "^10.0.0",
+    "@types/cors": "^2.8.19",
+    "@types/node": "^24.6.0",
     "esbuild": "^0.19.12",
-    "nodemon": "^3.0.1"
+    "fastify": "^5.6.1",
+    "nodemon": "^3.0.1",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.2"
   }
 }

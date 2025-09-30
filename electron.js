@@ -204,7 +204,7 @@ async function handleEvents(){
 
     const serverPath = path.join(__dirname, 'server', 'dist', 'server.js');
 
-    const server = require(serverPath);
+    const {default: server} = require(serverPath);
     await server.ready();
 
     const objectClonable = (res) => {

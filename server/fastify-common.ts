@@ -1,22 +1,50 @@
-const fastify = require('fastify')({ logger: process.env.NODE_ENV !== 'production' });
-const StorytelClient = require('./storytelApi');
+import Fastify, { FastifyRequest, FastifyReply } from 'fastify';
+import StorytelClient from './storytelApi';
+import crypto from 'crypto';
+import dotenv from 'dotenv';
+import fastifyJWT from '@fastify/jwt';
+import fastifyCors from '@fastify/cors';
+
+// Extend JWT user type
+interface JWTUser {
+    storytelToken: string;
+    jwt: string;
+    email: string;
+}
+
+// Extend FastifyRequest with user property
+declare module '@fastify/jwt' {
+    interface FastifyJWT {
+        user: JWTUser;
+    }
+}
+
+// Extend Fastify instance with authenticate decorator
+declare module 'fastify' {
+    interface FastifyInstance {
+        authenticate: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
+    }
+}
+
+
+dotenv.config();
+
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-this-in-production';
 
-require('dotenv').config();
+const fastify = Fastify({ logger: process.env.NODE_ENV !== 'production' });
 
 // Register plugins
-fastify.register(require('@fastify/cors'), {
+fastify.register(fastifyCors, {
     origin: 'http://localhost:3000',
     credentials: true,
     methods: ['POST', 'PATCH', 'PUT', 'DELETE'],
 });
 
-fastify.register(require('@fastify/jwt'), {
+fastify.register(fastifyJWT, {
     secret: JWT_SECRET
 });
-
 // Authentication decorator
-fastify.decorate('authenticate', async function (request, reply) {
+fastify.decorate('authenticate', async function (request: FastifyRequest, reply: FastifyReply) {
     try {
         await request.jwtVerify();
     } catch (err) {
@@ -25,7 +53,9 @@ fastify.decorate('authenticate', async function (request, reply) {
 });
 
 // Route per login
-fastify.post('/api/login', async (request, reply) => {
+fastify.post<{
+    Body: { email: string; password: string };
+}>('/api/login', async (request, reply) => {
     try {
         const { email, password } = request.body;
 
@@ -35,6 +65,7 @@ fastify.post('/api/login', async (request, reply) => {
 
         const storytelClient = new StorytelClient();
         const loginData = await storytelClient.login(email, password);
+
         // Create JWT token with storytel client data
         const token = fastify.jwt.sign({
             storytelToken: loginData.accountInfo.singleSignToken,
@@ -43,13 +74,13 @@ fastify.post('/api/login', async (request, reply) => {
         });
 
         reply.send({ success: true, message: 'Login successful', token });
-    } catch (error) {
+    } catch (error: any) {
         reply.code(401).send({ error: error.message });
     }
 });
 
 // Route per logout
-fastify.post('/api/logout', async (request, reply) => {
+fastify.post('/api/logout', async (_request, reply) => {
     reply.send({ success: true, message: 'Logged out successfully' });
 });
 
@@ -62,19 +93,22 @@ fastify.get('/api/bookshelf', {
 
         storytelClient.loginData = {
             accountInfo: {
-                singleSignToken: request.user.storytelToken
+                singleSignToken: request.user.storytelToken,
+                jwt: ''
             }
         };
 
         const bookshelf = await storytelClient.getBookshelf();
         reply.send(bookshelf);
-    } catch (error) {
+    } catch (error: any) {
         reply.code(500).send({ error: error.message });
     }
 });
 
 // Route per ottenere stream URL
-fastify.post('/api/stream', {
+fastify.post<{
+    Body: { bookId: string };
+}>('/api/stream', {
     preHandler: fastify.authenticate
 }, async (request, reply) => {
     try {
@@ -84,201 +118,207 @@ fastify.post('/api/stream', {
         // Set the login data from JWT token
         storytelClient.loginData = {
             accountInfo: {
-                singleSignToken: request.user.storytelToken
+                singleSignToken: request.user.storytelToken,
+                jwt: ''
             }
         };
         const streamUrl = await storytelClient.getStreamUrl(bookId);
         reply.send({ streamUrl });
-    } catch (error) {
+    } catch (error: any) {
         reply.code(500).send({ error: error.message });
     }
 });
 
 // Route per salvare bookmark
-fastify.post('/api/bookmarks/:consumableId', {
+fastify.post<{
+    Params: { consumableId: string };
+    Body: { position: number; note: string };
+}>('/api/bookmarks/:consumableId', {
     preHandler: fastify.authenticate
 }, async (request, reply) => {
     try {
-
         const { consumableId } = request.params;
-
         const { position, note } = request.body;
 
         const storytelClient = new StorytelClient();
         // Set the login data from JWT token
         storytelClient.loginData = {
             accountInfo: {
-                jwt: request.user.jwt
+                jwt: request.user.jwt,
+                singleSignToken: ''
             }
         };
 
         await storytelClient.setBookmark(consumableId, position, note);
 
         reply.send({ success: true, message: 'Bookmark saved' });
-    } catch (error) {
+    } catch (error: any) {
         reply.code(500).send({ error: error.message });
     }
 });
 
-fastify.delete('/api/bookmarks/:consumableId/:bookmarkId', {
+fastify.delete<{
+    Params: { consumableId: string; bookmarkId: string };
+}>('/api/bookmarks/:consumableId/:bookmarkId', {
     preHandler: fastify.authenticate
 }, async (request, reply) => {
     try {
-
         const { consumableId, bookmarkId } = request.params;
         const storytelClient = new StorytelClient();
         // Set the login data from JWT token
         storytelClient.loginData = {
             accountInfo: {
-                jwt: request.user.jwt
+                jwt: request.user.jwt,
+                singleSignToken: ''
             }
         };
 
         await storytelClient.deleteBookmark(consumableId, bookmarkId);
 
         reply.send({ success: true, message: 'Bookmark removed' });
-    } catch (error) {
+    } catch (error: any) {
         reply.code(500).send({ error: error.message });
     }
 });
 
-fastify.put('/api/bookmarks/:consumableId/:bookmarkId', {
+fastify.put<{
+    Params: { consumableId: string; bookmarkId: string };
+    Body: any;
+}>('/api/bookmarks/:consumableId/:bookmarkId', {
     preHandler: fastify.authenticate
 }, async (request, reply) => {
     try {
-
         const { consumableId, bookmarkId } = request.params;
         const storytelClient = new StorytelClient();
         // Set the login data from JWT token
         storytelClient.loginData = {
             accountInfo: {
-                jwt: request.user.jwt
+                jwt: request.user.jwt,
+                singleSignToken: ''
             }
         };
 
         await storytelClient.updateBookmark(consumableId, bookmarkId, request.body);
 
         reply.send({ success: true, message: 'Bookmark removed' });
-    } catch (error) {
+    } catch (error: any) {
         reply.code(500).send({ error: error.message });
     }
 });
-
-
-
 
 fastify.get('/api/bookmark-positional', {
     preHandler: fastify.authenticate
 }, async (request, reply) => {
     try {
-
         const storytelClient = new StorytelClient();
         // Set the login data from JWT token
         storytelClient.loginData = {
             accountInfo: {
-                jwt: request.user.jwt
+                jwt: request.user.jwt,
+                singleSignToken: ''
             }
         };
 
         const bookmarks = await storytelClient.getBookmarkPositional();
         reply.send(bookmarks);
-
-    } catch (error) {
+    } catch (error: any) {
         reply.code(500).send({ error: error.message });
     }
 });
 
-
-fastify.get('/api/bookmark-positional/:consumableId', {
+fastify.get<{
+    Params: { consumableId: string };
+}>('/api/bookmark-positional/:consumableId', {
     preHandler: fastify.authenticate
 }, async (request, reply) => {
     try {
-
-
         const { consumableId } = request.params;
 
         const storytelClient = new StorytelClient();
         // Set the login data from JWT token
         storytelClient.loginData = {
             accountInfo: {
-                jwt: request.user.jwt
+                jwt: request.user.jwt,
+                singleSignToken: ''
             }
         };
 
         const bookmarks = await storytelClient.getBookmarkPositional(consumableId);
         reply.send(bookmarks);
-
-    } catch (error) {
+    } catch (error: any) {
         reply.code(500).send({ error: error.message });
     }
 });
 
-
-fastify.put('/api/bookmark-positional/:consumableId', {
+fastify.put<{
+    Params: { consumableId: string };
+    Body: { position: number };
+}>('/api/bookmark-positional/:consumableId', {
     preHandler: fastify.authenticate
 }, async (request, reply) => {
     try {
-
-
         const { consumableId } = request.params;
-        const {position} = request.body;
+        const { position } = request.body;
 
         const storytelClient = new StorytelClient();
         // Set the login data from JWT token
         storytelClient.loginData = {
             accountInfo: {
-                jwt: request.user.jwt
+                jwt: request.user.jwt,
+                singleSignToken: ''
             }
         };
 
         const deviceId = process.env.DEVICE_ID || crypto.randomUUID().toUpperCase();
         const updated = await storytelClient.updateBookmarkPositional(consumableId, position, deviceId);
         reply.send(updated);
-
-    } catch (error) {
+    } catch (error: any) {
         reply.code(500).send({ error: error.message });
     }
 });
 
-fastify.get('/api/bookmarks/:consumableId', {
+fastify.get<{
+    Params: { consumableId: string };
+}>('/api/bookmarks/:consumableId', {
     preHandler: fastify.authenticate
 }, async (request, reply) => {
     try {
-
         const storytelClient = new StorytelClient();
         const { consumableId } = request.params;
 
         // Set the login data from JWT token
         storytelClient.loginData = {
             accountInfo: {
-                jwt: request.user.jwt
+                jwt: request.user.jwt,
+                singleSignToken: ''
             }
         };
 
         const bookmarks = await storytelClient.getBookmark(consumableId);
         reply.send(bookmarks);
-
-    } catch (error) {
+    } catch (error: any) {
         reply.code(500).send({ error: error.message });
     }
 });
 
-fastify.get('/api/bookmetadata/:consumableId', {
+fastify.get<{
+    Params: { consumableId: string };
+}>('/api/bookmetadata/:consumableId', {
     preHandler: fastify.authenticate
-}, async(request, reply) => {
+}, async (request, reply) => {
     try {
-
         const { consumableId } = request.params;
         const storytelClient = new StorytelClient();
 
         storytelClient.loginData = {
             accountInfo: {
-                jwt: request.user.jwt
+                jwt: request.user.jwt,
+                singleSignToken: ''
             }
         };
         const bookInfoContent = await storytelClient.getPlayBookMetaData(consumableId);
         reply.send(bookInfoContent);
-    } catch (error) {
+    } catch (error: any) {
         reply.code(500).send({ error: error.message });
     }
 });
@@ -293,4 +333,4 @@ fastify.get('/api/auth/status', async (request, reply) => {
     }
 });
 
-module.exports = fastify;
+export default fastify;

@@ -1,9 +1,9 @@
-const esbuild = require('esbuild');
+import esbuild from 'esbuild';
 
-const build = async () => {
+const build = async (): Promise<void> => {
     try {
         await esbuild.build({
-            entryPoints: ['fastify-common.js'],
+            entryPoints: ['fastify-common.ts'],
             bundle: true,
             platform: 'node',
             target: 'node18',

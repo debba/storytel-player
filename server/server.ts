@@ -1,7 +1,8 @@
-const fastifyCmn = require('./fastify-common');
-const PORT = process.env.PORT || 3001;
+import fastifyCmn from './fastify-common';
 
-const start = async () => {
+const PORT = parseInt(process.env.PORT || '3001', 10);
+
+const start = async (): Promise<void> => {
     try {
         await fastifyCmn.listen({ port: PORT, host: '0.0.0.0' });
         console.log(`Storytel server running on port ${PORT}`);
@@ -10,6 +11,5 @@ const start = async () => {
         process.exit(1);
     }
 };
-
 
 start();
