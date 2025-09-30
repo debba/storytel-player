@@ -403,22 +403,54 @@ function PlayerView() {
                 <div className="px-4 py-6 sm:px-0">
                     <div className="bg-gray-900 rounded-lg shadow-lg overflow-hidden border border-gray-800">
                         {/* Book Info */}
-                        <div className="p-6 flex items-center space-x-6 border-b border-gray-800">
-                            {book.book.cover && (
-                                <img
-                                    src={"https://www.storytel.com" + book.book.cover}
-                                    alt={book.book.name}
-                                    className="w-32 h-44 object-cover rounded-lg shadow-md"
-                                />
-                            )}
-                            <div className="flex-1">
-                                <h2 className="text-2xl font-bold text-white mb-2">{book.book.name}</h2>
-                                <p className="text-lg text-gray-300 mb-1">Author: {book.book.authorsAsString}</p>
-                                <p className="text-lg text-gray-300 mb-3">Narrator: {book.abook.narratorAsString}</p>
-                                <div className="flex items-center space-x-4">
-                                    <span className="text-sm text-orange-400">Velocità: {playbackRate}x</span>
+                        <div className="p-6 flex flex-col items-center">
+                            <div className="flex flex-col items-center mb-6">
+                                {book.book.cover && (
+                                    <img
+                                        src={"https://www.storytel.com" + book.book.cover}
+                                        alt={book.book.name}
+                                        className="w-64 h-64 object-cover rounded-lg shadow-2xl mb-4"
+                                    />
+                                )}
+                                <div className="text-center">
+                                    <h2 className="text-lg font-bold text-white mb-0.5">{book.book.name}</h2>
+                                    <p className="text-sm text-gray-300 mb-0.5">{book.book.authorsAsString}</p>
+                                    <p className="text-sm text-gray-300 mb-2">{book.abook.narratorAsString}</p>
                                 </div>
                             </div>
+                        </div>
+                        <div className="px-6 py-0 flex flex-col">
+                        {(() => {
+                            let cumulativeTime = 0;
+                            let currentChapterData = null;
+
+                            for (let i = 0; i < chapters.length; i++) {
+                                const chapter = chapters[i];
+                                const chapterStart = cumulativeTime;
+                                const chapterEnd = cumulativeTime + (chapter.durationInSeconds || 0);
+
+                                if (currentTime >= chapterStart && currentTime < chapterEnd) {
+                                    currentChapterData = {
+                                        ...chapter,
+                                        title: chapter.title || `Chapter ${chapter.number}`,
+                                        start: chapterStart,
+                                        end: chapterEnd
+                                    };
+                                    break;
+                                }
+
+                                cumulativeTime = chapterEnd;
+                            }
+
+                            return currentChapterData ? (
+                                <div className="text-left mt-2">
+                                    <p className="text-base text-white">{currentChapterData.title}</p>
+                                    <p className="text-sm text-gray-400">
+                                        {formatTime((currentChapterData.end - currentTime) / playbackRate)}
+                                    </p>
+                                </div>
+                            ) : null;
+                        })()}
                         </div>
 
                         {/* Audio Element */}
