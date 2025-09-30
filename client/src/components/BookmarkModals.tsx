@@ -1,5 +1,5 @@
 import React from 'react';
-import {formatBookmarkTime, formatTime} from "../utils/helpers";
+import {formatTime} from "../utils/helpers";
 
 function BookmarkModals({
   // Bookmarks Modal
@@ -66,7 +66,7 @@ function BookmarkModals({
                       <div className="flex justify-between items-start">
                         <div className="flex-1">
                           <div className="text-sm font-medium text-orange-400">
-                            {formatBookmarkTime(bookmark.position)}
+                            {formatTime(bookmark.position)}
                           </div>
                           {bookmark.note && (
                             <div className="text-sm text-gray-300 mt-1">
@@ -197,7 +197,7 @@ function BookmarkModals({
 
             <div className="mb-4">
               <p className="text-sm text-gray-400 mb-4">
-                Posizione: <span className="font-medium text-orange-400">{formatBookmarkTime(bookmarkToEdit.position)}</span>
+                Posizione: <span className="font-medium text-orange-400">{formatTime(bookmarkToEdit.position)}</span>
               </p>
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Nota
@@ -246,7 +246,7 @@ function BookmarkModals({
               </p>
               <div className="bg-gray-800 rounded-lg p-3 mb-4 border border-gray-600">
                 <div className="text-sm font-medium text-orange-400">
-                  {formatBookmarkTime(bookmarkToDelete.position)}
+                  {formatTime(bookmarkToDelete.position)}
                 </div>
                 {bookmarkToDelete.note && (
                   <div className="text-sm text-gray-300 mt-1">

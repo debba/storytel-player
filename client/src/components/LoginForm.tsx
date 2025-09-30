@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../services/api';
+import api from '../utils/api';
 import storage from "../utils/storage";
 
 function LoginForm({ onLogin }) {

@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import LoginForm from './components/LoginForm';
 import Dashboard from './components/Dashboard';
 import PlayerView from './components/PlayerView';
-import api from './services/api';
+import api from './utils/api';
 import storage from "./utils/storage";
 
 function App() {
@@ -27,7 +27,7 @@ function App() {
       setIsAuthenticated(response.data.authenticated);
     } catch (error) {
       setIsAuthenticated(false);
-      storage.remove('token');
+      await storage.remove('token');
     } finally {
       setIsLoading(false);
     }
@@ -43,7 +43,7 @@ function App() {
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
-      storage.remove('token');
+      await storage.remove('token');
       setIsAuthenticated(false);
     }
   };

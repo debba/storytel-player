@@ -1,19 +1,20 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import api from '../services/api';
+import api from '../utils/api';
 import BookCard from './BookCard';
 import LoadingState from './LoadingState';
 import ErrorState from './ErrorState';
 import DashboardHeader from './DashboardHeader';
+import {BookShelfEntity, BookShelfResponse} from "../interfaces/books";
 
 function Dashboard({onLogout}) {
     const navigate = useNavigate();
-    const [books, setBooks] = useState([]);
+    const [books, setBooks] = useState<BookShelfEntity[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
-    const [, setCurrentBook] = useState(null);
+    const [, setCurrentBook] = useState<BookShelfEntity | null>(null);
     const [filterStatus, setFilterStatus] = useState(-1)
-    const [filteredBooks, setFilteredBooks] = useState([]);
+    const [filteredBooks, setFilteredBooks] = useState<BookShelfEntity[]>([]);
 
     useEffect(() => {
         loadBookshelf();
@@ -30,16 +31,16 @@ function Dashboard({onLogout}) {
     const loadBookshelf = async () => {
         try {
             setIsLoading(true);
-            const response = await api.get('/bookshelf');
+            const response = await api.get<BookShelfResponse>('/bookshelf');
             setBooks(response.data.books);
-        } catch (error) {
+        } catch (error: any) {
             setError(error.response?.data?.error || 'Failed to load bookshelf');
         } finally {
             setIsLoading(false);
         }
     };
 
-    const handleBookSelect = (book) => {
+    const handleBookSelect = (book: BookShelfEntity) => {
         setCurrentBook(book);
         navigate(`/player/${book.abook.id}`, {
             state: {
@@ -49,7 +50,7 @@ function Dashboard({onLogout}) {
     };
 
     const handleBookShelfStatus = (
-        status
+        status: BookShelfEntity['status']
     ) => {
         setFilterStatus(status);
     };

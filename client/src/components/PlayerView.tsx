@@ -1,6 +1,6 @@
-import React, {useState, useEffect, useRef, useCallback} from 'react';
-import {useParams, useLocation, useNavigate} from 'react-router-dom';
-import api from '../services/api';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
+import {useLocation, useNavigate, useParams} from 'react-router-dom';
+import api from '../utils/api';
 import LoadingState from './LoadingState';
 import ErrorState from './ErrorState';
 import BookmarkModals from "./BookmarkModals";
@@ -60,8 +60,7 @@ function PlayerView() {
 
     const goToBookmark = useCallback((position) => {
         if (audioRef.current) {
-            const seconds = Math.floor(position / 1000);
-            audioRef.current.currentTime = seconds;
+            audioRef.current.currentTime = Math.floor(position / 1000);
             setShowBookmarksModal(false);
         }
     }, [setShowBookmarksModal]);

@@ -71,8 +71,8 @@
     },
     "linux": {
       "category": "multimedia",
-      "target": "AppImage",
-      "icon": "client/public/assets/icon.png"
+      "target": ["AppImage", "pacman"],
+      "icon": "assets/icon.png"
     }
   }
 }

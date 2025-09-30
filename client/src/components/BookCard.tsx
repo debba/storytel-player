@@ -1,18 +1,13 @@
 import React from 'react';
+import {formatTime} from "../utils/helpers";
+import {BookShelfEntity} from "../interfaces/books";
 
-function BookCard({ book, onBookSelect }) {
+function BookCard({ book, onBookSelect } : {book:BookShelfEntity}) {
 
   const position = book.abookMark ?  book.abookMark.pos : 0;
   const totalDuration = book.abook.time;
 
-  const formatTime = (microseconds) => {
-    const totalSeconds = Math.floor(microseconds / 1000 / 1000);
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    return `${hours} h ${minutes} min rimanente`;
-  };
-
-  const getCategoryLabel = (book) => {
+  const getCategoryLabel = (book: BookShelfEntity) => {
     return book.book.category.title;
   };
 
