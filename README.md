@@ -2,6 +2,11 @@
 
 A desktop application for playing Storytel audiobooks, built with React, Fastify, and Electron.
 
+## Screenshots
+
+![Library View](assets/screenshot-1.png)
+![Player View](assets/screenshot-2.png)
+
 ## Features
 
 - **Desktop App**: Native desktop application with system tray integration
