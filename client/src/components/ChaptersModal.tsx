@@ -64,7 +64,7 @@ function ChaptersModal({ isOpen, chapters, currentTime, playbackRate, onClose, o
                   >
                     <div className="flex items-center justify-between p-3">
                       <div className="flex-1">
-                        <h4 className="font-medium text-white text-sm">{chapter.title}</h4>
+                        <h4 className="font-medium text-white text-sm">{chapter.title || `Chapter ${chapter.number}`}</h4>
                         {isCurrentChapter ? (
                           <div className="flex justify-between items-center">
                             <p className="text-xs text-gray-400">
