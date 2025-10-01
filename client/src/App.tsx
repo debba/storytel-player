@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {Routes, Route, Navigate, MemoryRouter, BrowserRouter} from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import LoginForm from './components/LoginForm';
 import Dashboard from './components/Dashboard';
 import PlayerView from './components/PlayerView';
@@ -10,6 +11,7 @@ const useMemoryRouter = import.meta.env.VITE_REACT_APP_USE_MEMORY_ROUTER === 'tr
 const Router = useMemoryRouter ? MemoryRouter : BrowserRouter;
 
 function App() {
+  const { t } = useTranslation();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -54,7 +56,7 @@ function App() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-xl text-gray-600">Loading...</div>
+        <div className="text-xl text-gray-600">{t('common.loading')}</div>
       </div>
     );
   }

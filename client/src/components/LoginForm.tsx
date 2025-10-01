@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import api from '../utils/api';
 import storage from "../utils/storage";
 
 // TODO: Define proper interface for LoginForm props
 function LoginForm({ onLogin }: { onLogin: any }) {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -16,7 +18,7 @@ function LoginForm({ onLogin }: { onLogin: any }) {
     e.preventDefault();
 
     if (!email || !password) {
-      setError('Please enter both email and password');
+      setError(t('login.errors.required'));
       return;
     }
 
@@ -30,7 +32,7 @@ function LoginForm({ onLogin }: { onLogin: any }) {
       onLogin();
       navigate('/');
     } catch (error: any) {
-      setError(error.response?.data?.error || 'Login failed');
+      setError(error.response?.data?.error || t('login.errors.failed'));
     } finally {
       setIsLoading(false);
     }
@@ -46,17 +48,17 @@ function LoginForm({ onLogin }: { onLogin: any }) {
                     <img src={'assets/icon.png'} alt={"Storytel"} className="w-12 h-12"/>
                 </div>
                 <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
-                Sign in to Storytel
+                {t('login.title')}
               </h2>
               <p className="mt-2 text-center text-sm text-gray-400">
-                Access your audiobook library
+                {t('login.subtitle')}
               </p>
             </div>
             <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
               <div className="space-y-4">
                 <div>
                   <label htmlFor="email" className="sr-only">
-                    Email address
+                    {t('login.email')}
                   </label>
                   <input
                     id="email"
@@ -67,12 +69,12 @@ function LoginForm({ onLogin }: { onLogin: any }) {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="relative block w-full px-3 py-2 border border-gray-600 placeholder-gray-400 text-white bg-gray-800 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
-                    placeholder="Email address"
+                    placeholder={t('login.email')}
                   />
                 </div>
                 <div className="relative">
                   <label htmlFor="password" className="sr-only">
-                    Password
+                    {t('login.password')}
                   </label>
                   <input
                     id="password"
@@ -83,7 +85,7 @@ function LoginForm({ onLogin }: { onLogin: any }) {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="relative block w-full px-3 py-2 pr-10 border border-gray-600 placeholder-gray-400 text-white bg-gray-800 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 focus:z-10 sm:text-sm"
-                    placeholder="Password"
+                    placeholder={t('login.password')}
                   />
                   <button
                     type="button"
@@ -122,10 +124,10 @@ function LoginForm({ onLogin }: { onLogin: any }) {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
-                      Signing in...
+                      {t('login.signingIn')}
                     </div>
                   ) : (
-                    'Sign in'
+                    t('login.signIn')
                   )}
                 </button>
               </div>

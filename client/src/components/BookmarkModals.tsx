@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {formatTime} from "../utils/helpers";
 import { Bookmark } from "../interfaces/bookmarks";
 
@@ -69,7 +70,7 @@ function BookmarkModals({
   onCloseDeleteConfirmModal,
   onDeleteBookmark
 }: BookmarkModalsProps) {
-
+  const { t } = useTranslation();
 
   return (
     <>
@@ -78,7 +79,7 @@ function BookmarkModals({
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-gray-900 rounded-lg p-6 max-w-md w-full mx-4 max-h-96 flex flex-col border border-gray-700">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-white">I tuoi Bookmarks</h3>
+              <h3 className="text-lg font-semibold text-white">{t('bookmarks.title')}</h3>
               <button
                 onClick={onCloseBookmarksModal}
                 className="text-gray-400 hover:text-white"
@@ -119,7 +120,7 @@ function BookmarkModals({
                               onShowEditBookmarkModal(bookmark);
                             }}
                             className="p-1 text-gray-400 hover:text-orange-400 transition-colors"
-                            title="Modifica bookmark"
+                            title={t('bookmarks.tooltipEdit')}
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -131,7 +132,7 @@ function BookmarkModals({
                               onShowDeleteConfirmModal(bookmark);
                             }}
                             className="p-1 text-gray-400 hover:text-red-600 transition-colors"
-                            title="Elimina bookmark"
+                            title={t('bookmarks.tooltipDelete')}
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -147,7 +148,7 @@ function BookmarkModals({
                   <svg className="w-12 h-12 mx-auto mb-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                   </svg>
-                  <p className="text-gray-400">Nessun bookmark salvato</p>
+                  <p className="text-gray-400">{t('bookmarks.noBookmarks')}</p>
                 </div>
               )}
             </div>
@@ -157,7 +158,7 @@ function BookmarkModals({
                 onClick={onShowCreateBookmarkModal}
                 className="w-full px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors"
               >
-                Crea Nuovo Bookmark
+                {t('bookmarks.createNew')}
               </button>
             </div>
           </div>
@@ -169,7 +170,7 @@ function BookmarkModals({
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-gray-900 rounded-lg p-6 max-w-md w-full mx-4 border border-gray-700">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-white">Crea Nuovo Bookmark</h3>
+              <h3 className="text-lg font-semibold text-white">{t('bookmarks.createTitle')}</h3>
               <button
                 onClick={onCloseCreateBookmarkModal}
                 className="text-gray-400 hover:text-white"
@@ -182,17 +183,17 @@ function BookmarkModals({
 
             <div className="mb-4">
               <p className="text-sm text-gray-400 mb-2">
-                Posizione attuale: {formatTime(currentTime / playbackRate)}
+                {t('bookmarks.currentPosition')} {formatTime(currentTime / playbackRate)}
               </p>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Nota (opzionale)
+                {t('bookmarks.noteOptional')}
               </label>
               <textarea
                 value={newBookmarkNote}
                 onChange={(e) => onNewBookmarkNoteChange(e.target.value)}
                 className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-white"
                 rows={3}
-                placeholder="Aggiungi una nota a questo bookmark..."
+                placeholder={t('bookmarks.notePlaceholderCreate')}
               />
             </div>
 
@@ -201,13 +202,13 @@ function BookmarkModals({
                 onClick={onCloseCreateBookmarkModal}
                 className="flex-1 px-4 py-2 bg-gray-800 text-gray-300 rounded-md hover:bg-gray-700 transition-colors"
               >
-                Annulla
+                {t('common.cancel')}
               </button>
               <button
                 onClick={onCreateBookmark}
                 className="flex-1 px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors"
               >
-                Salva Bookmark
+                {t('bookmarks.save')}
               </button>
             </div>
           </div>
@@ -219,7 +220,7 @@ function BookmarkModals({
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-gray-900 rounded-lg p-6 max-w-md w-full mx-4 border border-gray-700">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-white">Modifica Bookmark</h3>
+              <h3 className="text-lg font-semibold text-white">{t('bookmarks.editTitle')}</h3>
               <button
                 onClick={onCloseEditBookmarkModal}
                 className="text-gray-400 hover:text-white"
@@ -232,17 +233,17 @@ function BookmarkModals({
 
             <div className="mb-4">
               <p className="text-sm text-gray-400 mb-4">
-                Posizione: <span className="font-medium text-orange-400">{formatTime(bookmarkToEdit.position)}</span>
+                {t('bookmarks.position')} <span className="font-medium text-orange-400">{formatTime(bookmarkToEdit.position)}</span>
               </p>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Nota
+                {t('bookmarks.note')}
               </label>
               <textarea
                 value={editBookmarkNote}
                 onChange={(e) => onEditBookmarkNoteChange(e.target.value)}
                 className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-white"
                 rows={3}
-                placeholder="Modifica la nota per questo bookmark..."
+                placeholder={t('bookmarks.notePlaceholderEdit')}
               />
             </div>
 
@@ -251,13 +252,13 @@ function BookmarkModals({
                 onClick={onCloseEditBookmarkModal}
                 className="flex-1 px-4 py-2 bg-gray-800 text-gray-300 rounded-md hover:bg-gray-700 transition-colors"
               >
-                Annulla
+                {t('common.cancel')}
               </button>
               <button
                 onClick={onEditBookmark}
                 className="flex-1 px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors"
               >
-                Salva Modifiche
+                {t('bookmarks.saveChanges')}
               </button>
             </div>
           </div>
@@ -275,9 +276,9 @@ function BookmarkModals({
             </div>
 
             <div className="text-center">
-              <h3 className="text-lg font-semibold text-white mb-2">Elimina Bookmark</h3>
+              <h3 className="text-lg font-semibold text-white mb-2">{t('bookmarks.deleteTitle')}</h3>
               <p className="text-gray-400 mb-2">
-                Sei sicuro di voler eliminare questo bookmark?
+                {t('bookmarks.deleteConfirm')}
               </p>
               <div className="bg-gray-800 rounded-lg p-3 mb-4 border border-gray-600">
                 <div className="text-sm font-medium text-orange-400">
@@ -290,7 +291,7 @@ function BookmarkModals({
                 )}
               </div>
               <p className="text-sm text-gray-500 mb-6">
-                Questa azione non può essere annullata.
+                {t('bookmarks.deleteWarning')}
               </p>
             </div>
 
@@ -299,13 +300,13 @@ function BookmarkModals({
                 onClick={onCloseDeleteConfirmModal}
                 className="flex-1 px-4 py-2 bg-gray-800 text-gray-300 rounded-md hover:bg-gray-700 transition-colors"
               >
-                Annulla
+                {t('common.cancel')}
               </button>
               <button
                 onClick={onDeleteBookmark}
                 className="flex-1 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
               >
-                Elimina
+                {t('common.delete')}
               </button>
             </div>
           </div>

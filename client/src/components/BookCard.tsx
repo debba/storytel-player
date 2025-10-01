@@ -1,6 +1,7 @@
 import React from 'react';
 import {formatMicrosecondsTime, formatTime} from "../utils/helpers";
 import {BookShelfEntity} from "../interfaces/books";
+import {useTranslation} from "react-i18next";
 
 interface BookCardProps {
   book: BookShelfEntity;
@@ -8,6 +9,7 @@ interface BookCardProps {
 }
 
 function BookCard({ book, onBookSelect } : BookCardProps) {
+  const { t } = useTranslation();
 
   const position = book.abookMark ?  book.abookMark.pos : 0;
   const totalDuration = book.abook.time;
@@ -36,13 +38,13 @@ function BookCard({ book, onBookSelect } : BookCardProps) {
         <div className="flex-1 min-w-0 flex flex-col">
           <div className="mb-1">
             <h2 className="text-lg font-bold text-white mb-0.5 truncate">{book.book.name}</h2>
-            <p className="text-sm text-gray-300 mb-0.5 truncate">Author: {book.book.authorsAsString}</p>
-            <p className="text-sm text-gray-300 mb-2 truncate">Narrator; {book.abook.narratorAsString}</p>
+            <p className="text-sm text-gray-300 mb-0.5 truncate">{t('bookCard.author')} {book.book.authorsAsString}</p>
+            <p className="text-sm text-gray-300 mb-2 truncate">{t('bookCard.narrator')} {book.abook.narratorAsString}</p>
           </div>
 
           <div className="mt-auto flex items-center gap-4">
             <p className="text-sm text-white whitespace-nowrap">
-              {remainingTime > 0 ? formatMicrosecondsTime(remainingTime) + ' remanining' : 'Completed'}
+              {remainingTime > 0 ? formatMicrosecondsTime(remainingTime) + ' ' + t('bookCard.remaining') : t('bookCard.completed')}
             </p>
             {position > 0 && (
               <div className="w-[100px] bg-gray-700 rounded-full h-2">

@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import api from '../utils/api';
 import BookCard from './BookCard';
 import LoadingState from './LoadingState';
@@ -12,6 +13,7 @@ interface DashboardProps {
 }
 
 function Dashboard({onLogout}: DashboardProps) {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [books, setBooks] = useState<BookShelfEntity[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -38,7 +40,7 @@ function Dashboard({onLogout}: DashboardProps) {
             const response = await api.get<BookShelfResponse>('/bookshelf');
             setBooks(response.data.books);
         } catch (error: any) {
-            setError(error.response?.data?.error || 'Failed to load bookshelf');
+            setError(error.response?.data?.error || t('dashboard.loadError'));
         } finally {
             setIsLoading(false);
         }
@@ -60,7 +62,7 @@ function Dashboard({onLogout}: DashboardProps) {
     };
 
     if (isLoading) {
-        return <LoadingState message="Loading your library..."/>;
+        return <LoadingState message={t('dashboard.loading')}/>;
     }
 
     if (error) {
@@ -75,8 +77,8 @@ function Dashboard({onLogout}: DashboardProps) {
             <main className="max-w-4xl mx-auto py-6 px-4 pb-32">
                 {books.length === 0 ? (
                     <div className="text-center py-20">
-                        <div className="text-gray-400 text-xl mb-4">No books found</div>
-                        <p className="text-gray-500">Your library appears to be empty.</p>
+                        <div className="text-gray-400 text-xl mb-4">{t('dashboard.noBooks')}</div>
+                        <p className="text-gray-500">{t('dashboard.emptyLibrary')}</p>
                     </div>
                 ) : (
                     <>
@@ -98,7 +100,7 @@ function Dashboard({onLogout}: DashboardProps) {
                                         : 'bg-gray-700 hover:bg-gray-600 text-white'
                                 }`}
                             >
-                                Not started
+                                {t('dashboard.filters.notStarted')}
                             </button>
                             <button
                                 onClick={() => handleBookShelfStatus(2)}
@@ -108,7 +110,7 @@ function Dashboard({onLogout}: DashboardProps) {
                                         : 'bg-gray-700 hover:bg-gray-600 text-white'
                                 }`}
                             >
-                                Started
+                                {t('dashboard.filters.started')}
                             </button>
                             <button
                                 onClick={() => handleBookShelfStatus(3)}
@@ -118,7 +120,7 @@ function Dashboard({onLogout}: DashboardProps) {
                                         : 'bg-gray-700 hover:bg-gray-600 text-white'
                                 }`}
                             >
-                                Conclused
+                                {t('dashboard.filters.concluded')}
                             </button>
                         </div>
                         <div className="space-y-8">

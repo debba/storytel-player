@@ -1,0 +1,98 @@
+{
+  "login": {
+    "title": "Sign in to Storytel",
+    "subtitle": "Access your audiobook library",
+    "email": "Email address",
+    "password": "Password",
+    "signIn": "Sign in",
+    "signingIn": "Signing in...",
+    "errors": {
+      "required": "Please enter both email and password",
+      "failed": "Login failed"
+    }
+  },
+  "dashboard": {
+    "title": "My Library",
+    "logout": "Logout",
+    "search": "Search books...",
+    "noBooks": "No books found",
+    "emptyLibrary": "Your library appears to be empty.",
+    "loading": "Loading your library...",
+    "loadError": "Failed to load bookshelf",
+    "filters": {
+      "notStarted": "Not started",
+      "started": "Started",
+      "concluded": "Concluded"
+    }
+  },
+  "player": {
+    "chapters": "Chapters",
+    "bookmarks": "Bookmarks",
+    "addBookmark": "Add bookmark",
+    "speed": "Speed",
+    "goTo": "Go to",
+    "goto": "Goto",
+    "playing": "Playing",
+    "paused": "Paused",
+    "nowPlaying": "Now Playing:",
+    "loadingAudio": "Loading audio...",
+    "loadingBookData": "Loading book data...",
+    "loadError": "Failed to load audio stream",
+    "loadChaptersError": "Failed to load chapters",
+    "loadBookmarksError": "Failed to load bookmarks"
+  },
+  "bookmarks": {
+    "title": "Your Bookmarks",
+    "noBookmarks": "No bookmarks saved",
+    "createNew": "Create New Bookmark",
+    "createTitle": "Create New Bookmark",
+    "editTitle": "Edit Bookmark",
+    "deleteTitle": "Delete Bookmark",
+    "deleteConfirm": "Are you sure you want to delete this bookmark?",
+    "deleteWarning": "This action cannot be undone.",
+    "currentPosition": "Current position:",
+    "position": "Position:",
+    "note": "Note",
+    "noteOptional": "Note (optional)",
+    "notePlaceholderCreate": "Add a note to this bookmark...",
+    "notePlaceholderEdit": "Edit the note for this bookmark...",
+    "save": "Save Bookmark",
+    "saveChanges": "Save Changes",
+    "tooltipEdit": "Edit bookmark",
+    "tooltipDelete": "Delete bookmark"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "close": "Close"
+  },
+  "bookCard": {
+    "completed": "Completed",
+    "remaining": "remaining",
+    "author": "Author:",
+    "narrator": "Narrator:"
+  },
+  "chapters": {
+    "title": "Chapters",
+    "noChapters": "No chapters available",
+    "chapter": "Chapter"
+  },
+  "gotoModal": {
+    "title": "Go to Time",
+    "description": "Enter the desired time (considering {{speed}}x speed)",
+    "hours": "Hours",
+    "minutes": "Min",
+    "seconds": "Sec",
+    "cancel": "Cancel",
+    "go": "Go"
+  },
+  "playbackSpeed": {
+    "title": "Playback Speed",
+    "presets": "Preset Speeds",
+    "custom": "Custom Speed",
+    "confirm": "Confirm"
+  }
+}

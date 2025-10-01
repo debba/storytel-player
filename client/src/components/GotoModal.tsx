@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface GotoModalProps {
   isOpen: boolean;
@@ -25,13 +26,15 @@ function GotoModal({
   onSecondsChange,
   onGoto
 }: GotoModalProps) {
+  const { t } = useTranslation();
+
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-gray-900 rounded-lg p-6 max-w-md w-full mx-4 border border-gray-700">
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-lg font-semibold text-white">Vai al Tempo</h3>
+          <h3 className="text-lg font-semibold text-white">{t('gotoModal.title')}</h3>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-white"
@@ -44,13 +47,13 @@ function GotoModal({
 
         <div className="mb-6">
           <p className="text-sm text-gray-400 mb-4">
-            Inserisci il tempo desiderato (considerando la velocità {playbackRate}x)
+            {t('gotoModal.description', { speed: playbackRate })}
           </p>
 
           <div className="flex items-center space-x-4 justify-center">
             {/* Hours */}
             <div className="text-center">
-              <label className="block text-sm text-gray-300 mb-2">Ore</label>
+              <label className="block text-sm text-gray-300 mb-2">{t('gotoModal.hours')}</label>
               <input
                 type="number"
                 min="0"
@@ -65,7 +68,7 @@ function GotoModal({
 
             {/* Minutes */}
             <div className="text-center">
-              <label className="block text-sm text-gray-300 mb-2">Min</label>
+              <label className="block text-sm text-gray-300 mb-2">{t('gotoModal.minutes')}</label>
               <input
                 type="number"
                 min="0"
@@ -80,7 +83,7 @@ function GotoModal({
 
             {/* Seconds */}
             <div className="text-center">
-              <label className="block text-sm text-gray-300 mb-2">Sec</label>
+              <label className="block text-sm text-gray-300 mb-2">{t('gotoModal.seconds')}</label>
               <input
                 type="number"
                 min="0"
@@ -98,13 +101,13 @@ function GotoModal({
             onClick={onClose}
             className="flex-1 px-4 py-2 bg-gray-800 text-gray-300 rounded-md hover:bg-gray-700 transition-colors"
           >
-            Annulla
+            {t('gotoModal.cancel')}
           </button>
           <button
             onClick={onGoto}
             className="flex-1 px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors"
           >
-            Vai
+            {t('gotoModal.go')}
           </button>
         </div>
       </div>

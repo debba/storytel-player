@@ -1,5 +1,6 @@
 import React from 'react';
 import { Chapter } from '../interfaces/chapters';
+import { useTranslation } from 'react-i18next';
 
 interface ChaptersModalProps {
   isOpen: boolean;
@@ -11,6 +12,8 @@ interface ChaptersModalProps {
 }
 
 function ChaptersModal({ isOpen, chapters, currentTime, playbackRate, onClose, onChapterClick }: ChaptersModalProps) {
+  const { t } = useTranslation();
+
   const formatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
@@ -28,7 +31,7 @@ function ChaptersModal({ isOpen, chapters, currentTime, playbackRate, onClose, o
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-gray-900 rounded-lg p-6 max-w-md w-full mx-4 max-h-96 flex flex-col border border-gray-700">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-white">Capitoli</h3>
+          <h3 className="text-lg font-semibold text-white">{t('chapters.title')}</h3>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-white"
@@ -64,7 +67,7 @@ function ChaptersModal({ isOpen, chapters, currentTime, playbackRate, onClose, o
                   >
                     <div className="flex items-center justify-between p-3">
                       <div className="flex-1">
-                        <h4 className="font-medium text-white text-sm">{chapter.title || `Chapter ${chapter.number}`}</h4>
+                        <h4 className="font-medium text-white text-sm">{chapter.title || `${t('chapters.chapter')} ${chapter.number}`}</h4>
                         {isCurrentChapter ? (
                           <div className="flex justify-between items-center">
                             <p className="text-xs text-gray-400">
@@ -106,7 +109,7 @@ function ChaptersModal({ isOpen, chapters, currentTime, playbackRate, onClose, o
               <svg className="w-12 h-12 mx-auto mb-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
               </svg>
-              <p className="text-gray-400">Nessun capitolo disponibile</p>
+              <p className="text-gray-400">{t('chapters.noChapters')}</p>
             </div>
           )}
         </div>

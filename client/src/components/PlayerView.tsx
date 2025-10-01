@@ -1,5 +1,6 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import api from '../utils/api';
 import LoadingState from './LoadingState';
 import ErrorState from './ErrorState';
@@ -14,6 +15,7 @@ import { Chapter } from "../interfaces/chapters";
 import "../types/window.d.ts";
 
 function PlayerView() {
+    const { t } = useTranslation();
     const {bookId} = useParams();
     const location = useLocation();
     const navigate = useNavigate();
@@ -59,7 +61,7 @@ function PlayerView() {
             const response = await api.post('/stream', { bookId });
             setAudioSrc(response.data.streamUrl);
         } catch (err: any) {
-            setError(err.response?.data?.error || 'Failed to load audio stream');
+            setError(err.response?.data?.error || t('player.loadError'));
         } finally {
             setIsLoading(false);
         }
@@ -81,9 +83,9 @@ function PlayerView() {
                 goToBookmark(data[0].position);
             }
         } catch (error: any) {
-            setError(error.response?.data?.error || 'Failed to load bookmarks');
+            setError(error.response?.data?.error || t('player.loadBookmarksError'));
         }
-    }, [goToBookmark]);
+    }, [goToBookmark, t]);
 
     const loadChapters = useCallback(async (consumableId: string) => {
         try {
@@ -94,9 +96,9 @@ function PlayerView() {
                 setChapters(data.formats[0].chapters);
             }
         } catch (error: any) {
-            setError(error.response?.data?.error || 'Failed to load chapters');
+            setError(error.response?.data?.error || t('player.loadChaptersError'));
         }
-    }, []);
+    }, [t]);
 
     const loadBookmarks = useCallback(async (consumableId: string) => {
         try {
@@ -105,9 +107,9 @@ function PlayerView() {
 
             setBookmarks(data.bookmarks);
         } catch (error: any) {
-            setError(error.response?.data?.error || 'Failed to load bookmarks');
+            setError(error.response?.data?.error || t('player.loadBookmarksError'));
         }
-    }, []);
+    }, [t]);
 
     useEffect(() => {
         if (bookId) {
@@ -370,7 +372,7 @@ function PlayerView() {
     };
 
     if (isLoading || isLoadingBookData) {
-        return <LoadingState message={isLoading ? "Loading audio..." : "Loading book data..."} />;
+        return <LoadingState message={isLoading ? t('player.loadingAudio') : t('player.loadingBookData')} />;
     }
 
     if (error) {
@@ -393,7 +395,7 @@ function PlayerView() {
                                 </svg>
                             </button>
                             <div className="text-sm font-bold text-white flex items-baseline gap-2 min-w-0 flex-1">
-                                <span className="flex-shrink-0 text-xl">Now Playing:</span>
+                                <span className="flex-shrink-0 text-xl">{t('player.nowPlaying')}</span>
                                 <div className="overflow-hidden relative flex-1">
                                     <div
                                         className={`whitespace-nowrap inline-flex animate-marquee`}
@@ -589,7 +591,7 @@ function PlayerView() {
                                         onClick={() => setShowGotoModal(true)}
                                         className="px-3 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors text-sm"
                                     >
-                                        Goto
+                                        {t('player.goto')}
                                     </button>
                                 </div>
 

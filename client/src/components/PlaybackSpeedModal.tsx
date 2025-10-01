@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface PlaybackSpeedModalProps {
   isOpen: boolean;
@@ -8,13 +9,15 @@ interface PlaybackSpeedModalProps {
 }
 
 function PlaybackSpeedModal({ isOpen, playbackRate, onClose, onRateChange }: PlaybackSpeedModalProps) {
+  const { t } = useTranslation();
+
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-gray-900 rounded-lg p-6 max-w-md w-full mx-4 border border-gray-700">
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-lg font-semibold text-white">Velocità di Riproduzione</h3>
+          <h3 className="text-lg font-semibold text-white">{t('playbackSpeed.title')}</h3>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-white"
@@ -27,7 +30,7 @@ function PlaybackSpeedModal({ isOpen, playbackRate, onClose, onRateChange }: Pla
 
         {/* Preset Speeds */}
         <div className="mb-6">
-          <h4 className="text-sm font-medium text-gray-300 mb-3">Velocità Predefinite</h4>
+          <h4 className="text-sm font-medium text-gray-300 mb-3">{t('playbackSpeed.presets')}</h4>
           <div className="grid grid-cols-3 gap-2">
             {[1.0, 1.25, 1.5, 1.75, 2.0].map((speed) => (
               <button
@@ -47,7 +50,7 @@ function PlaybackSpeedModal({ isOpen, playbackRate, onClose, onRateChange }: Pla
 
         {/* Custom Speed Slider */}
         <div className="mb-6">
-          <h4 className="text-sm font-medium text-gray-300 mb-3">Velocità Personalizzata</h4>
+          <h4 className="text-sm font-medium text-gray-300 mb-3">{t('playbackSpeed.custom')}</h4>
           <div className="flex items-center space-x-4">
             <span className="text-sm text-gray-400">0.5x</span>
             <input
@@ -70,7 +73,7 @@ function PlaybackSpeedModal({ isOpen, playbackRate, onClose, onRateChange }: Pla
           onClick={onClose}
           className="w-full px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors"
         >
-          Conferma
+          {t('playbackSpeed.confirm')}
         </button>
       </div>
     </div>
