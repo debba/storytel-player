@@ -78,7 +78,8 @@
       "category": "multimedia",
       "target": [
         "AppImage",
-        "pacman"
+        "pacman",
+        "deb"
       ],
       "icon": "assets/icon.png"
     }
