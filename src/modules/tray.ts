@@ -2,6 +2,7 @@ import { Tray, Menu, app } from 'electron';
 import * as path from 'path';
 import { PlayingState } from '../types';
 import { WindowManager } from './window';
+import { i18n } from '../i18n';
 
 export class TrayManager {
   private tray: Tray | null = null;
@@ -49,7 +50,7 @@ export class TrayManager {
 
     const displayTitle = this.currentPlayingState.bookTitle
       ? this.truncateTitle(this.currentPlayingState.bookTitle)
-      : 'No book playing now';
+      : i18n.t('tray.noBookPlaying');
 
     const menuTemplate: Electron.MenuItemConstructorOptions[] = [
       {
@@ -58,7 +59,7 @@ export class TrayManager {
       },
       { type: 'separator' },
       {
-        label: 'Show App',
+        label: i18n.t('tray.showApp'),
         click: () => this.windowManager.show(),
       },
     ];
@@ -67,11 +68,11 @@ export class TrayManager {
       menuTemplate.push(
         { type: 'separator' },
         {
-          label: 'Play/Pause',
+          label: i18n.t('tray.playPause'),
           click: () => this.sendToRenderer('tray-play-pause'),
         },
         {
-          label: 'Playback Speed',
+          label: i18n.t('tray.playbackSpeed'),
           submenu: this.createSpeedSubmenu(),
         }
       );
@@ -80,9 +81,9 @@ export class TrayManager {
     menuTemplate.push(
       { type: 'separator' },
       {
-        label: 'Quit',
+        label: i18n.t('tray.quit'),
         click: () => {
-            app.isQuitting = true;
+          app.isQuitting = true;
           app.quit();
         },
       }
