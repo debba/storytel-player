@@ -139,7 +139,7 @@ function PlayerView() {
             if (positionUpdateIntervalRef.current) {
                 clearInterval(positionUpdateIntervalRef.current);
             }
-            document.title = 'Storytel Client';
+            document.title = 'Storytel Player';
             // Clear tray when leaving PlayerView
             if (window.trayControls && window.trayControls.updatePlayingState) {
                 window.trayControls.updatePlayingState(false, null);
