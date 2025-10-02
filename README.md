@@ -5,7 +5,7 @@
 ![Build & Release](https://github.com/debba/storytel-player/workflows/Build%20&%20Release/badge.svg)
 [![Known Vulnerabilities](https://snyk.io//test/github/debba/storytel-player/badge.svg?targetFile=package.json)](https://snyk.io//test/github/debba/storytel-player?targetFile=package.json)
 
-A cross-platform desktop application for playing Storytel audiobooks, built with TypeScript, React, Fastify, and Electron.
+**Unoffical Storytel Player for Desktop** — a cross-platform desktop application for playing Storytel audiobooks, built with TypeScript, React, Fastify, and Electron.
 
 ✅ **Native Desktop App**: Cross-platform application with system tray integration and single instance lock
 
