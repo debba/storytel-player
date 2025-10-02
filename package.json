@@ -78,11 +78,19 @@
       "node_modules/**/*"
     ],
     "mac": {
-      "category": "public.app-category.audio"
+      "category": "public.app-category.audio",
+      "publish": {
+        "provider": "github",
+        "releaseType": "draft"
+      }
     },
     "win": {
       "target": "nsis",
-      "verifyUpdateCodeSignature": false
+      "verifyUpdateCodeSignature": false,
+      "publish": {
+        "provider": "github",
+        "releaseType": "draft"
+      }
     },
     "linux": {
       "category": "multimedia",
@@ -91,7 +99,11 @@
         "deb",
         "pacman"
       ],
-      "icon": "assets/icon.png"
+      "icon": "assets/icon.png",
+      "publish": {
+        "provider": "github",
+        "releaseType": "draft"
+      }
     }
   }
 }
