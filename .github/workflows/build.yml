@@ -2,9 +2,18 @@ name: Build and Release
 
 on:
   push:
+    branches:
+      - master
+      - main
     tags:
       - 'v*'
-  workflow_dispatch:
+  pull_request:
+    branches:
+      - master
+      - main
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -16,70 +25,62 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: '20'
+          node-version: '18'
           cache: 'npm'
 
       - name: Install dependencies
         run: npm run install-all
 
       - name: Build application
-        run: npm run electron:dist
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run build
 
-      - name: Upload artifacts (Linux)
-        if: matrix.os == 'ubuntu-latest'
+      - name: Build server
+        run: npm run server:build
+
+      - name: Package Electron app
+        run: npm run electron:pack
+
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: linux-build
-          path: |
-            dist/*.AppImage
-            dist/*.pacman
-            dist/*.yml
-
-      - name: Upload artifacts (Windows)
-        if: matrix.os == 'windows-latest'
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-build
-          path: |
-            dist/*.exe
-            dist/*.yml
-
-      - name: Upload artifacts (macOS)
-        if: matrix.os == 'macos-latest'
-        uses: actions/upload-artifact@v4
-        with:
-          name: macos-build
-          path: |
-            dist/*.dmg
-            dist/*.zip
-            dist/*.yml
+          name: storytel-player-${{ matrix.os }}
+          path: dist/
 
   release:
     needs: build
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
+    if: startsWith(github.ref, 'refs/tags/v')
 
     steps:
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
         with:
-          path: artifacts
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm run install-all
+
+      - name: Build and create distributables
+        run: npm run electron:dist
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            artifacts/linux-build/*
-            artifacts/windows-build/*
-            artifacts/macos-build/*
+            dist/*.exe
+            dist/*.dmg
+            dist/*.pkg.tar.xz
+            dist/*.AppImage
+            dist/*.deb
+            dist/*.rpm
           draft: false
           prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
