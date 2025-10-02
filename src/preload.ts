@@ -8,6 +8,11 @@ contextBridge.exposeInMainWorld('electronStore', {
     ipcRenderer.invoke('store-set', key, value),
 });
 
+// Locale API
+contextBridge.exposeInMainWorld('electronLocale', {
+  getLocale: (): Promise<string> => ipcRenderer.invoke('get-locale'),
+});
+
 // Tray Controls API
 contextBridge.exposeInMainWorld('trayControls', {
   onPlayPause: (callback: () => void): void => {

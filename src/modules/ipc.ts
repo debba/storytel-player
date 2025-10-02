@@ -3,6 +3,7 @@ import { storeManager } from './store';
 import { ServerManager } from './server';
 import { TrayManager } from './tray';
 import { ApiConfig } from '../types';
+import { i18n } from '../i18n';
 
 export class IpcManager {
   private serverManager: ServerManager;
@@ -17,6 +18,7 @@ export class IpcManager {
     this.setupStoreHandlers();
     this.setupApiHandlers();
     this.setupTrayHandlers();
+    this.setupLocaleHandlers();
   }
 
   private setupStoreHandlers(): void {
@@ -103,5 +105,11 @@ export class IpcManager {
         this.trayManager.updatePlayingState({ isPlaying, bookTitle });
       }
     );
+  }
+
+  private setupLocaleHandlers(): void {
+    ipcMain.handle('get-locale', () => {
+      return i18n.getLanguage();
+    });
   }
 }

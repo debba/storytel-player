@@ -21,8 +21,10 @@ class I18n {
     }
 
     public detectLanguage(): void {
-        const locale = this.appLocale || 'en';
-        const languageCode = locale.split('-')[0];
+        // Check for APP_LOCALE environment variable first
+        const envLocale = process.env.APP_LOCALE;
+        const locale = envLocale || this.appLocale || 'en';
+        const languageCode = locale.split('-')[0].toLowerCase();
 
         if (languageCode === 'it') {
             this.currentLanguage = 'it';

@@ -32,13 +32,31 @@ i18n
     }
   });
 
-const detectedLanguage = i18n.language || window.navigator.language;
-const languageCode = detectedLanguage.split('-')[0];
+// Check if running in Electron and get locale from Electron
+if (window.electronLocale) {
+  window.electronLocale.getLocale().then((electronLocale: string) => {
+    i18n.changeLanguage(electronLocale);
+  }).catch(() => {
+    // Fallback to browser detection if Electron locale fails
+    const detectedLanguage = i18n.language || window.navigator.language;
+    const languageCode = detectedLanguage.split('-')[0];
 
-if (languageCode === 'it') {
-  i18n.changeLanguage('it');
+    if (languageCode === 'it') {
+      i18n.changeLanguage('it');
+    } else {
+      i18n.changeLanguage('en');
+    }
+  });
 } else {
-  i18n.changeLanguage('en');
+  // Fallback to browser detection if not in Electron
+  const detectedLanguage = i18n.language || window.navigator.language;
+  const languageCode = detectedLanguage.split('-')[0];
+
+  if (languageCode === 'it') {
+    i18n.changeLanguage('it');
+  } else {
+    i18n.changeLanguage('en');
+  }
 }
 
 export default i18n;

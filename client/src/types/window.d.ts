@@ -14,5 +14,8 @@ declare global {
       onPlayPause?: (callback: () => void) => void;
       onSetSpeed?: (callback: (event: any, speed: number) => void) => void;
     };
+    electronLocale?: {
+      getLocale: () => Promise<string>;
+    };
   }
 }

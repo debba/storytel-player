@@ -1,6 +1,6 @@
 {
   "name": "storytel-player",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "email": "andrea@debbaweb.it",
   "description": "Storytel Unofficial Player - Storytel audiobook player for desktop",
   "main": "dist/electron/main.js",
@@ -80,7 +80,8 @@
       "category": "multimedia",
       "target": [
         "AppImage",
-        "deb"
+        "deb",
+        "pacman"
       ],
       "icon": "assets/icon.png"
     }
