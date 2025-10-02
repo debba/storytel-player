@@ -23,7 +23,7 @@ jobs:
           node-version: 22
 
       - name: Build
-        run: npm ci
+        run: npm run install-all
 
       - name: Release
         if: contains(github.ref, 'master')
@@ -42,7 +42,7 @@ jobs:
           node-version: 22
 
       - name: Build
-        run: npm ci
+        run: npm run install-all
 
       - name: Release
         if: contains(github.ref, 'master')
@@ -61,7 +61,7 @@ jobs:
           node-version: 22
 
       - name: Build
-        run: npm ci
+        run: npm run install-all
 
       - name: Release
         if: contains(github.ref, 'master')
@@ -80,7 +80,7 @@ jobs:
           node-version: 22
 
       - name: Build
-        run: npm ci
+        run: npm run install-all
 
       - name: Release
         if: contains(github.ref, 'master')
@@ -99,7 +99,7 @@ jobs:
           node-version: 22
 
       - name: Build
-        run: npm ci
+        run: npm run install-all
 
       - name: Release
         if: contains(github.ref, 'master')
