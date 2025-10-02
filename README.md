@@ -1,6 +1,28 @@
-# Storytel Unofficial Player
+# Storytel Player for Desktop
 
-A desktop application for playing Storytel audiobooks, built with React, Fastify, and Electron.
+![](https://img.shields.io/github/release/debba/storytel-player.svg?style=flat)
+![](https://img.shields.io/github/downloads/debba/storytel-player/total.svg?style=flat)
+![Build & Release](https://github.com/debba/storytel-player/workflows/Build%20&%20Release/badge.svg)
+[![Known Vulnerabilities](https://snyk.io//test/github/debba/storytel-player/badge.svg?targetFile=package.json)](https://snyk.io//test/github/debba/storytel-player?targetFile=package.json)
+
+A cross-platform desktop application for playing Storytel audiobooks, built with TypeScript, React, Fastify, and Electron.
+
+✅ **Native Desktop App**: Cross-platform application with system tray integration and single instance lock
+
+✅ **Audiobook Library**: Browse your Storytel library with cover art and progress tracking
+
+✅ **Audio Player**: HTML5 audio player with playback controls and bookmarks
+
+✅ **Session Management**: Secure authentication with persistent storage via electron-store
+
+✅ **Internationalization**: Multi-language support (i18next) with automatic language detection
+
+✅ **Cross-Platform**: Available for Windows, macOS (x64/ARM64), and Linux (x64/ARM64/ARMv7)
+
+✅ **Development Mode**: Hot reload for both client and server during development
+
+> [!NOTE]  
+> This is an independent project, not affiliated with Storytel
 
 ## Screenshots
 
@@ -9,26 +31,25 @@ A desktop application for playing Storytel audiobooks, built with React, Fastify
 
 ## Features
 
-- **Desktop App**: Native desktop application with system tray integration
-- **Audiobook Library**: Browse your Storytel library with cover art and progress tracking
-- **Audio Player**: Built-in HTML5 audio player with seek controls and bookmarks
-- **Session Management**: Secure login with session-based authentication
-- **Cross-Platform**: Available for Windows, macOS, and Linux
-- **Development Mode**: Hot reload for both client and server during development
+
 
 ## Architecture
 
-The application follows a multi-tier architecture:
+The application is built with TypeScript and follows a modular architecture:
 
-- **Frontend**: React 18 with Tailwind CSS (port 3000 in dev mode)
-- **Backend**: Fastify server with RESTful API (Express.js alternative)
-- **Desktop**: Electron wrapper for native desktop experience
-- **Authentication**: Session-based with secure cookie storage
+- **Frontend**: React 18 with TypeScript, Tailwind CSS, and Vite (port 3000 in dev mode)
+- **Backend**: Fastify server with TypeScript and RESTful API (port 8080)
+- **Desktop**: Electron 38+ with TypeScript
+  - Window Manager: Main window handling with development/production modes
+  - Tray Manager: System tray integration
+  - Server Manager: Embedded Fastify server management
+  - IPC Manager: Inter-process communication between Electron and React
+- **Authentication**: Session-based authentication with secure storage
 - **Audio Streaming**: Direct integration with Storytel's streaming API
 
 ## Prerequisites
 
-- Node.js 16+
+- Node.js 22+ (see `.nvmrc` for the recommended version)
 - npm 7+
 
 ## Installation
@@ -55,8 +76,8 @@ npm run dev
 ```
 
 This will:
-- Start the Fastify server on port 8080 (with nodemon for auto-restart)
-- Start the React development server on port 3000
+- Start the Fastify server on port 3001 (with tsx watch for auto-restart)
+- Start the Vite development server on port 3000
 - Both servers will reload automatically when files change
 
 ### Individual Components
@@ -92,52 +113,32 @@ Build all components for production:
 npm run build
 ```
 
-This command:
-1. Builds the React client (`client/build/`)
-2. Builds the server with esbuild (`server/dist/`)
+This command builds the React client with Vite (`client/build/`).
 
 ### Build Electron App
 
 Create distributable Electron packages:
 
 ```bash
-# Package without installer
-npm run electron:pack
-
-# Create installer/distributable
+# Build and create installer/distributable for current platform
 npm run electron:dist
+
+# Platform-specific builds
+npm run electron:dist:win           # Windows (x64)
+npm run electron:dist:mac:x64       # macOS (Intel)
+npm run electron:dist:mac:arm64     # macOS (Apple Silicon)
+npm run electron:dist:linux         # Linux (all targets)
+npm run electron:dist:linux:x64     # Linux x64 (tar.gz, deb, rpm, AppImage)
+npm run electron:dist:linux:arm64   # Linux ARM64
+npm run electron:dist:linux:arm     # Linux ARMv7
 ```
 
 The built applications will be available in the `dist/` directory.
 
-### Platform-specific Builds
-
-The app is configured to build for:
-- **Windows**: NSIS installer
-- **macOS**: DMG package
-- **Linux**: Pacman package
-
-## Project Structure
-
-```
-storytel-player/
-├── client/                 # React frontend
-│   ├── public/            # Static assets
-│   ├── src/               # React source code
-│   │   ├── components/    # React components
-│   │   ├── services/      # API services
-│   │   └── App.js         # Main App component
-│   └── package.json       # Client dependencies
-├── server/                # Fastify backend
-│   ├── dist/              # Built server (production)
-│   ├── fastify-common.js  # Fastify configuration
-│   ├── storytelApi.js     # Storytel API integration
-│   ├── server.js          # Server entry point
-│   └── package.json       # Server dependencies
-├── dist/                  # Electron build output
-├── electron.js            # Electron main process
-└── package.json           # Root and Electron config
-```
+**Build targets:**
+- **Windows**: NSIS installer (.exe)
+- **macOS**: DMG package (.dmg)
+- **Linux**: AppImage, deb, rpm, Pacman packages
 
 ## Scripts
 
@@ -145,14 +146,23 @@ storytel-player/
 |---------|-------------|
 | `npm start` | Start both client and server (production mode) |
 | `npm run dev` | Start development servers with hot reload |
-| `npm run build` | Build client for production |
+| `npm run build` | Build client with Vite |
+| `npm run build-win` | Build client for Windows |
 | `npm run server:build` | Build server with esbuild |
 | `npm run install-all` | Install dependencies for all components |
 | `npm run clean` | Clean all build directories |
+| `npm run electron:build` | Compile Electron TypeScript files |
 | `npm run electron` | Run Electron app (production) |
-| `npm run electron:dev` | Run Electron app (development) |
-| `npm run electron:pack` | Package Electron app |
-| `npm run electron:dist` | Create Electron installer |
+| `npm run electron:dev` | Run Electron app (development mode) |
+| `npm run electron:pack` | Package Electron app without installer |
+| `npm run electron:dist` | Build and create installer for current platform |
+| `npm run electron:dist:win` | Build Windows installer (x64) |
+| `npm run electron:dist:linux` | Build all Linux packages |
+| `npm run electron:dist:linux:x64` | Build Linux x64 packages |
+| `npm run electron:dist:linux:arm64` | Build Linux ARM64 packages |
+| `npm run electron:dist:linux:arm` | Build Linux ARMv7 packages |
+| `npm run electron:dist:mac:x64` | Build macOS Intel package |
+| `npm run electron:dist:mac:arm64` | Build macOS Apple Silicon package |
 
 ## Configuration
 
@@ -175,18 +185,21 @@ Electron Builder configuration is in `package.json` under the `build` key:
 
 ## Development Notes
 
-- The Electron app runs on a fixed window size (480x800) and is always on top
-- In development mode, both React and Fastify servers run concurrently
-- The production build uses esbuild for the server for faster builds
-- ASAR packaging excludes the server directory for proper file access
+- The Electron app features a compact UI (480x800 window size) optimized for desktop use
+- Single instance lock prevents multiple app instances from running simultaneously
+- In development mode, the app connects to local dev servers (React on port 3000, Fastify on port 3001)
+- In production mode, the app serves static files from `client/build/` and runs the bundled server
+- The embedded Fastify server is managed by the Electron main process
+- TypeScript is used throughout the project (Electron, React, and Fastify)
+- Certificate errors are ignored in development mode for local HTTPS testing
 
 ## Technologies Used
 
-- **Frontend**: React 18, Tailwind CSS, Axios
-- **Backend**: Fastify, JWT authentication, CORS
-- **Desktop**: Electron 38+
-- **Build Tools**: React Scripts, esbuild, electron-builder
-- **Development**: Concurrently, Nodemon
+- **Frontend**: React 18, TypeScript, Tailwind CSS, Vite, i18next, Axios
+- **Backend**: Fastify 5, TypeScript, @fastify/cors, dotenv
+- **Desktop**: Electron 38+, electron-store
+- **Build Tools**: Vite, esbuild, electron-builder, TypeScript compiler
+- **Development**: Concurrently, tsx (for server watch mode)
 
 ## License
 
