@@ -94,5 +94,12 @@
     "presets": "Preset Speeds",
     "custom": "Custom Speed",
     "confirm": "Confirm"
+  },
+  "tray": {
+    "noBookPlaying": "No book playing now",
+    "showApp": "Show App",
+    "playPause": "Play/Pause",
+    "playbackSpeed": "Playback Speed",
+    "quit": "Quit"
   }
 }

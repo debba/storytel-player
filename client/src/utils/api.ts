@@ -8,7 +8,7 @@ declare global {
 }
 
 const axiosApi = axios.create({
-    baseURL: "http://localhost:3001/api", // o la tua baseURL reale
+    baseURL: `${import.meta.env.VITE_BACKEND_API_URL}/api`, // o la tua baseURL reale
     withCredentials: true,
 });
 

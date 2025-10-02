@@ -94,5 +94,12 @@
     "presets": "Velocità Predefinite",
     "custom": "Velocità Personalizzata",
     "confirm": "Conferma"
+  },
+  "tray": {
+    "noBookPlaying": "Nessun libro in riproduzione",
+    "showApp": "Mostra App",
+    "playPause": "Play/Pausa",
+    "playbackSpeed": "Velocità di Riproduzione",
+    "quit": "Esci"
   }
 }

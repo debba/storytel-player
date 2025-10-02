@@ -1,72 +1,62 @@
-import { app } from 'electron';
+import {app} from 'electron';
+import * as dot from 'dot-object';
 
 interface Translations {
-  tray: {
-    noBookPlaying: string;
-    showApp: string;
-    playPause: string;
-    playbackSpeed: string;
-    quit: string;
-  };
+    [key: string]: any;
 }
 
-const translations: Record<'it' | 'en', Translations> = {
-  it: {
-    tray: {
-      noBookPlaying: 'Nessun libro in riproduzione',
-      showApp: 'Mostra App',
-      playPause: 'Play/Pausa',
-      playbackSpeed: 'Velocità di Riproduzione',
-      quit: 'Esci',
-    },
-  },
-  en: {
-    tray: {
-      noBookPlaying: 'No book playing now',
-      showApp: 'Show App',
-      playPause: 'Play/Pause',
-      playbackSpeed: 'Playback Speed',
-      quit: 'Quit',
-    },
-  },
-};
-
 class I18n {
-  private currentLanguage: 'it' | 'en' = 'en';
+    private currentLanguage: 'it' | 'en' = 'en';
+    public translations: Translations = {};
+    private fastifyServer: any = null;
+    private appLocale: string = 'en';
 
-  constructor() {
-    this.detectLanguage();
-  }
-
-  private detectLanguage(): void {
-    const locale = app.getLocale();
-    const languageCode = locale.split('-')[0];
-
-    if (languageCode === 'it') {
-      this.currentLanguage = 'it';
-    } else {
-      this.currentLanguage = 'en';
-    }
-  }
-
-  t(key: string): string {
-    const keys = key.split('.');
-    let value: any = translations[this.currentLanguage];
-
-    for (const k of keys) {
-      if (value && typeof value === 'object') {
-        value = value[k];
-      } else {
-        return key;
-      }
+    public setAppLocale(locale: string): void {
+        this.appLocale = locale;
     }
 
-    return typeof value === 'string' ? value : key;
-  }
+    async initialize(server: any): Promise<void> {
+        this.fastifyServer = server;
+        await this.loadTranslations();
+    }
 
-  getLanguage(): 'it' | 'en' {
-    return this.currentLanguage;
-  }
+    public detectLanguage(): void {
+        const locale = this.appLocale || 'en';
+        const languageCode = locale.split('-')[0];
+
+        if (languageCode === 'it') {
+            this.currentLanguage = 'it';
+        } else {
+            this.currentLanguage = 'en';
+        }
+    }
+
+    private async loadTranslations(): Promise<void> {
+        if (!this.fastifyServer) {
+            console.error('Fastify server not initialized');
+            return;
+        }
+
+        try {
+            const response = await this.fastifyServer.inject({
+                method: 'GET',
+                url: `/api/translations?lang=${this.currentLanguage}`,
+            });
+
+            this.translations = response.json();
+        } catch (error) {
+            console.error('Failed to load translations:', error);
+        }
+    }
+
+    t(key: string): string {
+        let value = dot.pick(key, this.translations) || key;
+        return typeof value === 'string' ? value : key;
+    }
+
+    getLanguage(): 'it' | 'en' {
+        return this.currentLanguage;
+    }
 }
 
 export const i18n = new I18n();

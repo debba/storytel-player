@@ -1,24 +1,23 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
+import api from "./utils/api";
 
-import translationIT from './locales/it.json';
-import translationEN from './locales/en.json';
+class ApiBackend {
+    static type = "backend" as const;
 
-const resources = {
-  it: {
-    translation: translationIT
-  },
-  en: {
-    translation: translationEN
-  }
-};
+    async read(lang: string, ns: string, callback: any) {
+        const response = await api.get(`/translations?lang=${lang}&ns=${ns}`, {});
+        callback(null, response.data);
+    }
+}
+
 
 i18n
+  .use(ApiBackend)
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    resources,
     fallbackLng: 'en',
     supportedLngs: ['it', 'en'],
     detection: {
@@ -33,7 +32,6 @@ i18n
     }
   });
 
-// Logica personalizzata: se italiano -> italiano, altrimenti -> inglese
 const detectedLanguage = i18n.language || window.navigator.language;
 const languageCode = detectedLanguage.split('-')[0];
 

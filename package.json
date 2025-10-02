@@ -28,6 +28,7 @@
   "author": "debba <andrea@debbaweb.it>",
   "license": "ISC",
   "dependencies": {
+    "dot-object": "^2.1.5",
     "electron-store": "^10.1.0"
   },
   "keywords": [
@@ -43,13 +44,14 @@
     "@babel/node": "^7.28.0",
     "@babel/preset-env": "^7.28.3",
     "@babel/preset-react": "^7.27.1",
+    "@types/dot-object": "^2.1.6",
+    "@types/electron": "^1.4.38",
     "@types/electron-store": "^1.3.1",
     "@types/node": "^24.6.0",
+    "concurrently": "^7.6.0",
     "electron": "^38.1.2",
     "electron-builder": "^26.0.12",
-    "typescript": "^5.9.2",
-    "@types/electron": "^1.4.38",
-    "concurrently": "^7.6.0"
+    "typescript": "^5.9.2"
   },
   "build": {
     "appId": "com.storytel.player",

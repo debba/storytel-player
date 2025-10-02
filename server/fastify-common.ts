@@ -37,7 +37,7 @@ const fastify = Fastify({ logger: process.env.NODE_ENV !== 'production' });
 fastify.register(fastifyCors, {
     origin: 'http://localhost:3000',
     credentials: true,
-    methods: ['POST', 'PATCH', 'PUT', 'DELETE'],
+    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
 });
 
 fastify.register(fastifyJWT, {
@@ -330,6 +330,31 @@ fastify.get('/api/auth/status', async (request, reply) => {
         reply.send({ authenticated: true });
     } catch (err) {
         reply.send({ authenticated: false });
+    }
+});
+
+fastify.get<{
+    Querystring: { lang?: string };
+}>('/api/translations', async (request, reply) => {
+    try {
+        const { lang } = request.query;
+
+        if (lang === 'it') {
+            const translations = await import('./locales/it.json');
+            reply.send(translations.default);
+        } else if (lang === 'en') {
+            const translations = await import('./locales/en.json');
+            reply.send(translations.default);
+        } else {
+            const translationsIt = await import('./locales/it.json');
+            const translationsEn = await import('./locales/en.json');
+            reply.send({
+                it: translationsIt.default,
+                en: translationsEn.default
+            });
+        }
+    } catch (error: any) {
+        reply.code(500).send({ error: 'Failed to load translations' });
     }
 });
 
