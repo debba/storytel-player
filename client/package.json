@@ -23,6 +23,8 @@
   "scripts": {
     "start": "vite",
     "build": "tsc && VITE_REACT_APP_USE_MEMORY_ROUTER=true vite build",
+    "build-win": "tsc && vite build",
+    "prebuild-win": "set VITE_REACT_APP_USE_MEMORY_ROUTER=true",
     "preview": "vite preview"
   },
   "eslintConfig": {

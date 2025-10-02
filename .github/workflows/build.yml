@@ -1,86 +1,106 @@
-name: Build and Release
+name: Build & Release
 
-on:
-  push:
-    branches:
-      - master
-      - main
-    tags:
-      - 'v*'
-  pull_request:
-    branches:
-      - master
-      - main
+env:
+  GH_TOKEN: ${{ SECRETS.GITHUB_TOKEN }}
 
-permissions:
-  contents: write
+on: push
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v5
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm run install-all
-
-      - name: Build application
-        run: npm run build
-
-      - name: Build server
-        run: npm run server:build
-
-      - name: Package Electron app
-        run: npm run electron:pack
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: storytel-player-${{ matrix.os }}
-          path: dist/
-
-  release:
-    needs: build
+  linux_x64:
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
+      - name: Check out Git repository
+        uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v5
+      - name: Install Node.js and NPM
+        uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: 22
 
-      - name: Install dependencies
-        run: npm run install-all
+      - name: Build
+        run: npm ci
 
-      - name: Build and create distributables
-        run: npm run electron:dist
+      - name: Release
+        if: contains(github.ref, 'master')
+        run: npm run electron:dist:linux:x64 -- --publish always
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
+  linux_arm64:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+
+      - name: Install Node.js and NPM
+        uses: actions/setup-node@v4
         with:
-          files: |
-            dist/*.exe
-            dist/*.dmg
-            dist/*.pkg.tar.xz
-            dist/*.AppImage
-            dist/*.deb
-            dist/*.rpm
-          draft: false
-          prerelease: false
+          node-version: 22
+
+      - name: Build
+        run: npm ci
+
+      - name: Release
+        if: contains(github.ref, 'master')
+        run: npm run electron:dist:linux:arm64 -- --publish always
+
+  linux_arm:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+
+      - name: Install Node.js and NPM
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build
+        run: npm ci
+
+      - name: Release
+        if: contains(github.ref, 'master')
+        run: npm run electron:dist:linux:arm -- --publish always
+
+  dmg:
+    runs-on: macos-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+
+      - name: Install Node.js and NPM
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build
+        run: npm ci
+
+      - name: Release
+        if: contains(github.ref, 'master')
+        run: npm run electron:dist:mac:x64 -- --publish always
+
+  exe:
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+
+      - name: Install Node.js and NPM
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build
+        run: npm ci
+
+      - name: Release
+        if: contains(github.ref, 'master')
+        run: npm run electron:dist:win -- --publish always

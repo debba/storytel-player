@@ -10,6 +10,7 @@
     "server": "cd server && npm install && npm start",
     "client": "cd client && npm install && npm start",
     "build": "cd client && npm run build",
+    "build-win": "cd client && npm run build-win",
     "dev": "concurrently \"npm run server:dev\" \"npm run client\"",
     "server:dev": "cd server && npm install && npm run dev",
     "install-all": "npm install && cd server && npm install && cd ../client && npm install",
@@ -19,9 +20,15 @@
     "electron:dev": "npm run electron:build && NODE_ENV=development electron .",
     "electron:pack": "electron-builder",
     "electron:dist": "npm run build && npm run server:build && npm run electron:build && electron-builder",
+    "electron:dist:win": "npm run build-win && npm run server:build && npm run electron:build && electron-builder --windows --x64",
+    "electron:dist:linux:x64": "npm run build && npm run server:build && npm run electron:build && electron-builder --x64 -l tar.gz deb rpm AppImage",
+    "electron:dist:linux:arm64": "npm run build && npm run server:build && npm run electron:build && electron-builder --arm64 -l tar.gz deb rpm AppImage",
+    "electron:dist:linux:arm": "npm run build && npm run server:build && npm run electron:build && electron-builder --armv7l -l tar.gz deb rpm AppImage",
+    "electron:dist:linux": "npm run build && npm run server:build && npm run electron:build && electron-builder --linux",
+    "electron:dist:mac:x64": "npm run build && npm run server:build && npm run electron:build && electron-builder --mac --x64",
+    "electron:dist:mac:arm64": "npm run build && npm run server:build && npm run electron:build && electron-builder --mac --arm64",
     "preelectron:pack": "npm run build && npm run server:build && npm run electron:build",
     "preelectron": "npm run build && npm run server:build",
-    "preelectron:dist": "npm run build && npm run server:build && npm run electron:build",
     "server:build": "cd server && npm run build",
     "clean": "rm -rf dist; rm -rf server/dist; rm -rf client/build"
   },
@@ -74,7 +81,8 @@
       "category": "public.app-category.audio"
     },
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "verifyUpdateCodeSignature": false
     },
     "linux": {
       "category": "multimedia",
