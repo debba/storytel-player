@@ -190,8 +190,8 @@ Electron Builder configuration is in `package.json` under the `build` key:
 
 ## License
 
-ISC License
+MIT License
 
 ## Author
 
-Andrea Debba (andrea@debbaweb.it)
+Andrea Debernardi (andrea@debbaweb.it)
