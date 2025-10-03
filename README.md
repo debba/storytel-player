@@ -7,6 +7,11 @@
 
 **Unoffical Storytel Player for Desktop** — a cross-platform desktop application for playing Storytel audiobooks, built with TypeScript, React, Fastify, and Electron.
 
+## Download
+
+<!-- DOWNLOAD_SECTION_START -->
+<!-- DOWNLOAD_SECTION_END -->
+
 ✅ **Native Desktop App**: Cross-platform application with system tray integration and single instance lock
 
 ✅ **Audiobook Library**: Browse your Storytel library with cover art and progress tracking
