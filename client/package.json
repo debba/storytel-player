@@ -21,9 +21,7 @@
   },
   "scripts": {
     "start": "vite",
-    "build": "tsc && VITE_REACT_APP_USE_MEMORY_ROUTER=true vite build",
-    "build-win": "tsc && vite build",
-    "prebuild-win": "set VITE_REACT_APP_USE_MEMORY_ROUTER=true",
+    "build": "tsc && cross-env VITE_REACT_APP_USE_MEMORY_ROUTER=true vite build",
     "preview": "vite preview"
   },
   "eslintConfig": {
@@ -49,6 +47,7 @@
     "@types/react": "^19.1.16",
     "@types/react-dom": "^19.1.9",
     "autoprefixer": "^10.4.14",
+    "cross-env": "^10.1.0",
     "postcss": "^8.4.21",
     "tailwindcss": "^3.2.7",
     "typescript": "^5.9.2",

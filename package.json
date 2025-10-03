@@ -20,7 +20,7 @@
     "electron:dev": "npm run electron:build && NODE_ENV=development electron .",
     "electron:pack": "electron-builder",
     "electron:dist": "npm run build && npm run server:build && npm run electron:build && electron-builder",
-    "electron:dist:win": "npm run build-win && npm run server:build && npm run electron:build && electron-builder --windows --x64",
+    "electron:dist:win": "npm run build && npm run server:build && npm run electron:build && electron-builder --windows --x64",
     "electron:dist:linux:x64:pacman": "npm run build && npm run server:build && npm run electron:build && electron-builder --x64 -l pacman",
     "electron:dist:linux:x64": "npm run build && npm run server:build && npm run electron:build && electron-builder --x64 -l tar.gz deb rpm AppImage",
     "electron:dist:linux:arm64": "npm run build && npm run server:build && npm run electron:build && electron-builder --arm64 -l tar.gz deb rpm AppImage",
