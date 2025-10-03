@@ -21,9 +21,10 @@
     "electron:pack": "electron-builder",
     "electron:dist": "npm run build && npm run server:build && npm run electron:build && electron-builder",
     "electron:dist:win": "npm run build-win && npm run server:build && npm run electron:build && electron-builder --windows --x64",
-    "electron:dist:linux:x64": "npm run build && npm run server:build && npm run electron:build && electron-builder --x64 -l tar.gz deb rpm AppImage pacman",
-    "electron:dist:linux:arm64": "npm run build && npm run server:build && npm run electron:build && electron-builder --arm64 -l tar.gz deb rpm AppImage pacman",
-    "electron:dist:linux:arm": "npm run build && npm run server:build && npm run electron:build && electron-builder --armv7l -l tar.gz deb rpm AppImage pacman",
+    "electron:dist:linux:x64:pacman": "npm run build && npm run server:build && npm run electron:build && electron-builder --x64 -l pacman",
+    "electron:dist:linux:x64": "npm run build && npm run server:build && npm run electron:build && electron-builder --x64 -l tar.gz deb rpm AppImage",
+    "electron:dist:linux:arm64": "npm run build && npm run server:build && npm run electron:build && electron-builder --arm64 -l tar.gz deb rpm AppImage",
+    "electron:dist:linux:arm": "npm run build && npm run server:build && npm run electron:build && electron-builder --armv7l -l tar.gz deb rpm AppImage",
     "electron:dist:linux": "npm run build && npm run server:build && npm run electron:build && electron-builder --linux",
     "electron:dist:mac:x64": "npm run build && npm run server:build && npm run electron:build && electron-builder --mac --x64",
     "electron:dist:mac:arm64": "npm run build && npm run server:build && npm run electron:build && electron-builder --mac --arm64",
@@ -96,8 +97,7 @@
       "category": "multimedia",
       "target": [
         "AppImage",
-        "deb",
-        "pacman"
+        "deb"
       ],
       "icon": "assets/icon.png",
       "publish": {
