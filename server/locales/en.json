@@ -98,6 +98,8 @@
   "tray": {
     "noBookPlaying": "No book playing now",
     "showApp": "Show App",
+    "play": "Play",
+    "pause": "Pause",
     "playPause": "Play/Pause",
     "playbackSpeed": "Playback Speed",
     "logout": "Logout",

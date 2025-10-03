@@ -98,6 +98,8 @@
   "tray": {
     "noBookPlaying": "Nessun libro in riproduzione",
     "showApp": "Mostra App",
+    "play": "Play",
+    "pause": "Pausa",
     "playPause": "Play/Pausa",
     "playbackSpeed": "Velocità di Riproduzione",
     "logout": "Logout",
