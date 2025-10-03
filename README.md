@@ -8,7 +8,7 @@
 **Unoffical Storytel Player for Desktop** — a cross-platform desktop application for playing Storytel audiobooks, built with TypeScript, React, Fastify, and Electron.
 
 <!-- DOWNLOAD_SECTION_START -->
-[![Windows](https://img.shields.io/badge/Windows-Download-blue?logo=windows)](${WINDOWS}) [![macOS](https://img.shields.io/badge/macOS-Download-black?logo=apple)](${MACOS}) [![Linux](https://img.shields.io/badge/Linux-Download-green?logo=linux)](${LINUX})
+[![Windows](https://img.shields.io/badge/Windows-Download-blue?logo=windows)](https://github.com/debba/storytel-player/releases/download/v1.0.6/Storytel-Player-Setup-1.0.6.exe) [![macOS](https://img.shields.io/badge/macOS-Download-black?logo=apple)](https://github.com/debba/storytel-player/releases/download/v1.0.6/Storytel-Player-1.0.6.dmg) [![Linux](https://img.shields.io/badge/Linux-Download-green?logo=linux)](https://github.com/debba/storytel-player/releases/download/v1.0.6/Storytel-Player-1.0.6.AppImage)
 <!-- DOWNLOAD_SECTION_END -->
 
 ✅ **Native Desktop App**: Cross-platform application with system tray integration and single instance lock
