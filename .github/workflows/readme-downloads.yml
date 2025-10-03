@@ -12,15 +12,13 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Get release data
-        id: release
-        uses: actions-ecosystem/action-get-latest-release@v1
-        with:
-          repo: debba/storytel-player
+      - name: Fetch latest release version
+          id: fetch-latest-release
+          uses: reloc8/action-latest-release-version@1.0.0
 
       - name: Update README.md
         run: |
-          TAG=${{ steps.release.outputs.tag_name }}
+          TAG=${{ steps.fetch-latest-release.outputs.latest-release }}
           WINDOWS="https://github.com/debba/storytel-player/releases/download/$TAG/Storytel-Player-Setup-${TAG#v}.exe"
           MACOS="https://github.com/debba/storytel-player/releases/download/$TAG/Storytel-Player-${TAG#v}.dmg"
           LINUX="https://github.com/debba/storytel-player/releases/download/$TAG/Storytel-Player-${TAG#v}.AppImage"
