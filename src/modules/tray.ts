@@ -9,6 +9,7 @@ export class TrayManager {
     private currentPlayingState: PlayingState = {
         isPlaying: false,
         bookTitle: null,
+        isAuthenticated: false,
     };
     private windowManager: WindowManager;
 
@@ -65,10 +66,14 @@ export class TrayManager {
         ];
 
         if (this.currentPlayingState.isPlaying || this.currentPlayingState.bookTitle) {
+            const playPauseLabel = this.currentPlayingState.isPlaying
+                ? i18n.t('tray.pause')
+                : i18n.t('tray.play');
+
             menuTemplate.push(
                 {type: 'separator'},
                 {
-                    label: i18n.t('tray.playPause'),
+                    label: playPauseLabel,
                     click: () => this.sendToRenderer('tray-play-pause'),
                 },
                 {
@@ -78,24 +83,26 @@ export class TrayManager {
             );
         }
 
-        menuTemplate.push(
-            {type: 'separator'},
-            {
+        menuTemplate.push({type: 'separator'});
+
+        if (this.currentPlayingState.isAuthenticated) {
+            menuTemplate.push({
                 label: i18n.t('tray.logout'),
                 click: () => {
                     this.windowManager.show();
                     this.sendToRenderer('tray-logout');
                 },
+            });
+        }
+
+        menuTemplate.push({
+            label: i18n.t('tray.quit'),
+            click: () => {
+                //@ts-ignore
+                app.isQuitting = true;
+                app.quit();
             },
-            {
-                label: i18n.t('tray.quit'),
-                click: () => {
-                    //@ts-ignore
-                    app.isQuitting = true;
-                    app.quit();
-                },
-            }
-        );
+        });
 
         const contextMenu = Menu.buildFromTemplate(menuTemplate);
         this.tray.setContextMenu(contextMenu);

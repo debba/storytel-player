@@ -3,6 +3,7 @@ import { BrowserWindow } from 'electron';
 export interface PlayingState {
   isPlaying: boolean;
   bookTitle: string | null;
+  isAuthenticated?: boolean;
 }
 
 export interface ApiConfig {

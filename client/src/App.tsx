@@ -33,14 +33,24 @@ function App() {
       if (!token) {
         setIsAuthenticated(false);
         setIsLoading(false);
+        if (window.trayControls?.updateAuthState) {
+          window.trayControls.updateAuthState(false);
+        }
         return;
       }
 
       const response = await api.get('/auth/status');
-      setIsAuthenticated(response.data.authenticated);
+      const authenticated = response.data.authenticated;
+      setIsAuthenticated(authenticated);
+      if (window.trayControls?.updateAuthState) {
+        window.trayControls.updateAuthState(authenticated);
+      }
     } catch (error) {
       setIsAuthenticated(false);
       await storage.remove('token');
+      if (window.trayControls?.updateAuthState) {
+        window.trayControls.updateAuthState(false);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -48,6 +58,9 @@ function App() {
 
   const handleLogin = () => {
     setIsAuthenticated(true);
+    if (window.trayControls?.updateAuthState) {
+      window.trayControls.updateAuthState(true);
+    }
   };
 
   const handleLogout = async () => {
@@ -58,6 +71,9 @@ function App() {
     } finally {
       await storage.remove('token');
       setIsAuthenticated(false);
+      if (window.trayControls?.updateAuthState) {
+        window.trayControls.updateAuthState(false);
+      }
     }
   };
 

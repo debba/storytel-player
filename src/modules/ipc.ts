@@ -105,6 +105,13 @@ export class IpcManager {
         this.trayManager.updatePlayingState({ isPlaying, bookTitle });
       }
     );
+
+    ipcMain.on(
+      'update-auth-state',
+      (_event, { isAuthenticated }: { isAuthenticated: boolean }) => {
+        this.trayManager.updatePlayingState({ isAuthenticated });
+      }
+    );
   }
 
   private setupLocaleHandlers(): void {

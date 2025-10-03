@@ -27,6 +27,9 @@ contextBridge.exposeInMainWorld('trayControls', {
   updatePlayingState: (isPlaying: boolean, bookTitle: string): void => {
     ipcRenderer.send('update-playing-state', { isPlaying, bookTitle });
   },
+  updateAuthState: (isAuthenticated: boolean): void => {
+    ipcRenderer.send('update-auth-state', { isAuthenticated });
+  },
 });
 
 // Electron API
