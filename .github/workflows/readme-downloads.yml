@@ -23,15 +23,11 @@ jobs:
           MACOS="https://github.com/debba/storytel-player/releases/download/$TAG/Storytel-Player-${TAG#v}.dmg"
           LINUX="https://github.com/debba/storytel-player/releases/download/$TAG/Storytel-Player-${TAG#v}.AppImage"
 
-          DOWNLOAD_SECTION="$(cat <<'EOM'
-          [![Windows](https://img.shields.io/badge/Windows-Download-blue?logo=windows)](${WINDOWS}) \
-          [![macOS](https://img.shields.io/badge/macOS-Download-black?logo=apple)](${MACOS}) \
-          [![Linux](https://img.shields.io/badge/Linux-Download-green?logo=linux)](${LINUX})
-          EOM
-          )"
-          ``
-
-          # Replacd section between markers
+          DOWNLOAD_SECTION="[![Windows](https://img.shields.io/badge/Windows-Download-blue?logo=windows)]($WINDOWS) \
+          [![macOS](https://img.shields.io/badge/macOS-Download-black?logo=apple)]($MACOS) \
+          [![Linux](https://img.shields.io/badge/Linux-Download-green?logo=linux)]($LINUX)"
+          
+          # Replace section between markers
           awk -v replacement="$DOWNLOAD_SECTION" '
             BEGIN { in_section=0 }
             /<!-- DOWNLOAD_SECTION_START -->/ {
