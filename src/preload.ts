@@ -21,6 +21,9 @@ contextBridge.exposeInMainWorld('trayControls', {
   onSetSpeed: (callback: (_event: IpcRendererEvent, speed: number) => void): void => {
     ipcRenderer.on('tray-set-speed', callback);
   },
+  onLogout: (callback: () => void): void => {
+    ipcRenderer.on('tray-logout', callback);
+  },
   updatePlayingState: (isPlaying: boolean, bookTitle: string): void => {
     ipcRenderer.send('update-playing-state', { isPlaying, bookTitle });
   },

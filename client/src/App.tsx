@@ -14,9 +14,17 @@ function App() {
   const { t } = useTranslation();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [triggerLogout, setTriggerLogout] = useState(false);
 
   useEffect(() => {
     checkAuthStatus();
+
+    // Listen for logout event from tray
+    if (window.trayControls?.onLogout) {
+      window.trayControls.onLogout(() => {
+        setTriggerLogout(true);
+      });
+    }
   }, []);
 
   const checkAuthStatus = async () => {
@@ -79,7 +87,7 @@ function App() {
             path="/"
             element={
               isAuthenticated ? (
-                <Dashboard onLogout={handleLogout} />
+                <Dashboard onLogout={handleLogout} triggerLogout={triggerLogout} setTriggerLogout={setTriggerLogout} />
               ) : (
                 <Navigate to="/login" replace />
               )

@@ -100,6 +100,13 @@
     "showApp": "Mostra App",
     "playPause": "Play/Pausa",
     "playbackSpeed": "Velocità di Riproduzione",
+    "logout": "Logout",
     "quit": "Esci"
+  },
+  "logout": {
+    "confirmTitle": "Conferma Logout",
+    "confirmMessage": "Sei sicuro di voler effettuare il logout?",
+    "confirmButton": "Logout",
+    "cancelButton": "Annulla"
   }
 }

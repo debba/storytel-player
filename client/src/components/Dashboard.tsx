@@ -10,9 +10,11 @@ import {BookShelfEntity, BookShelfResponse} from "../interfaces/books";
 
 interface DashboardProps {
     onLogout: () => void;
+    triggerLogout?: boolean;
+    setTriggerLogout?: (value: boolean) => void;
 }
 
-function Dashboard({onLogout}: DashboardProps) {
+function Dashboard({onLogout, triggerLogout, setTriggerLogout}: DashboardProps) {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const [books, setBooks] = useState<BookShelfEntity[]>([]);
@@ -71,7 +73,11 @@ function Dashboard({onLogout}: DashboardProps) {
 
     return (
         <div className="min-h-screen bg-black text-white">
-            <DashboardHeader onLogout={onLogout}/>
+            <DashboardHeader
+                onLogout={onLogout}
+                triggerLogout={triggerLogout}
+                setTriggerLogout={setTriggerLogout}
+            />
 
             {/* Main Content */}
             <main className="max-w-4xl mx-auto py-6 px-4 pb-32">

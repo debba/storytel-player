@@ -81,6 +81,13 @@ export class TrayManager {
         menuTemplate.push(
             {type: 'separator'},
             {
+                label: i18n.t('tray.logout'),
+                click: () => {
+                    this.windowManager.show();
+                    this.sendToRenderer('tray-logout');
+                },
+            },
+            {
                 label: i18n.t('tray.quit'),
                 click: () => {
                     //@ts-ignore
