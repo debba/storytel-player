@@ -1,0 +1,57 @@
+name: Update README with latest downloads
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Get release data
+        id: release
+        uses: actions-ecosystem/action-get-latest-release@v1
+        with:
+          repo: debba/storytel-player
+
+      - name: Update README.md
+        run: |
+          TAG=${{ steps.release.outputs.tag_name }}
+          WINDOWS="https://github.com/debba/storytel-player/releases/download/$TAG/Storytel-Player-Setup-${TAG#v}.exe"
+          MACOS="https://github.com/debba/storytel-player/releases/download/$TAG/Storytel-Player-${TAG#v}.dmg"
+          LINUX="https://github.com/debba/storytel-player/releases/download/$TAG/Storytel-Player-${TAG#v}.AppImage"
+
+          DOWNLOAD_SECTION=$(cat <<EOM
+[![Windows](https://img.shields.io/badge/Windows-Download-blue?logo=windows)]($WINDOWS)  
+[![macOS](https://img.shields.io/badge/macOS-Download-black?logo=apple)]($MACOS)  
+[![Linux](https://img.shields.io/badge/Linux-Download-green?logo=linux)]($LINUX)
+EOM
+)
+
+          # Replacd section between markers
+          awk -v replacement="$DOWNLOAD_SECTION" '
+            BEGIN { in_section=0 }
+            /<!-- DOWNLOAD_SECTION_START -->/ {
+              print $0
+              print replacement
+              in_section=1
+              next
+            }
+            /<!-- DOWNLOAD_SECTION_END -->/ {
+              in_section=0
+            }
+            !in_section { print $0 }
+          ' README.md > README.new
+
+          mv README.new README.md
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git add README.md
+          git commit -m "Update README with latest release ${{ steps.release.outputs.tag_name }}"
+          git push
