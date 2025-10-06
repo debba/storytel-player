@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { BookShelfEntity } from "../interfaces/books";
+import React, {useEffect, useState} from 'react';
+import {useLocation, useNavigate, useParams} from 'react-router-dom';
+import {useTranslation} from 'react-i18next';
+import {BookShelfEntity} from "../interfaces/books";
 import LoadingState from './LoadingState';
 import ErrorState from './ErrorState';
+import Navbar from './Navbar';
 import "../types/window.d.ts";
 
 function BookView() {
-    const { t } = useTranslation();
-    const { bookId } = useParams();
+    const {t} = useTranslation();
+    const {bookId} = useParams();
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -29,19 +30,19 @@ function BookView() {
     }, [book]);
 
     const handlePlayBook = () => {
-        navigate(`/player/${bookId}`, { state: { book } });
+        navigate(`/player/${bookId}`, {state: {book}});
     };
 
     if (isLoading) {
-        return <LoadingState message={t('common.loading')} />;
+        return <LoadingState message={t('common.loading')}/>;
     }
 
     if (error) {
-        return <ErrorState error={error} onRetry={() => navigate('/')} />;
+        return <ErrorState error={error} onRetry={() => navigate('/')}/>;
     }
 
     if (!book) {
-        return <ErrorState error={t('common.error')} onRetry={() => navigate('/')} />;
+        return <ErrorState error={t('common.error')} onRetry={() => navigate('/')}/>;
     }
 
     const formatDuration = (microseconds: number) => {
@@ -68,27 +69,9 @@ function BookView() {
 
     return (
         <div className="min-h-screen bg-black text-white">
-            {/* Navigation Bar */}
-            <nav className="bg-black border-b border-gray-800">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between h-16">
-                        <div className="flex items-center">
-                            <button
-                                onClick={() => navigate('/')}
-                                className="text-gray-400 hover:text-white"
-                            >
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                          d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                                </svg>
-                            </button>
-                        </div>
-                        <div className="flex items-center space-x-4">
-
-                        </div>
-                    </div>
-                </div>
-            </nav>
+            <Navbar barTitle={t('bookView.details')} onBackClick={() => navigate('/')}>
+                <span>{book.book.name}</span>
+            </Navbar>
 
             {/* Main Content */}
             <main className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
@@ -122,14 +105,15 @@ function BookView() {
                             {t('bookCard.author')}: <span className="font-semibold">{book.book.authorsAsString}</span>
                         </p>
                         <p>
-                            {t('bookCard.narrator')}: <span className="font-semibold">{book.abook.narratorAsString}</span>
+                            {t('bookCard.narrator')}: <span
+                            className="font-semibold">{book.abook.narratorAsString}</span>
                         </p>
                     </div>
 
                     {/* Play Button */}
                     <button
                         onClick={handlePlayBook}
-                        className="mb-6 px-8 py-4 bg-white text-black rounded-full hover:bg-gray-100 transition-colors flex items-center space-x-3 text-lg font-semibold"
+                        className="mb-6 px-8 py-4 bg-white text-black rounded-full hover:bg-gray-100 transition-colors flex items-center text-lg font-semibold"
                     >
                         <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M8 5v14l11-7z"/>

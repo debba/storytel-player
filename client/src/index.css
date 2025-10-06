@@ -40,7 +40,6 @@ code {
     background: rgba(0,0,0,0.6);
 }
 
-/* Animazione marquee per titoli lunghi */
 @keyframes marquee-scroll {
     0% {
         transform: translateX(0);

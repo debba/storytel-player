@@ -1,21 +1,22 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import {useTranslation} from 'react-i18next';
 import api from '../utils/api';
 import LoadingState from './LoadingState';
 import ErrorState from './ErrorState';
+import Navbar from './Navbar';
 import BookmarkModals from "./BookmarkModals";
 import PlaybackSpeedModal from "./PlaybackSpeedModal";
 import GotoModal from "./GotoModal";
 import ChaptersModal from "./ChaptersModal";
-import {formatTime} from "../utils/helpers";
-import { BookShelfEntity } from "../interfaces/books";
-import { Bookmark } from "../interfaces/bookmarks";
-import { Chapter } from "../interfaces/chapters";
+import {formatTime, formatTimeNatural} from "../utils/helpers";
+import {BookShelfEntity} from "../interfaces/books";
+import {Bookmark} from "../interfaces/bookmarks";
+import {Chapter} from "../interfaces/chapters";
 import "../types/window.d.ts";
 
 function PlayerView() {
-    const { t } = useTranslation();
+    const {t} = useTranslation();
     const {bookId} = useParams();
     const location = useLocation();
     const navigate = useNavigate();
@@ -58,7 +59,7 @@ function PlayerView() {
     const loadAudioStream = useCallback(async () => {
         try {
             setIsLoading(true);
-            const response = await api.post('/stream', { bookId });
+            const response = await api.post('/stream', {bookId});
             setAudioSrc(response.data.streamUrl);
         } catch (err: any) {
             setError(err.response?.data?.error || t('player.loadError'));
@@ -70,6 +71,7 @@ function PlayerView() {
     const goToBookmark = useCallback((position: number) => {
         if (audioRef.current) {
             audioRef.current.currentTime = Math.floor(position / 1000);
+            audioRef.current.play();
             setShowBookmarksModal(false);
         }
     }, [setShowBookmarksModal]);
@@ -77,7 +79,7 @@ function PlayerView() {
     const goToPosition = useCallback(async (consumableId: string) => {
         try {
             const response = await api.get(`/bookmark-positional/${consumableId}`);
-            const { data } = response;
+            const {data} = response;
 
             if (data.length === 1 && 'position' in data[0]) {
                 goToBookmark(data[0].position);
@@ -90,7 +92,7 @@ function PlayerView() {
     const loadChapters = useCallback(async (consumableId: string) => {
         try {
             const response = await api.get(`/bookmetadata/${consumableId}`);
-            const { data } = response;
+            const {data} = response;
 
             if (data.formats && data.formats.length > 0) {
                 setChapters(data.formats[0].chapters);
@@ -103,7 +105,7 @@ function PlayerView() {
     const loadBookmarks = useCallback(async (consumableId: string) => {
         try {
             const response = await api.get(`/bookmarks/${consumableId}`);
-            const { data } = response;
+            const {data} = response;
 
             setBookmarks(data.bookmarks);
         } catch (error: any) {
@@ -230,7 +232,7 @@ function PlayerView() {
         }
     };
 
-    const handleLoadedMetadata = async() => {
+    const handleLoadedMetadata = async () => {
         if (audioRef.current) {
             await goToPosition(book.book.consumableId);
             setDuration(audioRef.current.duration);
@@ -372,93 +374,108 @@ function PlayerView() {
     };
 
     if (isLoading || isLoadingBookData) {
-        return <LoadingState message={isLoading ? t('player.loadingAudio') : t('player.loadingBookData')} />;
+        return <LoadingState message={isLoading ? t('player.loadingAudio') : t('player.loadingBookData')}/>;
     }
 
     if (error) {
-        return <ErrorState error={error} onRetry={() => navigate('/')} />;
+        return <ErrorState error={error} onRetry={() => navigate('/')}/>;
     }
 
     return (
         <div className="min-h-screen bg-black text-white">
-            <nav className="bg-black border-b border-gray-800">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between h-16">
-                        <div className="flex items-center min-w-0 flex-1 gap-4">
-                            <button
-                                onClick={() => navigate('/')}
-                                className="text-gray-400 hover:text-white flex-shrink-0"
-                            >
-                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                          d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                                </svg>
-                            </button>
-                            <div className="text-sm font-bold text-white flex items-baseline gap-2 min-w-0 flex-1">
-                                <span className="flex-shrink-0 text-xl">{t('player.nowPlaying')}</span>
-                                <div className="overflow-hidden relative flex-1">
-                                    <div
-                                        className={`whitespace-nowrap inline-flex animate-marquee`}
-                                    >
-                                        <span>{book.book.name}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </nav>
+            <Navbar barTitle={t('player.nowPlaying')} onBackClick={() => navigate(`/book/${bookId}`, {state: {book}})}>
+                <span>{book.book.name}</span>
+            </Navbar>
             <main className="max-w-4xl mx-auto py-2 sm:px-6 lg:px-8 pb-2">
-                <div className="px-4 py-2 sm:px-0">
-                    <div className="bg-gray-900 rounded-lg shadow-lg overflow-hidden border border-gray-800">
+                <div className="px-2">
+                    <div className="rounded-lg shadow-lg overflow-hidden">
                         {/* Book Info */}
-                        <div className="p-4 flex flex-col items-center">
+                        <div className="flex flex-col items-center">
                             <div className="flex flex-col items-center mb-2">
                                 <img
                                     src={"https://www.storytel.com" + (book.book.largeCover || book.book.largeCoverE)}
                                     alt={book.book.name}
                                     className="w-64 h-64 object-cover rounded-lg shadow-2xl mb-4"
                                 />
-                                {/*<div className="text-center">
+                                <div className="text-center">
                                     <h2 className="text-lg font-bold text-white mb-0.5">{book.book.name}</h2>
                                     <p className="text-sm text-gray-300 mb-0">
                                         {t('bookCard.author')} {book.book.authorsAsString} • {t('bookCard.narrator')} {book.abook.narratorAsString}
                                     </p>
-                                </div>*/}
+                                </div>
                             </div>
                         </div>
-                        <div className="px-6 py-0 flex flex-col">
-                        {(() => {
-                            let cumulativeTime = 0;
-                            let currentChapterData = null;
+                        <div className="px-6 py-0 flex">
+                            {(() => {
+                                let cumulativeTime = 0;
+                                let currentChapterData = null;
 
-                            for (let i = 0; i < chapters.length; i++) {
-                                const chapter = chapters[i];
-                                const chapterStart = cumulativeTime;
-                                const chapterEnd = cumulativeTime + (chapter.durationInSeconds || 0);
+                                for (let i = 0; i < chapters.length; i++) {
+                                    const chapter = chapters[i];
+                                    const chapterStart = cumulativeTime;
+                                    const chapterEnd = cumulativeTime + (chapter.durationInSeconds || 0);
 
-                                if (currentTime >= chapterStart && currentTime < chapterEnd) {
-                                    currentChapterData = {
-                                        ...chapter,
-                                        title: chapter.title || `Chapter ${chapter.number}`,
-                                        start: chapterStart,
-                                        end: chapterEnd
-                                    };
-                                    break;
+                                    if (currentTime >= chapterStart && currentTime < chapterEnd) {
+                                        currentChapterData = {
+                                            ...chapter,
+                                            title: chapter.title || `Chapter ${chapter.number}`,
+                                            start: chapterStart,
+                                            end: chapterEnd
+                                        };
+                                        break;
+                                    }
+
+                                    cumulativeTime = chapterEnd;
                                 }
 
-                                cumulativeTime = chapterEnd;
-                            }
+                                return currentChapterData ? (
+                                    <div className="flex justify-between items-start w-full mt-0">
+                                        <div className="text-left flex-1">
+                                            <p className="text-base text-white">{currentChapterData.title}</p>
+                                            <p className="text-sm text-gray-400">
+                                                {formatTimeNatural((currentChapterData.end - currentTime) / playbackRate)}
+                                            </p>
+                                        </div>
+                                        <div className="flex items-center space-x-3 ml-4">
+                                            {chapters && chapters.length > 0 && (
+                                                <button
+                                                    onClick={() => setShowChaptersModal(true)}
+                                                    className="px-2 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors"
+                                                >
+                                                    <svg className="w-6 h-6" xmlns="http://www.w3.org/2000/svg"
+                                                         viewBox="0 0 48 48">
+                                                        <g>
+                                                            <path fill="currentColor"></path>
+                                                            <g>
+                                                                <path fill="currentColor"
+                                                                      d="M16.002 22.002h25.997v4H16.002zM16.002 11.995h25.997v4H16.002zM16.002 32.008h25.997v4H16.002zM6 12h4v4H6zM6 22.006h4v4H6zM6 32.013h4v4H6z"></path>
+                                                            </g>
+                                                        </g>
+                                                    </svg>
+                                                </button>
+                                            )}
+                                            <button
+                                                id="bookmark-btn"
+                                                onClick={() => setShowBookmarksModal(true)}
+                                                className="px-2 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                     className="w-6 h-6">
+                                                    <path
+                                                        id="SVGRepo_iconCarrier"
+                                                        stroke="#464455"
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        fill="currentColor"
+                                                        d="M15.75 5h-7.5C7.56 5 7 5.588 7 6.313V19l5-3.5 5 3.5V6.313C17 5.588 16.44 5 15.75 5"
+                                                    ></path>
+                                                </svg>
 
-                            return currentChapterData ? (
-                                <div className="text-left mt-0">
-                                    <p className="text-base text-white">{currentChapterData.title}</p>
-                                    <p className="text-sm text-gray-400">
-                                        {formatTime((currentChapterData.end - currentTime) / playbackRate)}
-                                    </p>
-                                </div>
-                            ) : null;
-                        })()}
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : null;
+                            })()}
                         </div>
 
                         {/* Audio Element */}
@@ -492,9 +509,9 @@ function PlayerView() {
 
                         {/* Player Controls */}
 
-                        <div className="p-6 bg-gray-900">
+                        <div className="p-6 ">
                             {/* Progress Bar */}
-                            <div className="mb-6">
+                            <div className="mb-6 relative">
                                 <input
                                     type="range"
                                     min="0"
@@ -506,126 +523,120 @@ function PlayerView() {
                                         background: `linear-gradient(to right, #ea580c 0%, #ea580c ${((currentTime / (duration || 1)) * 100)}%, #374151 ${((currentTime / (duration || 1)) * 100)}%, #374151 100%)`
                                     }}
                                 />
-                                <div className="flex justify-between text-sm text-gray-400 mt-2">
+                                <div className="flex justify-between items-center text-sm text-gray-400 mt-2">
                                     <span>{formatTime(currentTime / playbackRate)}</span>
+
+                                    {/* Goto - Center */}
+                                    <div className="absolute left-1/2 transform -translate-x-1/2">
+                                        <button
+                                            onClick={() => setShowGotoModal(true)}
+                                            className="px-3 py-1 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors text-xs"
+                                        >
+                                            {t('player.goto')}
+                                        </button>
+                                    </div>
+
                                     <span>{formatTime(duration / playbackRate)}</span>
                                 </div>
                             </div>
 
                             {/* Control Buttons */}
-                            <div className="flex items-center justify-center space-x-6 mb-6">
-                                <button
-                                    onClick={skipBackward}
-                                    className="p-3 bg-gray-800 rounded-full hover:bg-gray-700 transition-colors text-white"
-                                >
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                              d="M12.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0019 16V8a1 1 0 00-1.6-.8L12.066 11.2zM4.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0011 16V8a1 1 0 00-1.6-.8L4.066 11.2z"/>
-                                    </svg>
-                                </button>
+                            <div className="flex items-center justify-between mb-6 w-full">
 
-                                <button
-                                    onClick={handlePlayPause}
-                                    className="p-4 bg-orange-600 text-white rounded-full hover:bg-orange-700 transition-colors"
-                                >
-                                    {isPlaying ? (
-                                        <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
-                                        </svg>
-                                        ) : (
-                                        <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M8 5v14l11-7z"/>
-                                        </svg>
-                                        )}
-                                </button>
-
-                                <button
-                                    onClick={skipForward}
-                                    className="p-3 bg-gray-800 rounded-full hover:bg-gray-700 transition-colors text-white"
-                                >
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                              d="M11.933 12.8a1 1 0 000-1.6L6.6 7.2A1 1 0 005 8v8a1 1 0 001.6.8l5.333-4zM19.933 12.8a1 1 0 000-1.6l-5.333-4A1 1 0 0013 8v8a1 1 0 001.6.8l5.333-4z"/>
-                                    </svg>
-                                </button>
-                            </div>
-
-                            {/* Volume, Speed, Goto and Bookmark */}
-                            <div className="flex items-center justify-between flex-wrap gap-4">
-                                <div className="flex items-center space-x-4">
-                                    {/* Volume Control */}
-                                    <div className="flex items-center space-x-2">
-                                        <button onClick={toggleMute} className="p-1 rounded hover:bg-gray-800 transition-colors">
-                                            {isMuted || volume === 0 ? (
-                                                <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-                                                    <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
-                                                </svg>
-                                            ) : (
-                                                <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-                                                    <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
-                                                </svg>
-                                            )}
-                                        </button>
-                                        <input
-                                            type="range"
-                                            min="0"
-                                            max="1"
-                                            step="0.1"
-                                            value={volume}
-                                            onChange={handleVolumeChange}
-                                            className="w-20 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
-                                        />
-                                    </div>
-
-                                    {/* Playback Speed */}
+                                {/* Left side - Playback speed */}
+                                <div className="flex-1 flex justify-start">
                                     <button
                                         onClick={() => setShowPlaybackSpeedModal(true)}
-                                        className="px-3 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors text-sm"
+                                        className="px-3 py-1  text-white rounded-md hover:bg-gray-700 transition-colors text-xs"
                                     >
                                         {playbackRate}x
                                     </button>
-
-                                    {/* Goto Time */}
-                                    <button
-                                        onClick={() => setShowGotoModal(true)}
-                                        className="px-3 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors text-sm"
-                                    >
-                                        {t('player.goto')}
-                                    </button>
                                 </div>
 
-                                <div className="flex items-center space-x-3">
-                                    {chapters && chapters.length > 0 && (
-                                        <button
-                                            onClick={() => setShowChaptersModal(true)}
-                                            className="px-2 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors"
-                                        >
-                                            <svg className="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-                                                <g>
-                                                    <path fill="currentColor"></path>
-                                                    <g>
-                                                        <path fill="currentColor" d="M16.002 22.002h25.997v4H16.002zM16.002 11.995h25.997v4H16.002zM16.002 32.008h25.997v4H16.002zM6 12h4v4H6zM6 22.006h4v4H6zM6 32.013h4v4H6z"></path>
-                                                    </g>
-                                                </g>
-                                            </svg>
-                                        </button>
-                                    )}
+                                {/* Center controls */}
+                                <div className="flex items-center justify-center gap-4">
+                                    <button
+                                        onClick={skipBackward}
+                                        className="p-3 bg-gray-800 rounded-full hover:bg-gray-700 transition-colors text-white"
+                                    >
+                                        {/* skip backward icon */}
+                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                                  d="M12.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0019 16V8a1 1 0 00-1.6-.8L12.066 11.2zM4.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0011 16V8a1 1 0 00-1.6-.8L4.066 11.2z"/>
+                                        </svg>
+                                    </button>
 
                                     <button
-                                        id="bookmark-btn"
-                                        onClick={() => setShowBookmarksModal(true)}
-                                        className="px-2 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors"
+                                        onClick={handlePlayPause}
+                                        className="p-3 bg-orange-600 text-white rounded-full hover:bg-orange-700 transition-colors"
                                     >
-                                        <svg xmlns="http://www.w3.org/2000/svg"                        className="w-6 h-6"
-                                             fill="currentColor" viewBox="0 0 16 16">
-                                            <path
-                                                fill="currentColor"
-                                                d="M2 0h12v16h-2l-4-4-4 4H2z"
-                                            ></path>
+                                        {isPlaying ? (
+                                            <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                                            </svg>
+                                        ) : (
+                                            <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M8 5v14l11-7z"/>
+                                            </svg>
+                                        )}
+                                    </button>
+
+                                    <button
+                                        onClick={skipForward}
+                                        className="p-3 bg-gray-800 rounded-full hover:bg-gray-700 transition-colors text-white"
+                                    >
+                                        {/* skip forward icon */}
+                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                                  d="M11.933 12.8a1 1 0 000-1.6L6.6 7.2A1 1 0 005 8v8a1 1 0 001.6.8l5.333-4zM19.933 12.8a1 1 0 000-1.6l-5.333-4A1 1 0 0013 8v8a1 1 0 001.6.8l5.333-4z"/>
                                         </svg>
                                     </button>
                                 </div>
+
+                                {/* Right side - Volume */}
+                                <div className="flex-1 flex justify-end">
+                                    <div className="relative group">
+                                        <button
+                                            onClick={toggleMute}
+                                            className="p-1 rounded hover:bg-gray-800 transition-colors"
+                                        >
+                                            {isMuted || volume === 0 ? (
+                                                <svg className="w-5 h-5 text-gray-400" fill="currentColor"
+                                                     viewBox="0 0 24 24">
+                                                    <path
+                                                        d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+                                                </svg>
+                                            ) : (
+                                                <svg className="w-5 h-5 text-gray-400" fill="currentColor"
+                                                     viewBox="0 0 24 24">
+                                                    <path
+                                                        d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                                                </svg>
+                                            )}
+                                        </button>
+                                        {/* Vertical volume slider on hover */}
+                                        <div
+                                            className="absolute bottom-full left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none group-hover:pointer-events-auto pb-2">
+                                            <div className="bg-gray-800 rounded-lg p-2 shadow-lg">
+                                                <input
+                                                    type="range"
+                                                    min="0"
+                                                    max="1"
+                                                    step="0.01"
+                                                    value={volume}
+                                                    onChange={handleVolumeChange}
+                                                    className="h-24 w-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                                                    style={{
+                                                        WebkitAppearance: 'slider-vertical'
+                                                    } as React.CSSProperties}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
+
 
                             <PlaybackSpeedModal
                                 isOpen={showPlaybackSpeedModal}

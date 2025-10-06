@@ -16,3 +16,22 @@ export const formatMicrosecondsTime = (microseconds: number) => {
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     return `${hours} h ${minutes} min`;
 };
+
+export const formatTimeNatural = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+
+    const parts = [];
+    if (hours > 0) {
+        parts.push(`${hours}h`);
+    }
+    if (minutes > 0) {
+        parts.push(`${minutes}min`);
+    }
+    if (secs > 0 || parts.length === 0) {
+        parts.push(`${secs}s`);
+    }
+
+    return parts.join(' ');
+};

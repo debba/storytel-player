@@ -83,7 +83,8 @@
     "category": "Categoria",
     "noDescription": "Nessuna descrizione disponibile.",
     "showMore": "mostra di più",
-    "showLess": "mostra meno"
+    "showLess": "mostra meno",
+    "details": "Dettagli Libro:"
   },
   "chapters": {
     "title": "Capitoli",
