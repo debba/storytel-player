@@ -9,7 +9,7 @@
 
 ## Release Download:
 <!-- DOWNLOAD_SECTION_START -->
-[![Windows](https://img.shields.io/badge/Windows-Download-blue?logo=windows)](https://github.com/debba/storytel-player/releases/download/v1.0.7/Storytel-Player-Setup-1.0.7.exe) [![macOS](https://img.shields.io/badge/macOS-Download-black?logo=apple)](https://github.com/debba/storytel-player/releases/download/v1.0.7/Storytel-Player-1.0.7.dmg) [![Linux](https://img.shields.io/badge/Linux-Download-green?logo=linux)](https://github.com/debba/storytel-player/releases/download/v1.0.7/Storytel-Player-1.0.7.AppImage)
+[![Windows](https://img.shields.io/badge/Windows-Download-blue?logo=windows)](https://github.com/debba/storytel-player/releases/download/v1.0.8/Storytel-Player-Setup-1.0.8.exe) [![macOS](https://img.shields.io/badge/macOS-Download-black?logo=apple)](https://github.com/debba/storytel-player/releases/download/v1.0.8/Storytel-Player-1.0.8.dmg) [![Linux](https://img.shields.io/badge/Linux-Download-green?logo=linux)](https://github.com/debba/storytel-player/releases/download/v1.0.8/Storytel-Player-1.0.8.AppImage)
 <!-- DOWNLOAD_SECTION_END -->
 
 ✅ **Native Desktop App**: Cross-platform application with system tray integration and single instance lock
