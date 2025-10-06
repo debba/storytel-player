@@ -1,4 +1,4 @@
-import {Tray, Menu, app} from 'electron';
+import {Tray, Menu, app, shell, dialog} from 'electron';
 import * as path from 'path';
 import {PlayingState} from '../types';
 import {WindowManager} from './window';
@@ -84,6 +84,44 @@ export class TrayManager {
         }
 
         menuTemplate.push({type: 'separator'});
+
+        menuTemplate.push({
+            label: "About",
+            click: () => {
+                const appInfo = [];
+                appInfo.push(`storytel-player@${app.getVersion()}\n`);
+                for (const prop in process.versions) {
+                    if (
+                        prop === "node" ||
+                        prop === "v8" ||
+                        prop === "electron" ||
+                        prop === "chrome"
+                    ) {
+                        appInfo.push(`${prop}: ${process.versions[prop]}`);
+                    }
+                }
+                dialog.showMessageBoxSync(this.windowManager.getWindow()!, {
+                    buttons: ["OK"],
+                    title: "About",
+                    normalizeAccessKeys: true,
+                    defaultId: 0,
+                    cancelId: 0,
+                    message: appInfo.join("\n"),
+                    type: "info",
+                });
+            }
+        }, {
+            label: "Help",
+            submenu: [
+                {
+                    label: "Github Project",
+                    click: () =>
+                        shell.openExternal(
+                            "https://github.com/debba/storytel-player"
+                        ),
+                }
+            ]
+        });
 
         if (this.currentPlayingState.isAuthenticated) {
             menuTemplate.push({

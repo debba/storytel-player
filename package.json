@@ -1,6 +1,6 @@
 {
   "name": "storytel-player",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "email": "andrea@debbaweb.it",
   "description": "Storytel Unofficial Player - Storytel audiobook player for desktop",
   "main": "dist/electron/main.js",
