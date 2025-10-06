@@ -110,5 +110,19 @@
     "confirmMessage": "Are you sure you want to logout?",
     "confirmButton": "Logout",
     "cancelButton": "Cancel"
+  },
+  "updater": {
+    "available": {
+      "title": "Update Available",
+      "message": "A new version is available:",
+      "download": "Download",
+      "later": "Later"
+    },
+    "ready": {
+      "title": "Update Ready",
+      "message": "Update downloaded. Restart to install version:",
+      "restart": "Restart Now",
+      "later": "Later"
+    }
   }
 }
