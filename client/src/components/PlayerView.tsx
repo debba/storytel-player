@@ -1,7 +1,6 @@
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
-import api from '../utils/api';
 import LoadingState from './LoadingState';
 import ErrorState from './ErrorState';
 import Navbar from './Navbar';
@@ -9,10 +8,13 @@ import BookmarkModals from "./BookmarkModals";
 import PlaybackSpeedModal from "./PlaybackSpeedModal";
 import GotoModal from "./GotoModal";
 import ChaptersModal from "./ChaptersModal";
-import {formatTime, formatTimeNatural} from "../utils/helpers";
+import PlayerControls from "./PlayerControls";
+import BookInfo from "./BookInfo";
 import {BookShelfEntity} from "../interfaces/books";
-import {Bookmark} from "../interfaces/bookmarks";
-import {Chapter} from "../interfaces/chapters";
+import {useAudioPlayer} from "../hooks/useAudioPlayer";
+import {useBookmarks} from "../hooks/useBookmarks";
+import {useChapters} from "../hooks/useChapters";
+import {useGotoModal} from "../hooks/useGotoModal";
 import "../types/window.d.ts";
 
 function PlayerView() {
@@ -20,113 +22,52 @@ function PlayerView() {
     const {bookId} = useParams();
     const location = useLocation();
     const navigate = useNavigate();
-    const audioRef = useRef<HTMLAudioElement>(null);
-    const [audioSrc, setAudioSrc] = useState<string | null>(null);
 
-    const [isLoading, setIsLoading] = useState(true);
-    const [isLoadingBookData, setIsLoadingBookData] = useState(true);
-    const [error, setError] = useState('');
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [currentTime, setCurrentTime] = useState(0);
-    const [duration, setDuration] = useState(0);
-    const [volume, setVolume] = useState(1);
-    const [isMuted, setIsMuted] = useState(false);
-    const [previousVolume, setPreviousVolume] = useState(1);
-    const [chapters, setChapters] = useState<Chapter[]>([]);
-    const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
-    const [showBookmarksModal, setShowBookmarksModal] = useState(false);
-    const [showCreateBookmarkModal, setShowCreateBookmarkModal] = useState(false);
-    const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
-    const [showEditBookmarkModal, setShowEditBookmarkModal] = useState(false);
-    const [bookmarkToDelete, setBookmarkToDelete] = useState<Bookmark | null>(null);
-    const [bookmarkToEdit, setBookmarkToEdit] = useState<Bookmark | null>(null);
-    const [newBookmarkNote, setNewBookmarkNote] = useState('');
-    const [editBookmarkNote, setEditBookmarkNote] = useState('');
-    const [playbackRate, setPlaybackRate] = useState(1.0);
-    const [showPlaybackSpeedModal, setShowPlaybackSpeedModal] = useState(false);
-    const [showGotoModal, setShowGotoModal] = useState(false);
-    const [gotoHours, setGotoHours] = useState(0);
-    const [gotoMinutes, setGotoMinutes] = useState(0);
-    const [gotoSeconds, setGotoSeconds] = useState(0);
-    const [showChaptersModal, setShowChaptersModal] = useState(false);
-
-    // TODO: Add proper type definition for NodeJS namespace or use number for timeout
-    const positionUpdateIntervalRef = useRef<any>(null);
-
-    // TODO: Add proper type for location state
     const book: BookShelfEntity = location.state?.book;
 
-    const loadAudioStream = useCallback(async () => {
-        try {
-            setIsLoading(true);
-            const response = await api.post('/stream', {bookId});
-            setAudioSrc(response.data.streamUrl);
-        } catch (err: any) {
-            setError(err.response?.data?.error || t('player.loadError'));
-        } finally {
-            setIsLoading(false);
-        }
-    }, [bookId]);
+    const [error, setError] = useState('');
+    const [isLoadingBookData, setIsLoadingBookData] = useState(true);
+    const [playbackRate, setPlaybackRate] = useState(1.0);
+    const [showPlaybackSpeedModal, setShowPlaybackSpeedModal] = useState(false);
 
-    const goToBookmark = useCallback((position: number) => {
-        if (audioRef.current) {
-            audioRef.current.currentTime = Math.floor(position / 1000);
-            audioRef.current.play();
-            setShowBookmarksModal(false);
-        }
-    }, [setShowBookmarksModal]);
+    // Audio player hook
+    const audioPlayer = useAudioPlayer({
+        bookId,
+        consumableId: book?.book?.consumableId,
+        playbackRate,
+        onLoadError: setError,
+    });
 
-    const goToPosition = useCallback(async (consumableId: string) => {
-        try {
-            const response = await api.get(`/bookmark-positional/${consumableId}`);
-            const {data} = response;
+    // Bookmarks hook
+    const bookmarks = useBookmarks({
+        consumableId: book?.book?.consumableId,
+        onError: setError,
+    });
 
-            if (data.length === 1 && 'position' in data[0]) {
-                goToBookmark(data[0].position);
-            }
-        } catch (error: any) {
-            setError(error.response?.data?.error || t('player.loadBookmarksError'));
-        }
-    }, [goToBookmark, t]);
+    // Chapters hook
+    const chapters = useChapters({
+        consumableId: book?.book?.consumableId,
+        currentTime: audioPlayer.currentTime,
+        onError: setError,
+    });
 
-    const loadChapters = useCallback(async (consumableId: string) => {
-        try {
-            const response = await api.get(`/bookmetadata/${consumableId}`);
-            const {data} = response;
+    // Goto modal hook
+    const gotoModal = useGotoModal({
+        onSeek: audioPlayer.handleSeek,
+        duration: audioPlayer.duration,
+        playbackRate,
+        currentTime: audioPlayer.currentTime,
+    });
 
-            if (data.formats && data.formats.length > 0) {
-                setChapters(data.formats[0].chapters);
-            }
-        } catch (error: any) {
-            setError(error.response?.data?.error || t('player.loadChaptersError'));
-        }
-    }, [t]);
-
-    const loadBookmarks = useCallback(async (consumableId: string) => {
-        try {
-            const response = await api.get(`/bookmarks/${consumableId}`);
-            const {data} = response;
-
-            setBookmarks(data.bookmarks);
-        } catch (error: any) {
-            setError(error.response?.data?.error || t('player.loadBookmarksError'));
-        }
-    }, [t]);
-
-    useEffect(() => {
-        if (bookId) {
-            loadAudioStream();
-        }
-    }, [bookId, loadAudioStream]);
-
+    // Load book data (chapters and bookmarks)
     useEffect(() => {
         const loadBookData = async () => {
             if (book) {
                 setIsLoadingBookData(true);
                 try {
                     await Promise.all([
-                        loadChapters(book.book.consumableId),
-                        loadBookmarks(book.book.consumableId),
+                        chapters.loadChapters(),
+                        bookmarks.loadBookmarks(),
                     ]);
                 } finally {
                     setIsLoadingBookData(false);
@@ -135,246 +76,50 @@ function PlayerView() {
             }
         };
 
-        loadBookData();
+        void loadBookData();
 
         return () => {
-            if (positionUpdateIntervalRef.current) {
-                clearInterval(positionUpdateIntervalRef.current);
-            }
             document.title = 'Storytel Player';
             // Clear tray when leaving PlayerView
             if (window.trayControls && window.trayControls.updatePlayingState) {
                 window.trayControls.updatePlayingState(false, null);
             }
         };
-    }, [book, loadChapters, loadBookmarks]);
-
-    const updatePosition = useCallback(async () => {
-        if (!audioRef.current || !book?.book?.consumableId) return;
-
-        try {
-            const position = Math.floor(audioRef.current.currentTime * 1000);
-            await api.put(`/bookmark-positional/${book.book.consumableId}`, {
-                position: position
-            });
-        } catch (error) {
-            console.error('Failed to update position:', error);
-        }
     }, [book]);
 
-    const handlePlayPause = useCallback(() => {
-        if (!audioRef.current) return;
-
-        if (isPlaying) {
-            audioRef.current.pause();
-            updatePosition();
-            if (positionUpdateIntervalRef.current) {
-                clearInterval(positionUpdateIntervalRef.current);
-                positionUpdateIntervalRef.current = null;
-            }
-        } else {
-            audioRef.current.play();
-            positionUpdateIntervalRef.current = setInterval(updatePosition, 30000);
-        }
-        setIsPlaying(!isPlaying);
-    }, [isPlaying, updatePosition]);
-
-    const handlePlaybackRateChange = useCallback((newRate: number) => {
+    // Playback rate change handler
+    const handlePlaybackRateChange = (newRate: number) => {
         setPlaybackRate(newRate);
-        if (audioRef.current) {
-            audioRef.current.playbackRate = newRate;
+        if (audioPlayer.audioRef.current) {
+            audioPlayer.audioRef.current.playbackRate = newRate;
         }
         setShowPlaybackSpeedModal(false);
-    }, []);
+    };
 
     // Tray event listeners
     useEffect(() => {
         if (window.trayControls) {
-            // TODO: Add proper type checking for trayControls methods
             window.trayControls.onPlayPause?.(() => {
-                handlePlayPause();
+                audioPlayer.handlePlayPause();
             });
 
-            window.trayControls.onSetSpeed?.((event: any, speed: number) => {
+            window.trayControls.onSetSpeed?.((_event: any, speed: number) => {
                 handlePlaybackRateChange(speed);
             });
         }
-    }, [handlePlayPause, handlePlaybackRateChange]);
+    }, [audioPlayer.handlePlayPause]);
 
     // Update tray with current playing state and book title
     useEffect(() => {
         if (window.trayControls && window.trayControls.updatePlayingState) {
             const bookTitle = book?.book?.name || null;
-            window.trayControls.updatePlayingState(isPlaying, bookTitle);
+            window.trayControls.updatePlayingState(audioPlayer.isPlaying, bookTitle);
         }
-    }, [isPlaying, book]);
+    }, [audioPlayer.isPlaying, book]);
 
-    const handleGotoTime = () => {
-        if (!audioRef.current) return;
 
-        const totalSeconds = (gotoHours * 3600) + (gotoMinutes * 60) + gotoSeconds;
-        const adjustedSeconds = totalSeconds * playbackRate; // Adjust for playback speed
-
-        if (adjustedSeconds >= 0 && adjustedSeconds <= duration) {
-            audioRef.current.currentTime = adjustedSeconds;
-            setCurrentTime(adjustedSeconds);
-        }
-
-        setShowGotoModal(false);
-        setGotoHours(0);
-        setGotoMinutes(0);
-        setGotoSeconds(0);
-    };
-
-    const handleTimeUpdate = () => {
-        if (audioRef.current) {
-            setCurrentTime(audioRef.current.currentTime);
-        }
-    };
-
-    const handleLoadedMetadata = async () => {
-        if (audioRef.current) {
-            await goToPosition(book.book.consumableId);
-            setDuration(audioRef.current.duration);
-        }
-    };
-
-    const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (!audioRef.current) return;
-
-        const seekTime = parseFloat(e.target.value);
-        audioRef.current.currentTime = seekTime;
-        setCurrentTime(seekTime);
-    };
-
-    const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const newVolume = parseFloat(e.target.value);
-        setVolume(newVolume);
-        if (audioRef.current) {
-            audioRef.current.volume = newVolume;
-        }
-        if (newVolume > 0) {
-            setIsMuted(false);
-        }
-    };
-
-    const toggleMute = () => {
-        if (!audioRef.current) return;
-
-        if (isMuted) {
-            // Unmute: ripristina il volume precedente
-            audioRef.current.volume = previousVolume;
-            setVolume(previousVolume);
-            setIsMuted(false);
-        } else {
-            // Mute: salva il volume attuale e imposta a 0
-            setPreviousVolume(volume);
-            audioRef.current.volume = 0;
-            setVolume(0);
-            setIsMuted(true);
-        }
-    };
-
-    const skipForward = () => {
-        if (audioRef.current) {
-            audioRef.current.currentTime = Math.min(audioRef.current.currentTime + 15, duration);
-        }
-    };
-
-    const skipBackward = () => {
-        if (audioRef.current) {
-            audioRef.current.currentTime = Math.max(audioRef.current.currentTime - 15, 0);
-        }
-    };
-
-    const handleChapterClick = (chapterStartTime: number) => {
-        if (audioRef.current) {
-            audioRef.current.currentTime = chapterStartTime;
-        }
-    };
-
-    const handleShowEditBookmarkModal = (bookmark: Bookmark) => {
-        setBookmarkToEdit(bookmark);
-        setEditBookmarkNote(bookmark.note || '');
-        setShowEditBookmarkModal(true);
-        setShowBookmarksModal(false);
-    };
-
-    const handleShowDeleteConfirmModal = (bookmark: Bookmark) => {
-        setBookmarkToDelete(bookmark);
-        setShowDeleteConfirmModal(true);
-        setShowBookmarksModal(false);
-    };
-
-    const handleShowCreateBookmarkModal = () => {
-        setShowBookmarksModal(false);
-        setShowCreateBookmarkModal(true);
-    };
-
-    const handleCloseEditBookmarkModal = () => {
-        setShowEditBookmarkModal(false);
-        setBookmarkToEdit(null);
-        setEditBookmarkNote('');
-    };
-
-    const handleCloseDeleteConfirmModal = () => {
-        setShowDeleteConfirmModal(false);
-        setBookmarkToDelete(null);
-    };
-
-    const createBookmark = async () => {
-        if (!audioRef.current || !book) return;
-
-        try {
-            const positionInMilliseconds = Math.floor(audioRef.current.currentTime * 1000);
-
-            await api.post(`/bookmarks/${book.book.consumableId}`, {
-                position: positionInMilliseconds,
-                note: newBookmarkNote
-            });
-
-            await loadBookmarks(book.book.consumableId);
-            setNewBookmarkNote('');
-            setShowCreateBookmarkModal(false);
-        } catch (error) {
-            console.error('Failed to create bookmark:', error);
-        }
-    };
-
-    const deleteBookmark = async () => {
-        if (!bookmarkToDelete || !book) return;
-
-        try {
-            await api.delete(`/bookmarks/${book.book.consumableId}/${bookmarkToDelete.id}`, {});
-            await loadBookmarks(book.book.consumableId);
-            setShowDeleteConfirmModal(false);
-            setBookmarkToDelete(null);
-        } catch (error) {
-            console.error('Failed to delete bookmark:', error);
-        }
-    };
-
-    const editBookmark = async () => {
-        if (!bookmarkToEdit || !book) return;
-
-        try {
-            await api.put(`/bookmarks/${book.book.consumableId}/${bookmarkToEdit.id}`, {
-                position: bookmarkToEdit.position,
-                note: editBookmarkNote,
-                type: 'abook'
-            });
-
-            await loadBookmarks(book.book.consumableId);
-            setShowEditBookmarkModal(false);
-            setBookmarkToEdit(null);
-            setEditBookmarkNote('');
-        } catch (error) {
-            console.error('Failed to edit bookmark:', error);
-        }
-    };
-
-    if (isLoading || isLoadingBookData) {
-        return <LoadingState message={isLoading ? t('player.loadingAudio') : t('player.loadingBookData')}/>;
+    if (audioPlayer.isLoading || isLoadingBookData) {
+        return <LoadingState message={audioPlayer.isLoading ? t('player.loadingAudio') : t('player.loadingBookData')}/>;
     }
 
     if (error) {
@@ -390,312 +135,102 @@ function PlayerView() {
                 <div className="px-2">
                     <div className="rounded-lg shadow-lg overflow-hidden">
                         {/* Book Info */}
-                        <div className="flex flex-col items-center">
-                            <div className="flex flex-col items-center mb-2">
-                                <img
-                                    src={"https://www.storytel.com" + (book.book.largeCover || book.book.largeCoverE)}
-                                    alt={book.book.name}
-                                    className="w-64 h-64 object-cover rounded-lg shadow-2xl mb-4"
-                                />
-                                <div className="text-center">
-                                    <h2 className="text-lg font-bold text-white mb-0.5">{book.book.name}</h2>
-                                    <p className="text-sm text-gray-300 mb-0">
-                                        {t('bookCard.author')} {book.book.authorsAsString} • {t('bookCard.narrator')} {book.abook.narratorAsString}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="px-6 py-0 flex">
-                            {(() => {
-                                let cumulativeTime = 0;
-                                let currentChapterData = null;
-
-                                for (let i = 0; i < chapters.length; i++) {
-                                    const chapter = chapters[i];
-                                    const chapterStart = cumulativeTime;
-                                    const chapterEnd = cumulativeTime + (chapter.durationInSeconds || 0);
-
-                                    if (currentTime >= chapterStart && currentTime < chapterEnd) {
-                                        currentChapterData = {
-                                            ...chapter,
-                                            title: chapter.title || `Chapter ${chapter.number}`,
-                                            start: chapterStart,
-                                            end: chapterEnd
-                                        };
-                                        break;
-                                    }
-
-                                    cumulativeTime = chapterEnd;
-                                }
-
-                                return currentChapterData ? (
-                                    <div className="flex justify-between items-start w-full mt-0">
-                                        <div className="text-left flex-1">
-                                            <p className="text-base text-white">{currentChapterData.title}</p>
-                                            <p className="text-sm text-gray-400">
-                                                {formatTimeNatural((currentChapterData.end - currentTime) / playbackRate)}
-                                            </p>
-                                        </div>
-                                        <div className="flex items-center space-x-3 ml-4">
-                                            {chapters && chapters.length > 0 && (
-                                                <button
-                                                    onClick={() => setShowChaptersModal(true)}
-                                                    className="px-2 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors"
-                                                >
-                                                    <svg className="w-6 h-6" xmlns="http://www.w3.org/2000/svg"
-                                                         viewBox="0 0 48 48">
-                                                        <g>
-                                                            <path fill="currentColor"></path>
-                                                            <g>
-                                                                <path fill="currentColor"
-                                                                      d="M16.002 22.002h25.997v4H16.002zM16.002 11.995h25.997v4H16.002zM16.002 32.008h25.997v4H16.002zM6 12h4v4H6zM6 22.006h4v4H6zM6 32.013h4v4H6z"></path>
-                                                            </g>
-                                                        </g>
-                                                    </svg>
-                                                </button>
-                                            )}
-                                            <button
-                                                id="bookmark-btn"
-                                                onClick={() => setShowBookmarksModal(true)}
-                                                className="px-2 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors"
-                                            >
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                     className="w-6 h-6">
-                                                    <path
-                                                        id="SVGRepo_iconCarrier"
-                                                        stroke="#464455"
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        fill="currentColor"
-                                                        d="M15.75 5h-7.5C7.56 5 7 5.588 7 6.313V19l5-3.5 5 3.5V6.313C17 5.588 16.44 5 15.75 5"
-                                                    ></path>
-                                                </svg>
-
-                                            </button>
-                                        </div>
-                                    </div>
-                                ) : null;
-                            })()}
-                        </div>
+                        <BookInfo
+                            book={book}
+                            currentChapter={chapters.currentChapter}
+                            chapters={chapters.chapters}
+                            currentTime={audioPlayer.currentTime}
+                            playbackRate={playbackRate}
+                            onShowChaptersModal={() => chapters.setShowChaptersModal(true)}
+                            onShowBookmarksModal={() => bookmarks.setShowBookmarksModal(true)}
+                        />
 
                         {/* Audio Element */}
                         <audio
-                            ref={audioRef}
-                            src={audioSrc || undefined}
-                            onTimeUpdate={handleTimeUpdate}
-                            onLoadedMetadata={handleLoadedMetadata}
-                            onPlay={() => {
-                                setIsPlaying(true);
-                                if (audioRef.current) {
-                                    audioRef.current.playbackRate = playbackRate;
-                                }
-                                positionUpdateIntervalRef.current = setInterval(updatePosition, 30000);
-                            }}
-                            onPause={() => {
-                                setIsPlaying(false);
-                                updatePosition();
-                                if (positionUpdateIntervalRef.current) {
-                                    clearInterval(positionUpdateIntervalRef.current);
-                                    positionUpdateIntervalRef.current = null;
-                                }
-                            }}
-                            onRateChange={() => {
-                                if (audioRef.current) {
-                                    audioRef.current.playbackRate = playbackRate;
-                                }
-                            }}
+                            ref={audioPlayer.audioRef}
+                            src={audioPlayer.audioSrc || undefined}
+                            onTimeUpdate={audioPlayer.handleTimeUpdate}
+                            onLoadedMetadata={audioPlayer.handleLoadedMetadata}
+                            onPlay={audioPlayer.handlePlay}
+                            onPause={audioPlayer.handlePause}
+                            onRateChange={audioPlayer.handleRateChange}
                             className="hidden"
                         />
 
                         {/* Player Controls */}
-
-                        <div className="p-6 ">
-                            {/* Progress Bar */}
-                            <div className="mb-6 relative">
-                                <input
-                                    type="range"
-                                    min="0"
-                                    max={duration || 0}
-                                    value={currentTime}
-                                    onChange={handleSeek}
-                                    className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
-                                    style={{
-                                        background: `linear-gradient(to right, #ea580c 0%, #ea580c ${((currentTime / (duration || 1)) * 100)}%, #374151 ${((currentTime / (duration || 1)) * 100)}%, #374151 100%)`
-                                    }}
-                                />
-                                <div className="flex justify-between items-center text-sm text-gray-400 mt-2">
-                                    <span>{formatTime(currentTime / playbackRate)}</span>
-
-                                    {/* Goto - Center */}
-                                    <div className="absolute left-1/2 transform -translate-x-1/2">
-                                        <button
-                                            onClick={() => setShowGotoModal(true)}
-                                            className="px-3 py-1 bg-gray-800 text-white rounded-md hover:bg-gray-700 transition-colors text-xs"
-                                        >
-                                            {t('player.goto')}
-                                        </button>
-                                    </div>
-
-                                    <span>{formatTime(duration / playbackRate)}</span>
-                                </div>
-                            </div>
-
-                            {/* Control Buttons */}
-                            <div className="flex items-center justify-between mb-6 w-full">
-
-                                {/* Left side - Playback speed */}
-                                <div className="flex-1 flex justify-start">
-                                    <button
-                                        onClick={() => setShowPlaybackSpeedModal(true)}
-                                        className="px-3 py-1  text-white rounded-md hover:bg-gray-700 transition-colors text-xs"
-                                    >
-                                        {playbackRate}x
-                                    </button>
-                                </div>
-
-                                {/* Center controls */}
-                                <div className="flex items-center justify-center gap-4">
-                                    <button
-                                        onClick={skipBackward}
-                                        className="p-3 bg-gray-800 rounded-full hover:bg-gray-700 transition-colors text-white"
-                                    >
-                                        {/* skip backward icon */}
-                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                                  d="M12.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0019 16V8a1 1 0 00-1.6-.8L12.066 11.2zM4.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0011 16V8a1 1 0 00-1.6-.8L4.066 11.2z"/>
-                                        </svg>
-                                    </button>
-
-                                    <button
-                                        onClick={handlePlayPause}
-                                        className="p-3 bg-orange-600 text-white rounded-full hover:bg-orange-700 transition-colors"
-                                    >
-                                        {isPlaying ? (
-                                            <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-                                                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
-                                            </svg>
-                                        ) : (
-                                            <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-                                                <path d="M8 5v14l11-7z"/>
-                                            </svg>
-                                        )}
-                                    </button>
-
-                                    <button
-                                        onClick={skipForward}
-                                        className="p-3 bg-gray-800 rounded-full hover:bg-gray-700 transition-colors text-white"
-                                    >
-                                        {/* skip forward icon */}
-                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                                  d="M11.933 12.8a1 1 0 000-1.6L6.6 7.2A1 1 0 005 8v8a1 1 0 001.6.8l5.333-4zM19.933 12.8a1 1 0 000-1.6l-5.333-4A1 1 0 0013 8v8a1 1 0 001.6.8l5.333-4z"/>
-                                        </svg>
-                                    </button>
-                                </div>
-
-                                {/* Right side - Volume */}
-                                <div className="flex-1 flex justify-end">
-                                    <div className="relative group">
-                                        <button
-                                            onClick={toggleMute}
-                                            className="p-1 rounded hover:bg-gray-800 transition-colors"
-                                        >
-                                            {isMuted || volume === 0 ? (
-                                                <svg className="w-5 h-5 text-gray-400" fill="currentColor"
-                                                     viewBox="0 0 24 24">
-                                                    <path
-                                                        d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
-                                                </svg>
-                                            ) : (
-                                                <svg className="w-5 h-5 text-gray-400" fill="currentColor"
-                                                     viewBox="0 0 24 24">
-                                                    <path
-                                                        d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
-                                                </svg>
-                                            )}
-                                        </button>
-                                        {/* Vertical volume slider on hover */}
-                                        <div
-                                            className="absolute bottom-full left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none group-hover:pointer-events-auto pb-2">
-                                            <div className="bg-gray-800 rounded-lg p-2 shadow-lg">
-                                                <input
-                                                    type="range"
-                                                    min="0"
-                                                    max="1"
-                                                    step="0.01"
-                                                    value={volume}
-                                                    onChange={handleVolumeChange}
-                                                    className="h-24 w-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
-                                                    style={{
-                                                        WebkitAppearance: 'slider-vertical'
-                                                    } as React.CSSProperties}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-
-
-                            <PlaybackSpeedModal
-                                isOpen={showPlaybackSpeedModal}
-                                playbackRate={playbackRate}
-                                onClose={() => setShowPlaybackSpeedModal(false)}
-                                onRateChange={handlePlaybackRateChange}
-                            />
-
-                            <GotoModal
-                                isOpen={showGotoModal}
-                                playbackRate={playbackRate}
-                                gotoHours={gotoHours}
-                                gotoMinutes={gotoMinutes}
-                                gotoSeconds={gotoSeconds}
-                                onClose={() => setShowGotoModal(false)}
-                                onHoursChange={setGotoHours}
-                                onMinutesChange={setGotoMinutes}
-                                onSecondsChange={setGotoSeconds}
-                                onGoto={handleGotoTime}
-                            />
-
-                            <ChaptersModal
-                                isOpen={showChaptersModal}
-                                chapters={chapters}
-                                currentTime={currentTime}
-                                playbackRate={playbackRate}
-                                onClose={() => setShowChaptersModal(false)}
-                                onChapterClick={handleChapterClick}
-                            />
-
-                        </div>
-
-                        <BookmarkModals
-                            showBookmarksModal={showBookmarksModal}
-                            bookmarks={bookmarks}
-                            onCloseBookmarksModal={() => setShowBookmarksModal(false)}
-                            onShowCreateBookmarkModal={handleShowCreateBookmarkModal}
-                            onGoToBookmark={goToBookmark}
-                            onShowEditBookmarkModal={handleShowEditBookmarkModal}
-                            onShowDeleteConfirmModal={handleShowDeleteConfirmModal}
-                            showCreateBookmarkModal={showCreateBookmarkModal}
-                            newBookmarkNote={newBookmarkNote}
-                            currentTime={currentTime}
+                        <PlayerControls
+                            isPlaying={audioPlayer.isPlaying}
+                            currentTime={audioPlayer.currentTime}
+                            duration={audioPlayer.duration}
+                            volume={audioPlayer.volume}
+                            isMuted={audioPlayer.isMuted}
                             playbackRate={playbackRate}
-                            onCloseCreateBookmarkModal={() => setShowCreateBookmarkModal(false)}
-                            onNewBookmarkNoteChange={setNewBookmarkNote}
-                            onCreateBookmark={createBookmark}
-                            showEditBookmarkModal={showEditBookmarkModal}
-                            bookmarkToEdit={bookmarkToEdit}
-                            editBookmarkNote={editBookmarkNote}
-                            onCloseEditBookmarkModal={handleCloseEditBookmarkModal}
-                            onEditBookmarkNoteChange={setEditBookmarkNote}
-                            onEditBookmark={editBookmark}
-                            showDeleteConfirmModal={showDeleteConfirmModal}
-                            bookmarkToDelete={bookmarkToDelete}
-                            onCloseDeleteConfirmModal={handleCloseDeleteConfirmModal}
-                            onDeleteBookmark={deleteBookmark}
+                            onPlayPause={audioPlayer.handlePlayPause}
+                            onSeek={audioPlayer.handleSeek}
+                            onVolumeChange={audioPlayer.handleVolumeChange}
+                            onToggleMute={audioPlayer.toggleMute}
+                            onSkipForward={audioPlayer.skipForward}
+                            onSkipBackward={audioPlayer.skipBackward}
+                            onShowGotoModal={gotoModal.openModal}
+                            onShowPlaybackSpeedModal={() => setShowPlaybackSpeedModal(true)}
                         />
 
+                        {/* Modals */}
+                        <PlaybackSpeedModal
+                            isOpen={showPlaybackSpeedModal}
+                            playbackRate={playbackRate}
+                            onClose={() => setShowPlaybackSpeedModal(false)}
+                            onRateChange={handlePlaybackRateChange}
+                        />
+
+                        <GotoModal
+                            isOpen={gotoModal.showGotoModal}
+                            playbackRate={playbackRate}
+                            gotoHours={gotoModal.gotoHours}
+                            gotoMinutes={gotoModal.gotoMinutes}
+                            gotoSeconds={gotoModal.gotoSeconds}
+                            onClose={() => gotoModal.setShowGotoModal(false)}
+                            onHoursChange={gotoModal.setGotoHours}
+                            onMinutesChange={gotoModal.setGotoMinutes}
+                            onSecondsChange={gotoModal.setGotoSeconds}
+                            onGoto={gotoModal.handleGotoTime}
+                        />
+
+                        <ChaptersModal
+                            isOpen={chapters.showChaptersModal}
+                            chapters={chapters.chapters}
+                            currentTime={audioPlayer.currentTime}
+                            playbackRate={playbackRate}
+                            onClose={() => chapters.setShowChaptersModal(false)}
+                            onChapterClick={(time) => chapters.handleChapterClick(time, audioPlayer.audioRef)}
+                        />
+
+                        <BookmarkModals
+                            showBookmarksModal={bookmarks.showBookmarksModal}
+                            bookmarks={bookmarks.bookmarks}
+                            onCloseBookmarksModal={() => bookmarks.setShowBookmarksModal(false)}
+                            onShowCreateBookmarkModal={bookmarks.handleShowCreateBookmarkModal}
+                            onGoToBookmark={(position) => bookmarks.goToBookmark(position, audioPlayer.audioRef)}
+                            onShowEditBookmarkModal={bookmarks.handleShowEditBookmarkModal}
+                            onShowDeleteConfirmModal={bookmarks.handleShowDeleteConfirmModal}
+                            showCreateBookmarkModal={bookmarks.showCreateBookmarkModal}
+                            newBookmarkNote={bookmarks.newBookmarkNote}
+                            currentTime={audioPlayer.currentTime}
+                            playbackRate={playbackRate}
+                            onCloseCreateBookmarkModal={() => bookmarks.setShowBookmarksModal(false)}
+                            onNewBookmarkNoteChange={bookmarks.setNewBookmarkNote}
+                            onCreateBookmark={() => bookmarks.createBookmark(audioPlayer.currentTime)}
+                            showEditBookmarkModal={bookmarks.showEditBookmarkModal}
+                            bookmarkToEdit={bookmarks.bookmarkToEdit}
+                            editBookmarkNote={bookmarks.editBookmarkNote}
+                            onCloseEditBookmarkModal={bookmarks.handleCloseEditBookmarkModal}
+                            onEditBookmarkNoteChange={bookmarks.setEditBookmarkNote}
+                            onEditBookmark={bookmarks.editBookmark}
+                            showDeleteConfirmModal={bookmarks.showDeleteConfirmModal}
+                            bookmarkToDelete={bookmarks.bookmarkToDelete}
+                            onCloseDeleteConfirmModal={bookmarks.handleCloseDeleteConfirmModal}
+                            onDeleteBookmark={bookmarks.deleteBookmark}
+                        />
                     </div>
                 </div>
             </main>
