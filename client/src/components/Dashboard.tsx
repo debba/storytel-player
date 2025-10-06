@@ -93,41 +93,28 @@ function Dashboard({onLogout, triggerLogout, setTriggerLogout}: DashboardProps) 
                             { filterStatus !== -1 && (
                                 <button
                                     onClick={() => handleBookShelfStatus(-1)}
-                                    className="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-full transition-colors duration-200 flex items-center justify-center w-12 h-12"
+                                    className="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-full transition-colors duration-200 flex items-center justify-center w-10 h-10"
                                 >
                                     ×
                                 </button>
                             )}
-                            <button
-                                onClick={() => handleBookShelfStatus(1)}
-                                className={`px-6 py-3 rounded-full transition-colors duration-200 ${
-                                    filterStatus === 1
-                                        ? 'bg-white text-black'
-                                        : 'bg-gray-700 hover:bg-gray-600 text-white'
-                                }`}
-                            >
-                                {t('dashboard.filters.notStarted')}
-                            </button>
-                            <button
-                                onClick={() => handleBookShelfStatus(2)}
-                                className={`px-6 py-3 rounded-full transition-colors duration-200 ${
-                                    filterStatus === 2
-                                        ? 'bg-white text-black'
-                                        : 'bg-gray-700 hover:bg-gray-600 text-white'
-                                }`}
-                            >
-                                {t('dashboard.filters.started')}
-                            </button>
-                            <button
-                                onClick={() => handleBookShelfStatus(3)}
-                                className={`px-6 py-3 rounded-full transition-colors duration-200 ${
-                                    filterStatus === 3
-                                        ? 'bg-white text-black'
-                                        : 'bg-gray-700 hover:bg-gray-600 text-white'
-                                }`}
-                            >
-                                {t('dashboard.filters.concluded')}
-                            </button>
+                            {[
+                                { status: 1, label: 'dashboard.filters.notStarted' },
+                                { status: 2, label: 'dashboard.filters.started' },
+                                { status: 3, label: 'dashboard.filters.concluded' }
+                            ].map(({ status, label }) => (
+                                <button
+                                    key={status}
+                                    onClick={() => handleBookShelfStatus(status)}
+                                    className={`px-4 py-2 rounded-full transition-colors duration-200 ${
+                                        filterStatus === status
+                                            ? 'bg-white text-black'
+                                            : 'bg-gray-700 hover:bg-gray-600 text-white'
+                                    }`}
+                                >
+                                    {t(label)}
+                                </button>
+                            ))}
                         </div>
                         <div className="space-y-8">
                             {filteredBooks.map((book) => (

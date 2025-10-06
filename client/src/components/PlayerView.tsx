@@ -408,23 +408,24 @@ function PlayerView() {
                     </div>
                 </div>
             </nav>
-            <main className="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8 pb-6">
-                <div className="px-4 py-6 sm:px-0">
+            <main className="max-w-4xl mx-auto py-2 sm:px-6 lg:px-8 pb-2">
+                <div className="px-4 py-2 sm:px-0">
                     <div className="bg-gray-900 rounded-lg shadow-lg overflow-hidden border border-gray-800">
                         {/* Book Info */}
-                        <div className="p-6 flex flex-col items-center">
-                            <div className="flex flex-col items-center mb-6">
+                        <div className="p-4 flex flex-col items-center">
+                            <div className="flex flex-col items-center mb-2">
                                 {book.book.cover && (
                                     <img
                                         src={"https://www.storytel.com" + book.book.cover}
                                         alt={book.book.name}
-                                        className="w-64 h-64 object-cover rounded-lg shadow-2xl mb-4"
+                                        className="w-48 h-48 object-cover rounded-lg shadow-2xl mb-4"
                                     />
                                 )}
                                 <div className="text-center">
                                     <h2 className="text-lg font-bold text-white mb-0.5">{book.book.name}</h2>
-                                    <p className="text-sm text-gray-300 mb-0.5">{book.book.authorsAsString}</p>
-                                    <p className="text-sm text-gray-300 mb-2">{book.abook.narratorAsString}</p>
+                                    <p className="text-sm text-gray-300 mb-0">
+                                        {t('bookCard.author')} {book.book.authorsAsString} • {t('bookCard.narrator')} {book.abook.narratorAsString}
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -452,7 +453,7 @@ function PlayerView() {
                             }
 
                             return currentChapterData ? (
-                                <div className="text-left mt-2">
+                                <div className="text-left mt-0">
                                     <p className="text-base text-white">{currentChapterData.title}</p>
                                     <p className="text-sm text-gray-400">
                                         {formatTime((currentChapterData.end - currentTime) / playbackRate)}
