@@ -15,6 +15,7 @@ import {useAudioPlayer} from "../hooks/useAudioPlayer";
 import {useBookmarks} from "../hooks/useBookmarks";
 import {useChapters} from "../hooks/useChapters";
 import {useGotoModal} from "../hooks/useGotoModal";
+import {truncateTitle} from '../utils/helpers';
 import "../types/window.d.ts";
 
 function PlayerView() {
@@ -72,7 +73,7 @@ function PlayerView() {
                 } finally {
                     setIsLoadingBookData(false);
                 }
-                document.title = book.book.name;
+                document.title = truncateTitle(book.book.name);
             }
         };
 

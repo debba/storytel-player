@@ -39,9 +39,9 @@ const BookInfo: React.FC<BookInfoProps> = ({
                     alt={book.book.name}
                     className="w-64 h-64 object-cover rounded-lg shadow-2xl mb-4"
                 />
-                <div className="text-center">
-                    <h2 className="text-lg font-bold text-white mb-0.5">{book.book.name}</h2>
-                    <p className="text-sm text-gray-300 mb-0">
+                <div className="text-center max-w-full px-4">
+                    <h2 className="text-lg font-bold text-white mb-0.5 break-words">{book.book.name}</h2>
+                    <p className="text-sm text-gray-300 mb-0 break-words">
                         {t('bookCard.author')} {book.book.authorsAsString} • {t('bookCard.narrator')} {book.abook.narratorAsString}
                     </p>
                 </div>

@@ -33,10 +33,10 @@ function Navbar({onBackClick, barTitle, children}: NavbarProps) {
                                       d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                             </svg>
                         </button>
-                        <div className="text-sm font-bold text-white flex items-baseline gap-2 min-w-0 flex-1">
+                        <div className="text-sm font-bold text-white flex items-baseline gap-2 min-w-0 flex-1 max-w-full">
                             <span className="flex-shrink-0 text-xl">{barTitle}</span>
-                            <div ref={titleRef} className="overflow-hidden relative flex-1 marquee-container"
-                                 style={{overflow: "hidden", whiteSpace: "nowrap"}}>
+                            <div ref={titleRef} className="overflow-hidden relative flex-1 marquee-container max-w-full"
+                                 style={{overflow: "hidden", whiteSpace: "nowrap", maxWidth: "100%"}}>
                                 <div  style={{ display: "inline-block" }} className={`whitespace-nowrap inline-flex ${shouldAnimate ? 'animate-marquee' : ''}`}>
                                     {children}
                                 </div>

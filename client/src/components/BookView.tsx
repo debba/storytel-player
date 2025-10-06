@@ -5,6 +5,7 @@ import {BookShelfEntity} from "../interfaces/books";
 import LoadingState from './LoadingState';
 import ErrorState from './ErrorState';
 import Navbar from './Navbar';
+import {truncateTitle} from '../utils/helpers';
 import "../types/window.d.ts";
 
 function BookView() {
@@ -21,7 +22,7 @@ function BookView() {
 
     useEffect(() => {
         if (book) {
-            document.title = book.book.name;
+            document.title = truncateTitle(book.book.name);
         }
 
         return () => {
@@ -95,7 +96,7 @@ function BookView() {
                     </button> */}
 
                     {/* Book Title */}
-                    <h1 className="text-2xl font-bold text-white mb-2 text-center">
+                    <h1 className="text-2xl font-bold text-white mb-2 text-center break-words max-w-full px-4">
                         {book.book.name}
                     </h1>
 
