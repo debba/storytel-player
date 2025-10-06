@@ -50,7 +50,7 @@ function Dashboard({onLogout, triggerLogout, setTriggerLogout}: DashboardProps) 
 
     const handleBookSelect = (book: BookShelfEntity) => {
         setCurrentBook(book);
-        navigate(`/player/${book.abook.id}`, {
+        navigate(`/book/${book.abook.id}`, {
             state: {
                 book: book
             }

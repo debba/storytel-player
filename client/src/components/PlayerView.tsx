@@ -414,19 +414,17 @@ function PlayerView() {
                         {/* Book Info */}
                         <div className="p-4 flex flex-col items-center">
                             <div className="flex flex-col items-center mb-2">
-                                {book.book.cover && (
-                                    <img
-                                        src={"https://www.storytel.com" + book.book.cover}
-                                        alt={book.book.name}
-                                        className="w-48 h-48 object-cover rounded-lg shadow-2xl mb-4"
-                                    />
-                                )}
-                                <div className="text-center">
+                                <img
+                                    src={"https://www.storytel.com" + (book.book.largeCover || book.book.largeCoverE)}
+                                    alt={book.book.name}
+                                    className="w-64 h-64 object-cover rounded-lg shadow-2xl mb-4"
+                                />
+                                {/*<div className="text-center">
                                     <h2 className="text-lg font-bold text-white mb-0.5">{book.book.name}</h2>
                                     <p className="text-sm text-gray-300 mb-0">
                                         {t('bookCard.author')} {book.book.authorsAsString} • {t('bookCard.narrator')} {book.abook.narratorAsString}
                                     </p>
-                                </div>
+                                </div>*/}
                             </div>
                         </div>
                         <div className="px-6 py-0 flex flex-col">

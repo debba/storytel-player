@@ -75,6 +75,16 @@
     "author": "Author:",
     "narrator": "Narrator:"
   },
+  "bookView": {
+    "saved": "Saved",
+    "listen": "Listen",
+    "language": "Language",
+    "duration": "Duration",
+    "category": "Category",
+    "noDescription": "No description available.",
+    "showMore": "show more",
+    "showLess": "show less"
+  },
   "chapters": {
     "title": "Chapters",
     "noChapters": "No chapters available",

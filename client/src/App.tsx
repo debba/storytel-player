@@ -6,6 +6,7 @@ import Dashboard from './components/Dashboard';
 import PlayerView from './components/PlayerView';
 import api from './utils/api';
 import storage from "./utils/storage";
+import BookView from "./components/BookView";
 
 const useMemoryRouter = import.meta.env.VITE_REACT_APP_USE_MEMORY_ROUTER === 'true';
 const Router = useMemoryRouter ? MemoryRouter : BrowserRouter;
@@ -119,6 +120,16 @@ function App() {
               )
             }
           />
+        <Route
+            path="/book/:bookId"
+            element={
+                isAuthenticated ? (
+                    <BookView />
+                ) : (
+                    <Navigate to="/login" replace />
+                )
+            }
+        />
         </Routes>
       </div>
     </Router>
