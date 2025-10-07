@@ -30,6 +30,7 @@ function PlayerView() {
     const [isLoadingBookData, setIsLoadingBookData] = useState(true);
     const [playbackRate, setPlaybackRate] = useState(1.0);
     const [showPlaybackSpeedModal, setShowPlaybackSpeedModal] = useState(false);
+    const [showKeyOverlay, setShowKeyOverlay] = useState<'play' | 'pause' | 'forward' | 'backward' | null>(null);
 
     // Audio player hook
     const audioPlayer = useAudioPlayer({
@@ -118,6 +119,40 @@ function PlayerView() {
         }
     }, [audioPlayer.isPlaying, book]);
 
+    // Keyboard shortcuts handler
+    useEffect(() => {
+        const handleKeyPress = (event: KeyboardEvent) => {
+            if (event.target !== document.body) return;
+
+            switch (event.code) {
+                case 'Space':
+                    event.preventDefault();
+                    setShowKeyOverlay(audioPlayer.isPlaying ? 'pause' : 'play');
+                    audioPlayer.handlePlayPause();
+                    setTimeout(() => setShowKeyOverlay(null), 1000);
+                    break;
+                case 'ArrowLeft':
+                    event.preventDefault();
+                    audioPlayer.skipBackward();
+                    setShowKeyOverlay('backward');
+                    setTimeout(() => setShowKeyOverlay(null), 1000);
+                    break;
+                case 'ArrowRight':
+                    event.preventDefault();
+                    audioPlayer.skipForward();
+                    setShowKeyOverlay('forward');
+                    setTimeout(() => setShowKeyOverlay(null), 1000);
+                    break;
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyPress);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyPress);
+        };
+    }, [audioPlayer.handlePlayPause, audioPlayer.skipForward, audioPlayer.skipBackward, audioPlayer.isPlaying]);
+
 
     if (audioPlayer.isLoading || isLoadingBookData) {
         return <LoadingState message={audioPlayer.isLoading ? t('player.loadingAudio') : t('player.loadingBookData')}/>;
@@ -128,10 +163,45 @@ function PlayerView() {
     }
 
     return (
-        <div className="min-h-screen bg-black text-white">
+        <div className="min-h-screen bg-black text-white relative">
             <Navbar barTitle={t('player.nowPlaying')} onBackClick={() => navigate(`/book/${bookId}`, {state: {book}})}>
                 <span>{book.book.name}</span>
             </Navbar>
+
+            {/* Keyboard Overlay */}
+            {showKeyOverlay && (
+                <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-50">
+                    <div className="bg-black bg-opacity-70 rounded-full p-8">
+                        <svg
+                            className="w-16 h-16 text-white"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            {showKeyOverlay === 'play' && (
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                            )}
+                            {showKeyOverlay === 'pause' && (
+                                <>
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6M14 9v6" />
+                                </>
+                            )}
+                            {showKeyOverlay === 'backward' && (
+                                <>
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0019 16V8a1 1 0 00-1.6-.8l-5.333 4zM4.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0011 16V8a1 1 0 00-1.6-.8l-5.334 4z" />
+                                </>
+                            )}
+                            {showKeyOverlay === 'forward' && (
+                                <>
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.933 12.8a1 1 0 000-1.6L6.6 7.2A1 1 0 005 8v8a1 1 0 001.6.8l5.333-4zM19.933 12.8a1 1 0 000-1.6l-5.333-4A1 1 0 0013 8v8a1 1 0 001.6.8l5.333-4z" />
+                                </>
+                            )}
+                        </svg>
+                    </div>
+                </div>
+            )}
+
             <main className="max-w-4xl mx-auto py-2 sm:px-6 lg:px-8 pb-2">
                 <div className="px-2">
                     <div className="rounded-lg shadow-lg overflow-hidden">
