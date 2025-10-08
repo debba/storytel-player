@@ -1,5 +1,6 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 import api from '../utils/api';
+import {BookmarkPositional} from "../interfaces/bookmarks";
 
 interface UseAudioPlayerProps {
     bookId: string | undefined;
@@ -46,11 +47,15 @@ export const useAudioPlayer = ({bookId, consumableId, playbackRate, onLoadError}
 
     const goToPosition = useCallback(async () => {
         try {
-            const response = await api.get(`/bookmark-positional/${consumableId}`);
+            const response = await api.get<BookmarkPositional[]>(`/bookmark-positional/${consumableId}`);
             const {data} = response;
 
-            if (data.length === 1 && 'position' in data[0] && audioRef.current) {
-                audioRef.current.currentTime = Math.floor(data[0].position / 1000);
+            const position = data?.find(
+                format => format.type === 'abook'
+            )?.position || 0;
+
+            if (audioRef.current) {
+                audioRef.current.currentTime = Math.floor(position / 1000);
                 audioRef.current.play();
             }
         } catch (error) {
