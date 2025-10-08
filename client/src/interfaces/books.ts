@@ -1,3 +1,5 @@
+import {Chapter} from "./chapters";
+
 export interface BookShelfResponse {
     books: BookShelfEntity[]
     result: string
@@ -136,4 +138,34 @@ export interface Tag {
     country: any
     id: number
     name: string
+}
+
+export interface BookMetaData {
+    title: string
+    deepLink: string
+    shareUrl: string
+    kidsBook: boolean
+    autoPlay: boolean
+    formats: Format[]
+    sttMapping: SttMapping
+}
+
+export interface Format {
+    type: 'abook' | 'ebook'
+    lengthInCharacters?: number
+    cover: Cover
+    durationInMilliseconds?: number
+    chapters?: Chapter[]
+    takedownDate: any
+}
+
+export interface Cover {
+    url: string
+    width: number
+    height: number
+}
+
+export interface SttMapping {
+    syncedReadingEnabled: boolean
+    mappingFileUrl: string
 }

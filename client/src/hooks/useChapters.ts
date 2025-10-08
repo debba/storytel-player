@@ -2,6 +2,7 @@ import {useCallback, useMemo, useState} from 'react';
 import api from '../utils/api';
 import {Chapter} from '../interfaces/chapters';
 import {t} from "i18next";
+import {BookMetaData} from "../interfaces/books";
 
 interface UseChaptersProps {
     consumableId: string;
@@ -15,12 +16,15 @@ export const useChapters = ({consumableId, currentTime, onError}: UseChaptersPro
 
     const loadChapters = useCallback(async () => {
         try {
-            const response = await api.get(`/bookmetadata/${consumableId}`);
+            const response = await api.get<BookMetaData>(`/bookmetadata/${consumableId}`);
             const {data} = response;
 
-            if (data.formats && data.formats.length > 0) {
-                setChapters(data.formats[0].chapters);
-            }
+            const chapters = data.formats?.find(
+                format => format.type === 'abook'
+            )?.chapters || [];
+
+            setChapters(chapters);
+
         } catch (error: any) {
             onError(error.response?.data?.error || 'Failed to load chapters');
         }
@@ -29,7 +33,7 @@ export const useChapters = ({consumableId, currentTime, onError}: UseChaptersPro
     const currentChapter = useMemo(() => {
         let cumulativeTime = 0;
 
-        for (let i = 0; i < chapters.length; i++) {
+        for (let i = 0; i < chapters?.length; i++) {
             const chapter = chapters[i];
             const chapterStart = cumulativeTime;
             const chapterEnd = cumulativeTime + (chapter.durationInSeconds || 0);
