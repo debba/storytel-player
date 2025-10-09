@@ -3,3 +3,5 @@ node_modules
 .env
 build
 dist
+downloads
+!download/.gitkeep

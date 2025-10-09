@@ -16,6 +16,9 @@ let ipcManager: IpcManager;
 let updaterManager: UpdaterManager;
 
 async function initialize(): Promise<void> {
+
+    process.env.IS_ELECTRON = 'true';
+
     windowManager = new WindowManager(isDev, isDebug);
     const mainWindow = windowManager.create();
 
@@ -35,7 +38,6 @@ async function initialize(): Promise<void> {
 
     ipcManager = new IpcManager(serverManager, trayManager);
     ipcManager.setupHandlers();
-
     // Initialize auto-updater
     updaterManager = new UpdaterManager(mainWindow, isDev);
     updaterManager.initialize();

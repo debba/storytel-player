@@ -18,6 +18,9 @@ interface BookInfoProps {
     playbackRate: number;
     onShowChaptersModal: () => void;
     onShowBookmarksModal: () => void;
+    onDownload: () => void;
+    isDownloaded: boolean;
+    isDownloading: boolean;
 }
 
 const BookInfo: React.FC<BookInfoProps> = ({
@@ -28,6 +31,9 @@ const BookInfo: React.FC<BookInfoProps> = ({
     playbackRate,
     onShowChaptersModal,
     onShowBookmarksModal,
+    onDownload,
+    isDownloaded,
+    isDownloading,
 }) => {
     const {t} = useTranslation();
 
@@ -88,6 +94,29 @@ const BookInfo: React.FC<BookInfoProps> = ({
                                     d="M15.75 5h-7.5C7.56 5 7 5.588 7 6.313V19l5-3.5 5 3.5V6.313C17 5.588 16.44 5 15.75 5"
                                 ></path>
                             </svg>
+                        </button>
+                        <button
+                            id="download-btn"
+                            onClick={onDownload}
+                            disabled={isDownloading}
+                            className={`px-2 py-2 rounded-md transition-colors ${
+                                isDownloaded
+                                    ? 'bg-green-600 hover:bg-green-700'
+                                    : isDownloading
+                                        ? 'bg-gray-600 cursor-not-allowed'
+                                        : 'bg-gray-800 hover:bg-gray-700'
+                            } text-white`}
+                        >
+                            {isDownloading ? (
+                                <svg className="w-6 h-6 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            ) : (
+                                <svg className="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                </svg>
+                            )}
                         </button>
                     </div>
                 </div>

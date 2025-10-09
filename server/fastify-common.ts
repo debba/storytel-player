@@ -4,6 +4,9 @@ import crypto from 'crypto';
 import dotenv from 'dotenv';
 import fastifyJWT from '@fastify/jwt';
 import fastifyCors from '@fastify/cors';
+import fs from 'fs';
+import path from 'path';
+import axios from 'axios';
 
 // Extend JWT user type
 interface JWTUser {
@@ -32,6 +35,12 @@ dotenv.config({
 });
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-this-in-production';
+const DOWNLOADS_DIR = path.join(__dirname, 'downloads');
+
+// Ensure downloads directory exists
+if (!fs.existsSync(DOWNLOADS_DIR)) {
+    fs.mkdirSync(DOWNLOADS_DIR, { recursive: true });
+}
 
 const fastify = Fastify({ logger: process.env.NODE_ENV !== 'production' });
 
@@ -115,17 +124,45 @@ fastify.post<{
 }, async (request, reply) => {
     try {
         const { bookId } = request.body;
+        const localFilePath = path.join(DOWNLOADS_DIR, `${bookId}.mp3`);
 
-        const storytelClient = new StorytelClient();
-        // Set the login data from JWT token
-        storytelClient.loginData = {
-            accountInfo: {
-                singleSignToken: request.user.storytelToken,
-                jwt: ''
+        // Check if file exists locally
+        if (fs.existsSync(localFilePath)) {
+            // Use custom protocol for Electron, fallback to HTTP for browser
+            const isElectron = request.headers['user-agent']?.includes('Electron') ||
+                              process.env.IS_ELECTRON === 'true';
+
+            if (isElectron) {
+                // Use file:// protocol directly for Electron
+                console.log(localFilePath);
+                reply.send({
+                    streamUrl: `file://${localFilePath}`,
+                    remote: false
+                });
+            } else {
+                // Use HTTP endpoint for browser
+                const protocol = request.protocol;
+                const host = request.hostname;
+                const port = (request.socket as any).localPort || 3001;
+                const baseUrl = `${protocol}://${host}:${port}`;
+
+                reply.send({
+                    streamUrl: `${baseUrl}/api/local-stream/${bookId}`,
+                    remote: false
+                });
             }
-        };
-        const streamUrl = await storytelClient.getStreamUrl(bookId);
-        reply.send({ streamUrl });
+        } else {
+            const storytelClient = new StorytelClient();
+            // Set the login data from JWT token
+            storytelClient.loginData = {
+                accountInfo: {
+                    singleSignToken: request.user.storytelToken,
+                    jwt: ''
+                }
+            };
+            const streamUrl = await storytelClient.getStreamUrl(bookId);
+            reply.send({ streamUrl, remote: true });
+        }
     } catch (error: any) {
         reply.code(500).send({ error: error.message });
     }
@@ -357,6 +394,154 @@ fastify.get<{
         }
     } catch (error: any) {
         reply.code(500).send({ error: 'Failed to load translations' });
+    }
+});
+
+// Route per scaricare il file audio da remoto
+fastify.post<{
+    Body: { bookId: string };
+}>('/api/download', {
+    preHandler: fastify.authenticate
+}, async (request, reply) => {
+    try {
+        const { bookId } = request.body;
+        const localFilePath = path.join(DOWNLOADS_DIR, `${bookId}.mp3`);
+
+        // Check if already exists
+        if (fs.existsSync(localFilePath)) {
+            return reply.send({ success: true, message: 'File already downloaded', percentage: 100 });
+        }
+
+        // Get stream URL
+        const storytelClient = new StorytelClient();
+        storytelClient.loginData = {
+            accountInfo: {
+                singleSignToken: request.user.storytelToken,
+                jwt: ''
+            }
+        };
+        const streamUrl = await storytelClient.getStreamUrl(bookId);
+
+        // Download the file
+        const response = await axios({
+            method: 'GET',
+            url: streamUrl,
+            responseType: 'stream'
+        });
+
+        const totalLength = parseInt(response.headers['content-length'] || '0', 10);
+        let downloadedLength = 0;
+
+        const writer = fs.createWriteStream(localFilePath);
+
+        response.data.on('data', (chunk: Buffer) => {
+            downloadedLength += chunk.length;
+            const percentage = totalLength > 0 ? Math.round((downloadedLength / totalLength) * 100) : 0;
+
+            // Here we could implement Server-Sent Events for real-time progress
+            // For now, we'll just log it
+            if (percentage % 10 === 0) {
+                fastify.log.info(`Download progress for ${bookId}: ${percentage}%`);
+            }
+        });
+
+        response.data.pipe(writer);
+
+        await new Promise<void>((resolve, reject) => {
+            writer.on('finish', () => resolve());
+            writer.on('error', reject);
+        });
+
+        reply.send({ success: true, message: 'Download completed', percentage: 100 });
+    } catch (error: any) {
+        reply.code(500).send({ error: error.message });
+    }
+});
+
+fastify.get<{ Params: { bookId: string } }>('/api/local-stream/:bookId', async (request, reply) => {
+    try {
+        const { bookId } = request.params;
+        const filePath = path.join(DOWNLOADS_DIR, `${bookId}.mp3`);
+
+        if (!fs.existsSync(filePath)) {
+            return reply.code(404).send({ error: 'File not found' });
+        }
+
+        const stat = fs.statSync(filePath);
+        const range = request.headers.range;
+
+        if (range) {
+            const [startStr, endStr] = range.replace(/bytes=/, '').split('-');
+            const start = parseInt(startStr, 10);
+            const end = endStr ? parseInt(endStr, 10) : stat.size - 1;
+
+            if (start >= stat.size || end >= stat.size) {
+                reply
+                    .code(416)
+                    .header('Content-Range', `bytes */${stat.size}`)
+                    .send();
+                return;
+            }
+
+            const chunkSize = (end - start) + 1;
+            const fileStream = fs.createReadStream(filePath, { start, end });
+
+            reply
+                .code(206) // partial content
+                .header('Content-Range', `bytes ${start}-${end}/${stat.size}`)
+                .header('Accept-Ranges', 'bytes')
+                .header('Content-Length', chunkSize)
+                .header('Content-Type', 'audio/mpeg')
+                .send(fileStream);
+            return reply;
+        } else {
+            const fileStream = fs.createReadStream(filePath);
+            reply
+                .header('Content-Length', stat.size)
+                .header('Content-Type', 'audio/mpeg')
+                .header('Accept-Ranges', 'bytes')
+                .send(fileStream);
+            return reply;
+        }
+    } catch (error: any) {
+        reply.code(500).send({ error: error.message });
+    }
+});
+
+fastify.get<{
+    Params: { bookId: string };
+}>('/api/download/:bookId', {
+    preHandler: fastify.authenticate
+}, async (request, reply) => {
+    try {
+        const { bookId } = request.params;
+        const localFilePath = path.join(DOWNLOADS_DIR, `${bookId}.mp3`);
+
+        if (!fs.existsSync(localFilePath)) {
+            return reply.code(404).send({ error: 'File not found' });
+        }
+
+        const stream = fs.createReadStream(localFilePath);
+        reply.type('audio/mpeg').send(stream);
+    } catch (error: any) {
+        reply.code(500).send({ error: error.message });
+    }
+});
+
+// Route per verificare lo stato del download
+fastify.get<{
+    Params: { bookId: string };
+}>('/api/download-status/:bookId', {
+    preHandler: fastify.authenticate
+}, async (request, reply) => {
+    try {
+        const { bookId } = request.params;
+        const localFilePath = path.join(DOWNLOADS_DIR, `${bookId}.mp3`);
+
+        const exists = fs.existsSync(localFilePath);
+        reply.send({ downloaded: exists });
+    } catch (error: any) {
+        reply.code(500).send({ error: error.message });
     }
 });
 

@@ -17,6 +17,7 @@ import {useChapters} from "../hooks/useChapters";
 import {useGotoModal} from "../hooks/useGotoModal";
 import {truncateTitle} from '../utils/helpers';
 import "../types/window.d.ts";
+import api from "../utils/api";
 
 function PlayerView() {
     const {t} = useTranslation();
@@ -31,6 +32,8 @@ function PlayerView() {
     const [playbackRate, setPlaybackRate] = useState(1.0);
     const [showPlaybackSpeedModal, setShowPlaybackSpeedModal] = useState(false);
     const [showKeyOverlay, setShowKeyOverlay] = useState<'play' | 'pause' | 'forward' | 'backward' | null>(null);
+    const [isDownloaded, setIsDownloaded] = useState(false);
+    const [isDownloading, setIsDownloading] = useState(false);
 
     // Audio player hook
     const audioPlayer = useAudioPlayer({
@@ -88,6 +91,44 @@ function PlayerView() {
             }
         };
     }, [book]);
+
+    // Check download status on mount
+    useEffect(() => {
+        const checkDownloadStatus = async () => {
+            if (bookId) {
+                try {
+                    const {data} = await api.get(`/download-status/${bookId}`);
+                    setIsDownloaded(data.downloaded);
+                } catch (error) {
+                    console.error('Failed to check download status', error);
+                }
+            }
+        };
+
+        void checkDownloadStatus();
+    }, [bookId]);
+
+    // Handle download
+    const handleDownload = async () => {
+        if (!bookId || isDownloading || isDownloaded) return;
+
+        setIsDownloading(true);
+        try {
+            const {data} = await api.post('/download', {
+               bookId
+            });
+
+            if (data.success) {
+                setIsDownloaded(true);
+            } else {
+                setError(data.error || 'Download failed');
+            }
+        } catch (error: any) {
+            setError(error.message || 'Download failed');
+        } finally {
+            setIsDownloading(false);
+        }
+    };
 
     // Playback rate change handler
     const handlePlaybackRateChange = (newRate: number) => {
@@ -214,6 +255,9 @@ function PlayerView() {
                             playbackRate={playbackRate}
                             onShowChaptersModal={() => chapters.setShowChaptersModal(true)}
                             onShowBookmarksModal={() => bookmarks.setShowBookmarksModal(true)}
+                            onDownload={handleDownload}
+                            isDownloaded={isDownloaded}
+                            isDownloading={isDownloading}
                         />
 
                         {/* Audio Element */}
