@@ -18,6 +18,7 @@ let updaterManager: UpdaterManager;
 async function initialize(): Promise<void> {
 
     process.env.IS_ELECTRON = 'true';
+    process.env.DOWNLOAD_PATH = app.getPath('downloads');
 
     windowManager = new WindowManager(isDev, isDebug);
     const mainWindow = windowManager.create();

@@ -35,7 +35,7 @@ dotenv.config({
 });
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-this-in-production';
-const DOWNLOADS_DIR = path.join(__dirname, 'downloads');
+const DOWNLOADS_DIR = process.env.IS_ELECTRON ? ''+process.env.DOWNLOAD_PATH : path.join(__dirname, 'downloads');
 
 // Ensure downloads directory exists
 if (!fs.existsSync(DOWNLOADS_DIR)) {
