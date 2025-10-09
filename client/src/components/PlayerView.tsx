@@ -134,7 +134,9 @@ function PlayerView() {
             if (data.success) {
                 setIsDownloaded(true);
             } else {
-                setError(data.error || 'Download failed');
+                if (data.error !== 'Download cancelled') {
+                    setError(data.error || 'Download failed');
+                }
             }
         } catch (error: any) {
             if (error?.response?.data?.error !== 'Download cancelled' && error?.response?.data?.error != 'canceled'){

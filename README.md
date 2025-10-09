@@ -26,16 +26,14 @@
 
 ✅ **Development Mode**: Hot reload for both client and server during development
 
-> [!NOTE]  
+✅ **Offline Listening**: Download audiobooks for offline playback
+
+> [!NOTE]
 > This is an independent project, not affiliated with Storytel
 
 ## Screenshots
 
 <img src="assets/screenshot-1.png" height="50%" width="45%"></img> <img src="assets/screenshot-2.png" width="45%"></img>
-
-## Features
-
-
 
 ## Architecture
 

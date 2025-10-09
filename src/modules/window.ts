@@ -18,7 +18,7 @@ export class WindowManager {
         const windowConfig: WindowConfig = {
             width: 480,
             height: 800,
-            resizable: !this.isDebug,
+            resizable: this.isDebug,
             maximizable: this.isDebug,
             alwaysOnTop: !this.isDebug
         };
