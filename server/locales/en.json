@@ -122,6 +122,18 @@
     "confirmButton": "Logout",
     "cancelButton": "Cancel"
   },
+  "download": {
+    "cancelTitle": "Cancel Download",
+    "cancelMessage": "Are you sure you want to cancel the download in progress?",
+    "cancelWarning": "The partially downloaded file will be deleted.",
+    "cancelButton": "Cancel Download",
+    "continueButton": "Continue Download",
+    "deleteTitle": "Delete Downloaded File",
+    "deleteMessage": "Are you sure you want to delete the downloaded file?",
+    "deleteWarning": "You will need to download it again to listen offline.",
+    "deleteButton": "Delete File",
+    "keepButton": "Keep File"
+  },
   "updater": {
     "available": {
       "title": "Update Available",

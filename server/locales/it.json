@@ -122,6 +122,18 @@
     "confirmButton": "Logout",
     "cancelButton": "Annulla"
   },
+  "download": {
+    "cancelTitle": "Annulla Download",
+    "cancelMessage": "Sei sicuro di voler annullare il download in corso?",
+    "cancelWarning": "Il file parzialmente scaricato verrà eliminato.",
+    "cancelButton": "Annulla Download",
+    "continueButton": "Continua Download",
+    "deleteTitle": "Elimina File Scaricato",
+    "deleteMessage": "Sei sicuro di voler eliminare il file scaricato?",
+    "deleteWarning": "Dovrai scaricarlo nuovamente per ascoltarlo offline.",
+    "deleteButton": "Elimina File",
+    "keepButton": "Mantieni File"
+  },
   "updater": {
     "available": {
       "title": "Aggiornamento Disponibile",

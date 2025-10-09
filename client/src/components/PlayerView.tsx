@@ -10,6 +10,7 @@ import GotoModal from "./GotoModal";
 import ChaptersModal from "./ChaptersModal";
 import PlayerControls from "./PlayerControls";
 import BookInfo from "./BookInfo";
+import DownloadCancelModal from "./DownloadCancelModal";
 import {BookShelfEntity} from "../interfaces/books";
 import {useAudioPlayer} from "../hooks/useAudioPlayer";
 import {useBookmarks} from "../hooks/useBookmarks";
@@ -34,6 +35,7 @@ function PlayerView() {
     const [showKeyOverlay, setShowKeyOverlay] = useState<'play' | 'pause' | 'forward' | 'backward' | null>(null);
     const [isDownloaded, setIsDownloaded] = useState(false);
     const [isDownloading, setIsDownloading] = useState(false);
+    const [showDownloadCancelModal, setShowDownloadCancelModal] = useState(false);
 
     // Audio player hook
     const audioPlayer = useAudioPlayer({
@@ -108,14 +110,25 @@ function PlayerView() {
         void checkDownloadStatus();
     }, [bookId]);
 
+    // Handle download button click
+    const handleDownloadClick = async () => {
+        if (isDownloading || isDownloaded) {
+            // Show confirmation modal for cancel or delete
+            setShowDownloadCancelModal(true);
+        } else {
+            // Start download directly
+            await handleDownload();
+        }
+    };
+
     // Handle download
     const handleDownload = async () => {
-        if (!bookId || isDownloading || isDownloaded) return;
+        if (!bookId || isDownloading) return;
 
         setIsDownloading(true);
         try {
             const {data} = await api.post('/download', {
-               bookId
+                bookId
             });
 
             if (data.success) {
@@ -124,9 +137,32 @@ function PlayerView() {
                 setError(data.error || 'Download failed');
             }
         } catch (error: any) {
-            setError(error.message || 'Download failed');
+            if (error?.response?.data?.error !== 'Download cancelled' && error?.response?.data?.error != 'canceled'){
+                setError(error.message || 'Download failed');
+            }
         } finally {
             setIsDownloading(false);
+        }
+    };
+
+    // Handle cancel download or delete file
+    const handleCancelOrDelete = async () => {
+        if (!bookId) return;
+
+        try {
+            setShowDownloadCancelModal(false);
+
+            if (isDownloading) {
+                await api.delete(`/download/${bookId}`);
+                setIsDownloading(false);
+            } else if (isDownloaded) {
+                // Delete downloaded file
+                await api.delete(`/downloaded-file/${bookId}`);
+                setIsDownloaded(false);
+            }
+        } catch (error: any) {
+            setError(error.response?.data?.error || error.message || 'Operation failed');
+            setShowDownloadCancelModal(false);
         }
     };
 
@@ -221,21 +257,25 @@ function PlayerView() {
                             xmlns="http://www.w3.org/2000/svg"
                         >
                             {showKeyOverlay === 'play' && (
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                      d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
                             )}
                             {showKeyOverlay === 'pause' && (
                                 <>
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6M14 9v6" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                          d="M10 9v6M14 9v6"/>
                                 </>
                             )}
                             {showKeyOverlay === 'backward' && (
                                 <>
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0019 16V8a1 1 0 00-1.6-.8l-5.333 4zM4.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0011 16V8a1 1 0 00-1.6-.8l-5.334 4z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                          d="M12.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0019 16V8a1 1 0 00-1.6-.8l-5.333 4zM4.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0011 16V8a1 1 0 00-1.6-.8l-5.334 4z"/>
                                 </>
                             )}
                             {showKeyOverlay === 'forward' && (
                                 <>
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.933 12.8a1 1 0 000-1.6L6.6 7.2A1 1 0 005 8v8a1 1 0 001.6.8l5.333-4zM19.933 12.8a1 1 0 000-1.6l-5.333-4A1 1 0 0013 8v8a1 1 0 001.6.8l5.333-4z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                          d="M11.933 12.8a1 1 0 000-1.6L6.6 7.2A1 1 0 005 8v8a1 1 0 001.6.8l5.333-4zM19.933 12.8a1 1 0 000-1.6l-5.333-4A1 1 0 0013 8v8a1 1 0 001.6.8l5.333-4z"/>
                                 </>
                             )}
                         </svg>
@@ -255,7 +295,8 @@ function PlayerView() {
                             playbackRate={playbackRate}
                             onShowChaptersModal={() => chapters.setShowChaptersModal(true)}
                             onShowBookmarksModal={() => bookmarks.setShowBookmarksModal(true)}
-                            onDownload={handleDownload}
+                            onDownload={handleDownloadClick}
+                            onCancelDownload={handleDownloadClick}
                             isDownloaded={isDownloaded}
                             isDownloading={isDownloading}
                         />
@@ -345,6 +386,14 @@ function PlayerView() {
                             bookmarkToDelete={bookmarks.bookmarkToDelete}
                             onCloseDeleteConfirmModal={bookmarks.handleCloseDeleteConfirmModal}
                             onDeleteBookmark={bookmarks.deleteBookmark}
+                        />
+
+                        {/* Download Cancel/Delete Modal */}
+                        <DownloadCancelModal
+                            isOpen={showDownloadCancelModal}
+                            isDownloading={isDownloading}
+                            onConfirm={handleCancelOrDelete}
+                            onCancel={() => setShowDownloadCancelModal(false)}
                         />
                     </div>
                 </div>

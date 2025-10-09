@@ -42,6 +42,12 @@ if (!fs.existsSync(DOWNLOADS_DIR)) {
     fs.mkdirSync(DOWNLOADS_DIR, { recursive: true });
 }
 
+const activeDownloads = new Map<string, {
+    controller: AbortController,
+    writer: fs.WriteStream,
+    filePath: string
+}>();
+
 const fastify = Fastify({ logger: process.env.NODE_ENV !== 'production' });
 
 // Register plugins
@@ -412,6 +418,10 @@ fastify.post<{
             return reply.send({ success: true, message: 'File already downloaded', percentage: 100 });
         }
 
+        if (activeDownloads.has(bookId)) {
+            return reply.code(409).send({ error: 'Download already in progress' });
+        }
+
         // Get stream URL
         const storytelClient = new StorytelClient();
         storytelClient.loginData = {
@@ -422,38 +432,108 @@ fastify.post<{
         };
         const streamUrl = await storytelClient.getStreamUrl(bookId);
 
-        // Download the file
-        const response = await axios({
-            method: 'GET',
-            url: streamUrl,
-            responseType: 'stream'
-        });
-
-        const totalLength = parseInt(response.headers['content-length'] || '0', 10);
-        let downloadedLength = 0;
-
+        // Create AbortController for this download
+        const controller = new AbortController();
         const writer = fs.createWriteStream(localFilePath);
 
-        response.data.on('data', (chunk: Buffer) => {
-            downloadedLength += chunk.length;
-            const percentage = totalLength > 0 ? Math.round((downloadedLength / totalLength) * 100) : 0;
+        // Track this download
+        activeDownloads.set(bookId, { controller, writer, filePath: localFilePath });
 
-            // Here we could implement Server-Sent Events for real-time progress
-            // For now, we'll just log it
-            if (percentage % 10 === 0) {
-                fastify.log.info(`Download progress for ${bookId}: ${percentage}%`);
+        try {
+            // Download the file
+            const response = await axios({
+                method: 'GET',
+                url: streamUrl,
+                responseType: 'stream',
+                signal: controller.signal as any
+            });
+
+            const totalLength = parseInt(response.headers['content-length'] || '0', 10);
+            let downloadedLength = 0;
+
+            response.data.on('data', (chunk: Buffer) => {
+                downloadedLength += chunk.length;
+                const percentage = totalLength > 0 ? Math.round((downloadedLength / totalLength) * 100) : 0;
+
+                if (percentage % 10 === 0) {
+                    fastify.log.info(`Download progress for ${bookId}: ${percentage}%`);
+                }
+            });
+
+            response.data.pipe(writer);
+
+            await new Promise<void>((resolve, reject) => {
+                writer.on('finish', () => resolve());
+                writer.on('error', reject);
+                controller.signal.addEventListener('abort', () => {
+                    reject(new Error('Download cancelled'));
+                });
+            });
+
+            // Clean up
+            activeDownloads.delete(bookId);
+
+            reply.send({ success: true, message: 'Download completed', percentage: 100 });
+        } catch (error: any) {
+            // Clean up on error
+            activeDownloads.delete(bookId);
+
+            // Remove partial file
+            if (fs.existsSync(localFilePath)) {
+                fs.unlinkSync(localFilePath);
             }
-        });
 
-        response.data.pipe(writer);
-
-        await new Promise<void>((resolve, reject) => {
-            writer.on('finish', () => resolve());
-            writer.on('error', reject);
-        });
-
-        reply.send({ success: true, message: 'Download completed', percentage: 100 });
+            if (error.message === 'Download cancelled') {
+                reply.code(499).send({ error: 'Download cancelled' });
+            } else {
+                throw error;
+            }
+        }
     } catch (error: any) {
+        reply.code(500).send({ error: error.message });
+    }
+});
+
+// Route per cancellare download in corso
+fastify.delete<{
+    Params: { bookId: string };
+}>('/api/download/:bookId', {
+    preHandler: fastify.authenticate
+}, async (request, reply) => {
+    try {
+        const { bookId } = request.params;
+
+        const download = activeDownloads.get(bookId);
+        if (!download) {
+            return reply.send({ error: 'No active download found' });
+        }
+
+        // Abort the download
+        download.controller.abort();
+
+        // Close the writer stream
+        download.writer.end();
+        download.writer.destroy();
+
+        // Wait a bit for the writer to close
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        // Remove partial file
+        try {
+            if (fs.existsSync(download.filePath)) {
+                fs.unlinkSync(download.filePath);
+            }
+        } catch (err) {
+            // File might be locked, ignore
+            console.error('Could not delete partial file:', err);
+        }
+
+        // Clean up
+        activeDownloads.delete(bookId);
+
+        reply.send({ success: true, message: 'Download cancelled' });
+    } catch (error: any) {
+        console.error('Error cancelling download:', error);
         reply.code(500).send({ error: error.message });
     }
 });
@@ -540,6 +620,29 @@ fastify.get<{
 
         const exists = fs.existsSync(localFilePath);
         reply.send({ downloaded: exists });
+    } catch (error: any) {
+        reply.code(500).send({ error: error.message });
+    }
+});
+
+// Route per eliminare file scaricato
+fastify.delete<{
+    Params: { bookId: string };
+}>('/api/downloaded-file/:bookId', {
+    preHandler: fastify.authenticate
+}, async (request, reply) => {
+    try {
+        const { bookId } = request.params;
+        const localFilePath = path.join(DOWNLOADS_DIR, `${bookId}.mp3`);
+
+        if (!fs.existsSync(localFilePath)) {
+            return reply.code(404).send({ error: 'File not found' });
+        }
+
+        // Delete the file
+        fs.unlinkSync(localFilePath);
+
+        reply.send({ success: true, message: 'File deleted successfully' });
     } catch (error: any) {
         reply.code(500).send({ error: error.message });
     }
