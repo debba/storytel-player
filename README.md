@@ -203,6 +203,10 @@ Electron Builder configuration is in `package.json` under the `build` key:
 - **Build Tools**: Vite, esbuild, electron-builder, TypeScript compiler
 - **Development**: Concurrently, tsx (for server watch mode)
 
+## 🌐 Website
+Visit our [official documentation](https://debba.github.io/storytel-player/)
+
+
 ## License
 
 MIT License
