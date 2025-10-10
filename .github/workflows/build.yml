@@ -29,6 +29,7 @@ jobs:
         run: npm run install-all
 
       - name: Release
+        if: contains(github.ref, 'master')
         run: npm run electron:dist:linux:x64 -- --publish always
 
   linux_arm64:
@@ -47,6 +48,7 @@ jobs:
         run: npm run install-all
 
       - name: Release
+        if: contains(github.ref, 'master')
         run: npm run electron:dist:linux:arm64 -- --publish always
 
   linux_arm:
@@ -65,6 +67,7 @@ jobs:
         run: npm run install-all
 
       - name: Release
+        if: contains(github.ref, 'master')
         run: npm run electron:dist:linux:arm -- --publish always
 
   dmg:
@@ -83,6 +86,7 @@ jobs:
         run: npm run install-all
 
       - name: Release
+        if: contains(github.ref, 'master')
         run: npm run electron:dist:mac:x64 -- --publish always
 
   exe:
@@ -101,4 +105,5 @@ jobs:
         run: npm run install-all
 
       - name: Release
+        if: contains(github.ref, 'master')
         run: npm run electron:dist:win -- --publish always
