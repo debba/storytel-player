@@ -34,6 +34,7 @@ export class WindowManager {
             },
             icon: path.join(__dirname, '../../../assets/icon.png'),
             show: false,
+            backgroundColor: '#000'
         });
 
         if (this.isDev) {

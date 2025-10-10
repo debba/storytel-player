@@ -10,6 +10,7 @@ declare global {
 const axiosApi = axios.create({
     baseURL: `${import.meta.env.VITE_BACKEND_API_URL}/api`, // o la tua baseURL reale
     withCredentials: true,
+    timeout: 15000
 });
 
 axiosApi.interceptors.request.use(async (config) => {

@@ -26,6 +26,10 @@ export class ServerManager {
       headers: headers || {},
     });
 
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+        throw new Error('Request failed with status code ' + response.status);
+    }
+
     return {
       data: response.json(),
     };
