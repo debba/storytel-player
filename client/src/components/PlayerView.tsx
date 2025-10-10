@@ -125,6 +125,7 @@ function PlayerView() {
     const handleDownload = async () => {
         if (!bookId || isDownloading) return;
 
+        const isElectron = !!window.electronStore
         setIsDownloading(true);
         try {
             const {data} = await api.post('/download', {
@@ -139,7 +140,7 @@ function PlayerView() {
                 }
             }
         } catch (error: any) {
-            if (error?.response?.data?.error !== 'Download cancelled' && error?.response?.data?.error != 'canceled'){
+            if (!isElectron && error?.response?.data?.error !== 'Download cancelled' && error?.response?.data?.error != 'canceled'){
                 setError(error.message || 'Download failed');
             }
         } finally {
