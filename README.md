@@ -33,7 +33,7 @@
 
 ## Screenshots
 
-<img src="assets/screenshot-1.png" height="50%" width="45%"></img> <img src="assets/screenshot-2.png" width="45%"></img>
+<img src="docs/assets/screenshot-1.png" height="50%" width="45%"></img> <img src="docs/assets/screenshot-2.png" width="45%"></img>
 
 ## Architecture
 
