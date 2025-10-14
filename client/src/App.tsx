@@ -30,7 +30,7 @@ function App() {
 
   const checkAuthStatus = async () => {
     try {
-      const token = storage.get('token');
+      const token = await storage.get('token');
       if (!token) {
         setIsAuthenticated(false);
         setIsLoading(false);
