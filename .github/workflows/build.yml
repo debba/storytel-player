@@ -1,7 +1,7 @@
 name: Build & Release
 
 env:
-  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GH_TOKEN: ${{ SECRETS.GITHUB_TOKEN }}
 
 on:
   push:
@@ -13,10 +13,8 @@ defaults:
     shell: bash
 
 jobs:
-  linux_x64: # <-- Primo job: crea la release
+  linux_x64:
     runs-on: ubuntu-latest
-    env:
-      ELECTRON_PUBLISH_MODE: always
 
     steps:
       - name: Check out Git repository
@@ -32,12 +30,11 @@ jobs:
 
       - name: Release
         if: contains(github.ref, 'master')
-        run: npm run electron:dist:linux:x64 -- --publish $ELECTRON_PUBLISH_MODE
+        run: npm run electron:dist:linux:x64 -- --publish always
 
   linux_arm64:
+    needs: linux_x64
     runs-on: ubuntu-latest
-    env:
-      ELECTRON_PUBLISH_MODE: onTag
 
     steps:
       - name: Check out Git repository
@@ -53,12 +50,11 @@ jobs:
 
       - name: Release
         if: contains(github.ref, 'master')
-        run: npm run electron:dist:linux:arm64 -- --publish $ELECTRON_PUBLISH_MODE
+        run: npm run electron:dist:linux:arm64 -- --publish always
 
   linux_arm:
+    needs: linux_arm64
     runs-on: ubuntu-latest
-    env:
-      ELECTRON_PUBLISH_MODE: onTag
 
     steps:
       - name: Check out Git repository
@@ -74,12 +70,11 @@ jobs:
 
       - name: Release
         if: contains(github.ref, 'master')
-        run: npm run electron:dist:linux:arm -- --publish $ELECTRON_PUBLISH_MODE
+        run: npm run electron:dist:linux:arm -- --publish always
 
   dmg:
+    needs: linux_arm
     runs-on: macos-latest
-    env:
-      ELECTRON_PUBLISH_MODE: onTag
 
     steps:
       - name: Check out Git repository
@@ -95,12 +90,11 @@ jobs:
 
       - name: Release
         if: contains(github.ref, 'master')
-        run: npm run electron:dist:mac:x64 -- --publish $ELECTRON_PUBLISH_MODE
+        run: npm run electron:dist:mac:x64 -- --publish always
 
   exe:
+    needs: dmg
     runs-on: windows-latest
-    env:
-      ELECTRON_PUBLISH_MODE: onTag
 
     steps:
       - name: Check out Git repository
@@ -116,4 +110,4 @@ jobs:
 
       - name: Release
         if: contains(github.ref, 'master')
-        run: npm run electron:dist:win -- --publish $ELECTRON_PUBLISH_MODE
+        run: npm run electron:dist:win -- --publish always
