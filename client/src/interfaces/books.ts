@@ -6,8 +6,8 @@ export interface BookShelfResponse {
 }
 
 export interface BookShelfEntity {
-    abook: Abook
-    abookMark: AbookMark
+    abook: Abook | null
+    abookMark: AbookMark | null
     book: Book
     ebook: any
     ebookMark: any
@@ -61,7 +61,7 @@ export interface AbookMark {
     bookId: number
     chapter: number
     charOffsetInChapter: number
-    insertDate?: string
+    insertDate?: string | null
     pos: number
     secondsSinceCreated: number
     type: number
