@@ -6,8 +6,8 @@ export interface BookShelfResponse {
 }
 
 export interface BookShelfEntity {
-    abook: Abook | null
-    abookMark: AbookMark | null
+    abook: Abook
+    abookMark: AbookMark
     book: Book
     ebook: any
     ebookMark: any
