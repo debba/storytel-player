@@ -111,7 +111,10 @@ class StorytelClient {
 
         try {
             const response = await this.client.get(url);
-            return response.data;
+            return {
+                ...response.data,
+                books: response.data.books.filter((book : any) => !!book?.abook)
+            };
         } catch (error: any) {
             throw new Error(`Failed to get bookshelf: ${error.message}`);
         }

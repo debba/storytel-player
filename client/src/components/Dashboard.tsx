@@ -32,7 +32,7 @@ function Dashboard({onLogout, triggerLogout, setTriggerLogout}: DashboardProps) 
         if (books.length === 0) return;
         let _filterStatus = filterStatus === -1 ? [1,2] : [filterStatus];
         setFilteredBooks(
-            books.filter(book => book.abook && _filterStatus.includes(+book.status))
+            books.filter(book => _filterStatus.includes(+book.status))
         );
     }, [filterStatus, books])
 
