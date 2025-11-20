@@ -32,7 +32,7 @@ function Dashboard({onLogout, triggerLogout, setTriggerLogout}: DashboardProps) 
         if (books.length === 0) return;
         let _filterStatus = filterStatus === -1 ? [1,2] : [filterStatus];
         setFilteredBooks(
-            books.filter(book => _filterStatus.includes(+book.status))
+            books.filter(book => book.abook && _filterStatus.includes(+book.status))
         );
     }, [filterStatus, books])
 
@@ -50,7 +50,7 @@ function Dashboard({onLogout, triggerLogout, setTriggerLogout}: DashboardProps) 
 
     const handleBookSelect = (book: BookShelfEntity) => {
         setCurrentBook(book);
-        navigate(`/book/${book.abook.id}`, {
+        navigate(`/book/${book.abook?.id}`, {
             state: {
                 book: book
             }
@@ -119,7 +119,7 @@ function Dashboard({onLogout, triggerLogout, setTriggerLogout}: DashboardProps) 
                         <div className="space-y-8">
                             {filteredBooks.map((book) => (
                                 <BookCard
-                                    key={book.abook.id}
+                                    key={book.abook?.id}
                                     book={book}
                                     onBookSelect={handleBookSelect}
                                 />
