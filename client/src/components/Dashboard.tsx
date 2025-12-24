@@ -117,7 +117,7 @@ function Dashboard({onLogout, triggerLogout, setTriggerLogout}: DashboardProps) 
                             ))}
                         </div>
                         <div className="space-y-8">
-                            {filteredBooks.map((book) => (
+                            {filteredBooks.filter(book => !!book?.abook).map((book) => (
                                 <BookCard
                                     key={book.abook?.id}
                                     book={book}
