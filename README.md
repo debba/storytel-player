@@ -4,11 +4,11 @@
 ![](https://img.shields.io/github/downloads/debba/storytel-player/total.svg?style=flat)
 ![Build & Release](https://github.com/debba/storytel-player/workflows/Build%20&%20Release/badge.svg)
 [![Known Vulnerabilities](https://snyk.io//test/github/debba/storytel-player/badge.svg?targetFile=package.json)](https://snyk.io//test/github/debba/storytel-player?targetFile=package.json)
-[![Discord](https://img.shields.io/discord/1470772941296894128?color=5865F2&logo=discord&logoColor=white)](https://discord.gg/WgsVw69F)
+[![Discord](https://img.shields.io/discord/1470772941296894128?color=5865F2&logo=discord&logoColor=white)](https://discord.gg/YrZPHAwMSG)
 
 **Unoffical Storytel Player for Desktop** — a cross-platform desktop application for playing Storytel audiobooks, built with TypeScript, React, Fastify, and Electron.
 
-**Discord** - [Join our discord server](https://discord.gg/WgsVw69F) and chat with the maintainers.
+**Discord** - [Join our discord server](https://discord.gg/YrZPHAwMSG) and chat with the maintainers.
 
 ## Release Download:
 <!-- DOWNLOAD_SECTION_START -->
