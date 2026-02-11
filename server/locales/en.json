@@ -14,6 +14,7 @@
   "dashboard": {
     "title": "My Library",
     "logout": "Logout",
+    "settings": "Settings",
     "search": "Search books...",
     "noBooks": "No books found",
     "emptyLibrary": "Your library appears to be empty.",
@@ -147,5 +148,20 @@
       "restart": "Restart Now",
       "later": "Later"
     }
+  },
+  "welcome": {
+    "title": "Welcome to Storytel Player!",
+    "message": "Thank you for using Storytel Player, an open-source desktop application for your audiobooks. Join our community to stay updated and share feedback!",
+    "starGithub": "Star on GitHub",
+    "joinDiscord": "Join Discord",
+    "getStarted": "Get Started"
+  },
+  "settings": {
+    "title": "Settings",
+    "community": "Community",
+    "githubRepo": "GitHub Repository",
+    "discordCommunity": "Join Discord",
+    "account": "Account",
+    "logout": "Logout"
   }
 }

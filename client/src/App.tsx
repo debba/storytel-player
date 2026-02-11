@@ -7,6 +7,7 @@ import PlayerView from './components/PlayerView';
 import api from './utils/api';
 import storage from "./utils/storage";
 import BookView from "./components/BookView";
+import WelcomeModal from './components/WelcomeModal';
 
 const useMemoryRouter = import.meta.env.VITE_REACT_APP_USE_MEMORY_ROUTER === 'true';
 const Router = useMemoryRouter ? MemoryRouter : BrowserRouter;
@@ -16,6 +17,7 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [triggerLogout, setTriggerLogout] = useState(false);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
 
   useEffect(() => {
     checkAuthStatus();
@@ -57,11 +59,28 @@ function App() {
     }
   };
 
+  useEffect(() => {
+    const checkFirstTime = async () => {
+      if (isAuthenticated && !isLoading) {
+        const hasSeenWelcome = await storage.get('hasSeenWelcome');
+        if (!hasSeenWelcome) {
+          setShowWelcomeModal(true);
+        }
+      }
+    };
+    checkFirstTime();
+  }, [isAuthenticated, isLoading]);
+
   const handleLogin = () => {
     setIsAuthenticated(true);
     if (window.trayControls?.updateAuthState) {
       window.trayControls.updateAuthState(true);
     }
+  };
+
+  const handleWelcomeClose = async () => {
+    await storage.set('hasSeenWelcome', 'true');
+    setShowWelcomeModal(false);
   };
 
   const handleLogout = async () => {
@@ -131,6 +150,12 @@ function App() {
             }
         />
         </Routes>
+        {isAuthenticated && (
+          <WelcomeModal
+            isOpen={showWelcomeModal}
+            onClose={handleWelcomeClose}
+          />
+        )}
       </div>
     </Router>
   );
