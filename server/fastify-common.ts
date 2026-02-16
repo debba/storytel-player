@@ -378,6 +378,17 @@ fastify.get('/api/auth/status', async (request, reply) => {
     }
 });
 
+// Route per ottenere informazioni account
+fastify.get('/api/account', {
+    preHandler: fastify.authenticate
+}, async (request, reply) => {
+    try {
+        reply.send({ email: request.user.email });
+    } catch (error: any) {
+        reply.code(500).send({ error: error.message });
+    }
+});
+
 fastify.get<{
     Querystring: { lang?: string };
 }>('/api/translations', async (request, reply) => {

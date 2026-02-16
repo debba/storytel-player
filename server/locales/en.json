@@ -162,6 +162,7 @@
     "githubRepo": "GitHub Repository",
     "discordCommunity": "Join Discord",
     "account": "Account",
+    "email": "Email",
     "logout": "Logout"
   }
 }

@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import api from '../utils/api';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -9,8 +10,26 @@ interface SettingsModalProps {
 
 function SettingsModal({ isOpen, onClose, onLogout }: SettingsModalProps) {
   const { t } = useTranslation();
+  const [email, setEmail] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (isOpen) {
+      fetchAccountInfo();
+    }
+  }, [isOpen]);
+
+  const fetchAccountInfo = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get('/account');
+      setEmail(response.data.email);
+    } catch (error) {
+      console.error('Failed to fetch account info:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleGithubClick = () => {
     window.open('https://github.com/debba/storytel-player', '_blank', 'noopener,noreferrer');
@@ -19,6 +38,8 @@ function SettingsModal({ isOpen, onClose, onLogout }: SettingsModalProps) {
   const handleDiscordClick = () => {
     window.open('https://discord.gg/YrZPHAwMSG', '_blank', 'noopener,noreferrer');
   };
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
@@ -72,6 +93,17 @@ function SettingsModal({ isOpen, onClose, onLogout }: SettingsModalProps) {
             {t('settings.account')}
           </h3>
           <div className="border-t border-gray-700 mb-3"></div>
+          
+          {/* Account Info */}
+          <div className="bg-gray-800 rounded-md p-4 mb-3">
+            <div className="flex flex-col">
+              <span className="text-sm text-gray-400 mb-1">{t('settings.email')}</span>
+              <span className="text-white font-medium">
+                {loading ? t('common.loading') : email || '-'}
+              </span>
+            </div>
+          </div>
+
           <button
             onClick={onLogout}
             className="w-full px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors"

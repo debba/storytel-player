@@ -38,7 +38,7 @@
   "dependencies": {
     "dot-object": "^2.1.5",
     "electron-store": "^10.1.0",
-    "electron-updater": "^6.6.2"
+    "electron-updater": "^6.7.3"
   },
   "keywords": [
     "storytel",
@@ -48,17 +48,17 @@
     "express"
   ],
   "devDependencies": {
-    "@babel/cli": "^7.28.3",
-    "@babel/core": "^7.28.4",
-    "@babel/node": "^7.28.0",
-    "@babel/preset-env": "^7.28.3",
-    "@babel/preset-react": "^7.27.1",
+    "@babel/cli": "^7.28.6",
+    "@babel/core": "^7.29.0",
+    "@babel/node": "^7.29.0",
+    "@babel/preset-env": "^7.29.0",
+    "@babel/preset-react": "^7.28.5",
     "@types/dot-object": "^2.1.6",
-    "@types/node": "^24.6.0",
+    "@types/node": "^24.10.13",
     "concurrently": "^7.6.0",
-    "electron": "^38.2.1",
-    "electron-builder": "^26.0.12",
-    "typescript": "^5.9.2"
+    "electron": "^40.4.1",
+    "electron-builder": "^26.7.0",
+    "typescript": "^5.9.3"
   },
   "build": {
     "appId": "com.storytel.player",

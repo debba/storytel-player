@@ -100,7 +100,17 @@ export class WindowManager {
 
     show(): void {
         if (this.mainWindow) {
+            if (this.mainWindow.isMinimized()) {
+                this.mainWindow.restore();
+            }
             this.mainWindow.show();
+            // Force window to foreground on Windows/Linux where focus() alone
+            // may not bring the window above a maximized window
+            const wasAlwaysOnTop = this.mainWindow.isAlwaysOnTop();
+            this.mainWindow.setAlwaysOnTop(true);
+            if (!wasAlwaysOnTop) {
+                this.mainWindow.setAlwaysOnTop(false);
+            }
             this.mainWindow.focus();
         }
     }
