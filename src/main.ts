@@ -60,6 +60,11 @@ if (!gotTheLock) {
     app.whenReady().then(initialize);
 }
 
+app.on('before-quit', () => {
+    // @ts-ignore
+    app.isQuitting = true;
+});
+
 app.on('window-all-closed', async () => {
     // @ts-ignore
     if (app.isQuitting) {
@@ -69,10 +74,7 @@ app.on('window-all-closed', async () => {
         }
 
         windowManager.killClientProcess();
-
-        if (process.platform !== 'darwin') {
-            app.quit();
-        }
+        app.quit();
     }
 });
 
