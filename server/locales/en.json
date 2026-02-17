@@ -161,6 +161,9 @@
     "community": "Community",
     "githubRepo": "GitHub Repository",
     "discordCommunity": "Join Discord",
+    "appearance": "Appearance",
+    "alwaysOnTop": "Keep window always on top",
+    "alwaysOnTopDescription": "Window will stay above other windows",
     "account": "Account",
     "email": "Email",
     "logout": "Logout"

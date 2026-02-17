@@ -2,16 +2,19 @@ import { ipcMain, IpcMainInvokeEvent } from 'electron';
 import { storeManager } from './store';
 import { ServerManager } from './server';
 import { TrayManager } from './tray';
+import { WindowManager } from './window';
 import { ApiConfig } from '../types';
 import { i18n } from '../i18n';
 
 export class IpcManager {
   private serverManager: ServerManager;
   private trayManager: TrayManager;
+  private windowManager: WindowManager;
 
-  constructor(serverManager: ServerManager, trayManager: TrayManager) {
+  constructor(serverManager: ServerManager, trayManager: TrayManager, windowManager: WindowManager) {
     this.serverManager = serverManager;
     this.trayManager = trayManager;
+    this.windowManager = windowManager;
   }
 
   setupHandlers(): void {
@@ -19,6 +22,7 @@ export class IpcManager {
     this.setupApiHandlers();
     this.setupTrayHandlers();
     this.setupLocaleHandlers();
+    this.setupWindowHandlers();
   }
 
   private setupStoreHandlers(): void {
@@ -117,6 +121,16 @@ export class IpcManager {
   private setupLocaleHandlers(): void {
     ipcMain.handle('get-locale', () => {
       return i18n.getLanguage();
+    });
+  }
+
+  private setupWindowHandlers(): void {
+    ipcMain.handle('window-set-always-on-top', (_event: IpcMainInvokeEvent, alwaysOnTop: boolean) => {
+      this.windowManager.setAlwaysOnTop(alwaysOnTop);
+    });
+
+    ipcMain.handle('window-is-always-on-top', () => {
+      return this.windowManager.isAlwaysOnTop();
     });
   }
 }

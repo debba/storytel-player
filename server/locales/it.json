@@ -161,6 +161,9 @@
     "community": "Community",
     "githubRepo": "Repository GitHub",
     "discordCommunity": "Unisciti a Discord",
+    "appearance": "Aspetto",
+    "alwaysOnTop": "Mantieni finestra sempre in primo piano",
+    "alwaysOnTopDescription": "La finestra rimarrà sopra le altre finestre",
     "account": "Account",
     "email": "Email",
     "logout": "Esci"

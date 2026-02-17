@@ -2,6 +2,7 @@ import {BrowserWindow, Menu, app} from 'electron';
 import {spawn, ChildProcess} from 'child_process';
 import * as path from 'path';
 import {WindowConfig} from '../types';
+import {storeManager} from './store';
 
 export class WindowManager {
     private mainWindow: BrowserWindow | null = null;
@@ -15,12 +16,15 @@ export class WindowManager {
     }
 
     create(): BrowserWindow {
+        // Get alwaysOnTop setting from store (default: false)
+        const alwaysOnTop = storeManager.get<boolean>('settings.alwaysOnTop') ?? false;
+
         const windowConfig: WindowConfig = {
             width: 480,
             height: 800,
             resizable: this.isDebug,
             maximizable: this.isDebug,
-            alwaysOnTop: !this.isDebug
+            alwaysOnTop
         };
 
         this.mainWindow = new BrowserWindow({
@@ -121,5 +125,16 @@ export class WindowManager {
 
     isVisible(): boolean {
         return this.mainWindow?.isVisible() ?? false;
+    }
+
+    setAlwaysOnTop(alwaysOnTop: boolean): void {
+        if (this.mainWindow) {
+            this.mainWindow.setAlwaysOnTop(alwaysOnTop);
+            storeManager.set('settings.alwaysOnTop', alwaysOnTop);
+        }
+    }
+
+    isAlwaysOnTop(): boolean {
+        return this.mainWindow?.isAlwaysOnTop() ?? false;
     }
 }

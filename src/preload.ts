@@ -13,6 +13,14 @@ contextBridge.exposeInMainWorld('electronLocale', {
   getLocale: (): Promise<string> => ipcRenderer.invoke('get-locale'),
 });
 
+// Window API
+contextBridge.exposeInMainWorld('electronWindow', {
+  setAlwaysOnTop: (alwaysOnTop: boolean): Promise<void> =>
+    ipcRenderer.invoke('window-set-always-on-top', alwaysOnTop),
+  isAlwaysOnTop: (): Promise<boolean> =>
+    ipcRenderer.invoke('window-is-always-on-top'),
+});
+
 // Tray Controls API
 contextBridge.exposeInMainWorld('trayControls', {
   onPlayPause: (callback: () => void): void => {

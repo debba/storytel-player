@@ -12,10 +12,12 @@ function SettingsModal({ isOpen, onClose, onLogout }: SettingsModalProps) {
   const { t } = useTranslation();
   const [email, setEmail] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
+  const [alwaysOnTop, setAlwaysOnTop] = useState<boolean>(false);
 
   useEffect(() => {
     if (isOpen) {
       fetchAccountInfo();
+      fetchAlwaysOnTopSetting();
     }
   }, [isOpen]);
 
@@ -28,6 +30,29 @@ function SettingsModal({ isOpen, onClose, onLogout }: SettingsModalProps) {
       console.error('Failed to fetch account info:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchAlwaysOnTopSetting = async () => {
+    try {
+      if (window.electronWindow) {
+        const isOnTop = await window.electronWindow.isAlwaysOnTop();
+        setAlwaysOnTop(isOnTop);
+      }
+    } catch (error) {
+      console.error('Failed to fetch always on top setting:', error);
+    }
+  };
+
+  const handleAlwaysOnTopToggle = async () => {
+    try {
+      if (window.electronWindow) {
+        const newValue = !alwaysOnTop;
+        await window.electronWindow.setAlwaysOnTop(newValue);
+        setAlwaysOnTop(newValue);
+      }
+    } catch (error) {
+      console.error('Failed to toggle always on top:', error);
     }
   };
 
@@ -56,6 +81,38 @@ function SettingsModal({ isOpen, onClose, onLogout }: SettingsModalProps) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
+        </div>
+
+        {/* Appearance Section */}
+        <div className="mb-6">
+          <h3 className="text-sm font-semibold text-gray-400 uppercase mb-3">
+            {t('settings.appearance')}
+          </h3>
+          <div className="border-t border-gray-700 mb-3"></div>
+          <div className="bg-gray-800 rounded-md p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <div className="text-white font-medium mb-1">
+                  {t('settings.alwaysOnTop')}
+                </div>
+                <div className="text-sm text-gray-400">
+                  {t('settings.alwaysOnTopDescription')}
+                </div>
+              </div>
+              <button
+                onClick={handleAlwaysOnTopToggle}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-gray-900 ${
+                  alwaysOnTop ? 'bg-orange-600' : 'bg-gray-600'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    alwaysOnTop ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Community Section */}
