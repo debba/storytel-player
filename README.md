@@ -86,7 +86,7 @@ If you are upgrading and you already have storytel-player on the allowed list yo
 macOS users who download directly from releases may need to run:
 
 ```bash
-xattr -c /Applications/StorytelPlayer.app
+xattr -c "/Applications/Storytel Player.app"
 ```
 
 after copying the app to the Applications directory.

@@ -1,0 +1,51 @@
+name: 🐛 Bug Report
+description: Create a report to help us improve Storytel Player
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what the bug is.
+      placeholder: I clicked X and Y happened...
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: To Reproduce
+      description: Steps to reproduce the behavior.
+      placeholder: |
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. See error
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: OS Version
+      description: What operating system are you using? (e.g., Windows 11, macOS 14.2, Ubuntu 22.04)
+      placeholder: macOS 14.2
+    validations:
+      required: true
+  - type: input
+    id: app-version
+    attributes:
+      label: Storytel Player Version
+      description: What version of Storytel Player are you running? (e.g., v1.0.0)
+      placeholder: v1.0.0
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Log Output
+      description: Please copy and paste any relevant log output. You can check logs launching storytel-player from terminal.
+      render: shell
