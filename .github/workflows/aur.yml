@@ -1,0 +1,41 @@
+name: Publish to AUR
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  aur-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get Release Version
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+
+      - name: Download .deb Artifact
+        run: |
+          wget "https://github.com/${{ github.repository }}/releases/download/v${{ steps.version.outputs.version }}/storytel-player_${{ steps.version.outputs.version }}_amd64.deb" -O app.deb
+
+      - name: Calculate SHA256
+        id: shasum
+        run: |
+          echo "sha256=$(sha256sum app.deb | awk '{print $1}')" >> $GITHUB_OUTPUT
+
+      - name: Update PKGBUILD
+        run: |
+          cd aur
+          sed -i "s/^pkgver=.*/pkgver=${{ steps.version.outputs.version }}/" PKGBUILD
+          sed -i "s/^sha256sums=.*/sha256sums=('${{ steps.shasum.outputs.sha256 }}')/" PKGBUILD
+
+      - name: Publish to AUR
+        uses: KSXGitHub/github-actions-deploy-aur@v2
+        with:
+          pkgname: storytel-player-bin
+          pkgbuild: ./aur/PKGBUILD
+          commit_username: ${{ secrets.AUR_USERNAME }}
+          commit_email: ${{ secrets.AUR_EMAIL }}
+          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          commit_message: "Update to v${{ steps.version.outputs.version }}"
+          force_push: true

@@ -59,24 +59,61 @@ The application is built with TypeScript and follows a modular architecture:
 
 ## Installation
 
-1. Clone the repository:
+### macOS
+
+#### Homebrew (Recommended)
+
+To add our tap, run:
+
 ```bash
-git clone <repository-url>
-cd storytel-player
+brew tap debba/storytel-player
 ```
 
-2. Install all dependencies:
+Then install:
+
 ```bash
-npm run install-all
+brew install --cask storytel-player
 ```
 
-This command will install dependencies for the root project, server, and client.
+[![Homebrew](https://img.shields.io/badge/Homebrew-Repository-orange?logo=homebrew)](https://github.com/debba/homebrew-storytel-player)
+
+#### Direct Download
+
+When you install storytel-player on macOS, you need to allow accessibility access (Privacy & Security) to the storytel-player app.
+
+If you are upgrading and you already have storytel-player on the allowed list you will need to manually remove them before accessibility access can be granted to the new version.
+
+macOS users who download directly from releases may need to run:
+
+```bash
+xattr -c /Applications/StorytelPlayer.app
+```
+
+after copying the app to the Applications directory.
+
+### Arch Linux (AUR)
+
+```bash
+yay -S storytel-player-bin
+```
+
+## Updates
+
+### Automatic Updates
+
+Storytel Player checks for updates automatically on startup. When a new version is available, a notification will appear, allowing you to download and install the update seamlessly.
+
+### Manual Updates
+
+You can also manually check for updates or download the latest version directly from the [Releases page](https://github.com/debba/storytel-player/releases).
+```
 
 ## Development
 
 Start the development environment with hot reload:
 
 ```bash
+npm run install-all
 npm run dev
 ```
 
