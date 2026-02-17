@@ -31,7 +31,8 @@
     "preelectron:pack": "npm run build && npm run server:build && npm run electron:build",
     "preelectron": "npm run build && npm run server:build",
     "server:build": "cd server && npm run build",
-    "clean": "rm -rf dist; rm -rf server/dist; rm -rf client/build"
+    "clean": "rm -rf dist; rm -rf server/dist; rm -rf client/build",
+    "version": "node scripts/sync-version.js && conventional-changelog -p angular -i CHANGELOG.md -s && git add README.md CHANGELOG.md src/version.ts docs/index.html"
   },
   "author": "debba <andrea@debbaweb.it>",
   "license": "MIT",
@@ -57,6 +58,7 @@
     "@types/node": "^24.10.13",
     "concurrently": "^7.6.0",
     "electron": "^40.4.1",
+    "conventional-changelog-cli": "^5.0.0",
     "electron-builder": "^26.7.0",
     "typescript": "^5.9.3"
   },
