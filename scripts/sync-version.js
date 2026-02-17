@@ -37,9 +37,16 @@ readme = readme.replace(
   `releases/download/v${newVersion}/`
 );
 
+// Update Windows installer filename: Storytel-Player-Setup-X.Y.Z.exe
 readme = readme.replace(
-  /Storytel-Player-\d+\.\d+\.\d+_/g,
-  `Storytel-Player-${newVersion}_`
+  /Storytel-Player-Setup-\d+\.\d+\.\d+/g,
+  `Storytel-Player-Setup-${newVersion}`
+);
+
+// Update macOS and Linux filenames: Storytel-Player-X.Y.Z.dmg and Storytel-Player-X.Y.Z.AppImage
+readme = readme.replace(
+  /Storytel-Player-(\d+\.\d+\.\d+)\.(dmg|AppImage)/g,
+  `Storytel-Player-${newVersion}.$2`
 );
 
 writeFileSync(paths.readme, readme);
