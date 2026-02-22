@@ -19,7 +19,7 @@ i18n
   .use(initReactI18next)
   .init({
     fallbackLng: 'en',
-    supportedLngs: ['it', 'en'],
+    supportedLngs: ['en', 'it', 'fr', 'es', 'de', 'sv'],
     detection: {
       order: ['navigator', 'htmlTag', 'path', 'subdomain'],
       caches: ['localStorage'],
@@ -41,8 +41,9 @@ if (window.electronLocale) {
     const detectedLanguage = i18n.language || window.navigator.language;
     const languageCode = detectedLanguage.split('-')[0];
 
-    if (languageCode === 'it') {
-      i18n.changeLanguage('it');
+    const supported = ['en', 'it', 'fr', 'es', 'de', 'sv'];
+    if (supported.includes(languageCode)) {
+      i18n.changeLanguage(languageCode);
     } else {
       i18n.changeLanguage('en');
     }
@@ -52,8 +53,9 @@ if (window.electronLocale) {
   const detectedLanguage = i18n.language || window.navigator.language;
   const languageCode = detectedLanguage.split('-')[0];
 
-  if (languageCode === 'it') {
-    i18n.changeLanguage('it');
+  const supported = ['en', 'it', 'fr', 'es', 'de', 'sv'];
+  if (supported.includes(languageCode)) {
+    i18n.changeLanguage(languageCode);
   } else {
     i18n.changeLanguage('en');
   }

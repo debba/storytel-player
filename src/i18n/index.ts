@@ -1,12 +1,15 @@
 import {app} from 'electron';
 import * as dot from 'dot-object';
+import {storeManager} from '../modules/store';
 
 interface Translations {
     [key: string]: any;
 }
 
+export type SupportedLanguage = 'en' | 'it' | 'fr' | 'es' | 'de' | 'sv';
+
 class I18n {
-    private currentLanguage: 'it' | 'en' = 'en';
+    private currentLanguage: SupportedLanguage = 'en';
     public translations: Translations = {};
     private fastifyServer: any = null;
     private appLocale: string = 'en';
@@ -21,13 +24,25 @@ class I18n {
     }
 
     public detectLanguage(): void {
-        // Check for APP_LOCALE environment variable first
+        // Check for saved language setting first
+        const savedLanguage = storeManager.get<string>('appLanguage');
+        
+        if (savedLanguage && savedLanguage !== 'auto') {
+            const supported = ['en', 'it', 'fr', 'es', 'de', 'sv'];
+            if (supported.includes(savedLanguage)) {
+                this.currentLanguage = savedLanguage as SupportedLanguage;
+                return;
+            }
+        }
+
+        // Check for APP_LOCALE environment variable next
         const envLocale = process.env.APP_LOCALE;
         const locale = envLocale || this.appLocale || 'en';
         const languageCode = locale.split('-')[0].toLowerCase();
 
-        if (languageCode === 'it') {
-            this.currentLanguage = 'it';
+        const supported = ['en', 'it', 'fr', 'es', 'de', 'sv'];
+        if (supported.includes(languageCode)) {
+            this.currentLanguage = languageCode as SupportedLanguage;
         } else {
             this.currentLanguage = 'en';
         }
@@ -56,7 +71,7 @@ class I18n {
         return typeof value === 'string' ? value : key;
     }
 
-    getLanguage(): 'it' | 'en' {
+    getLanguage(): SupportedLanguage {
         return this.currentLanguage;
     }
 }

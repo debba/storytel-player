@@ -1,5 +1,6 @@
 import React from 'react';
 import {useTranslation} from 'react-i18next';
+import Modal from './Modal';
 
 interface DownloadCancelModalProps {
     isOpen: boolean;
@@ -20,12 +21,11 @@ const DownloadCancelModal: React.FC<DownloadCancelModalProps> = ({isOpen, isDown
     const cancelButton = isDownloading ? t('download.continueButton') : t('download.keepButton');
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-gray-900 rounded-lg p-6 w-80 max-w-md border border-gray-700">
-                <h2 className="text-xl font-bold text-white mb-4">{title}</h2>
-                <p className="text-gray-300 mb-2">{message}</p>
-                <p className="text-gray-400 text-sm mb-6">{warning}</p>
-                <div className="flex gap-3">
+        <Modal isOpen={isOpen} onClose={onCancel} title={title}>
+            <div className="flex flex-col gap-2">
+                <p className="text-gray-300">{message}</p>
+                <p className="text-gray-400 text-sm mb-4">{warning}</p>
+                <div className="flex gap-3 mt-2">
                     <button
                         onClick={onCancel}
                         className="flex-1 px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600 transition-colors"
@@ -40,7 +40,7 @@ const DownloadCancelModal: React.FC<DownloadCancelModalProps> = ({isOpen, isDown
                     </button>
                 </div>
             </div>
-        </div>
+        </Modal>
     );
 };
 

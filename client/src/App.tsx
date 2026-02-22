@@ -1,15 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import {Routes, Route, Navigate, MemoryRouter, BrowserRouter} from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import LoginForm from './components/LoginForm';
-import Dashboard from './components/Dashboard';
-import PlayerView from './components/PlayerView';
-import api from './utils/api';
+import React, { useState, useEffect } from "react";
+import {
+  Routes,
+  Route,
+  Navigate,
+  MemoryRouter,
+  BrowserRouter,
+} from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import LoginForm from "./components/LoginForm";
+import Dashboard from "./components/Dashboard";
+import PlayerView from "./components/PlayerView";
+import api from "./utils/api";
 import storage from "./utils/storage";
 import BookView from "./components/BookView";
-import WelcomeModal from './components/WelcomeModal';
+import WelcomeModal from "./components/WelcomeModal";
 
-const useMemoryRouter = import.meta.env.VITE_REACT_APP_USE_MEMORY_ROUTER === 'true';
+const useMemoryRouter =
+  import.meta.env.VITE_REACT_APP_USE_MEMORY_ROUTER === "true";
 const Router = useMemoryRouter ? MemoryRouter : BrowserRouter;
 
 function App() {
@@ -32,7 +39,7 @@ function App() {
 
   const checkAuthStatus = async () => {
     try {
-      const token = await storage.get('token');
+      const token = await storage.get("token");
       if (!token) {
         setIsAuthenticated(false);
         setIsLoading(false);
@@ -42,7 +49,7 @@ function App() {
         return;
       }
 
-      const response = await api.get('/auth/status');
+      const response = await api.get("/auth/status");
       const authenticated = response.data.authenticated;
       setIsAuthenticated(authenticated);
       if (window.trayControls?.updateAuthState) {
@@ -50,7 +57,7 @@ function App() {
       }
     } catch (error) {
       setIsAuthenticated(false);
-      await storage.remove('token');
+      await storage.remove("token");
       if (window.trayControls?.updateAuthState) {
         window.trayControls.updateAuthState(false);
       }
@@ -62,8 +69,8 @@ function App() {
   useEffect(() => {
     const checkFirstTime = async () => {
       if (isAuthenticated && !isLoading) {
-        const hasSeenWelcome = await storage.get('hasSeenWelcome');
-        if (!hasSeenWelcome) {
+        const hasSeenWelcome = await storage.get("hasSeenWelcome");
+        if (!hasSeenWelcome || hasSeenWelcome === "false") {
           setShowWelcomeModal(true);
         }
       }
@@ -79,17 +86,17 @@ function App() {
   };
 
   const handleWelcomeClose = async () => {
-    await storage.set('hasSeenWelcome', 'true');
+    await storage.set("hasSeenWelcome", "true");
     setShowWelcomeModal(false);
   };
 
   const handleLogout = async () => {
     try {
-      await api.post('/logout');
+      await api.post("/logout");
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
     } finally {
-      await storage.remove('token');
+      await storage.remove("token");
       setIsAuthenticated(false);
       if (window.trayControls?.updateAuthState) {
         window.trayControls.updateAuthState(false);
@@ -100,7 +107,7 @@ function App() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-xl text-gray-600">{t('common.loading')}</div>
+        <div className="text-xl text-gray-600">{t("common.loading")}</div>
       </div>
     );
   }
@@ -123,7 +130,11 @@ function App() {
             path="/"
             element={
               isAuthenticated ? (
-                <Dashboard onLogout={handleLogout} triggerLogout={triggerLogout} setTriggerLogout={setTriggerLogout} />
+                <Dashboard
+                  onLogout={handleLogout}
+                  triggerLogout={triggerLogout}
+                  setTriggerLogout={setTriggerLogout}
+                />
               ) : (
                 <Navigate to="/login" replace />
               )
@@ -139,16 +150,12 @@ function App() {
               )
             }
           />
-        <Route
+          <Route
             path="/book/:bookId"
             element={
-                isAuthenticated ? (
-                    <BookView />
-                ) : (
-                    <Navigate to="/login" replace />
-                )
+              isAuthenticated ? <BookView /> : <Navigate to="/login" replace />
             }
-        />
+          />
         </Routes>
         {isAuthenticated && (
           <WelcomeModal

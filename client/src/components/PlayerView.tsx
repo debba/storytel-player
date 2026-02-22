@@ -18,7 +18,7 @@ import {useChapters} from "../hooks/useChapters";
 import {useGotoModal} from "../hooks/useGotoModal";
 import {truncateTitle} from '../utils/helpers';
 import "../types/window.d.ts";
-import api from "../utils/api";
+import api, { trackAction } from "../utils/api";
 
 function PlayerView() {
     const {t} = useTranslation();
@@ -99,8 +99,8 @@ function PlayerView() {
         const checkDownloadStatus = async () => {
             if (bookId) {
                 try {
-                    const {data} = await api.get(`/download-status/${bookId}`);
-                    setIsDownloaded(data.downloaded);
+                    const {data: statusData} = await api.get(`/download-status/${bookId}`);
+                    setIsDownloaded(statusData.downloaded);
                 } catch (error) {
                     console.error('Failed to check download status', error);
                 }
@@ -128,20 +128,23 @@ function PlayerView() {
         const isElectron = !!window.electronStore
         setIsDownloading(true);
         try {
-            const {data} = await api.post('/download', {
+            trackAction('User initiated download', { bookId: book?.id, bookName: book?.book?.name || "Unknown" });
+
+            const response = await api.post('/download', {
                 bookId
             });
 
-            if (data.success) {
+            if (response && (response as any).data?.success) {
                 setIsDownloaded(true);
             } else {
-                if (data.error !== 'Download cancelled') {
-                    setError(data.error || 'Download failed');
+                if ((response as any)?.data?.error !== 'Download cancelled') {
+                    setError((response as any)?.data?.error || 'Download failed');
                 }
             }
         } catch (error: any) {
-            if (!isElectron && error?.response?.data?.error !== 'Download cancelled' && error?.response?.data?.error != 'canceled'){
-                setError(error.message || 'Download failed');
+            const errorMsg = error?.data?.error || error?.response?.data?.error;
+            if (errorMsg !== 'Download cancelled' && errorMsg !== 'canceled') {
+                setError(errorMsg || error.message || 'Download failed');
             }
         } finally {
             setIsDownloading(false);
@@ -156,10 +159,11 @@ function PlayerView() {
             setShowDownloadCancelModal(false);
 
             if (isDownloading) {
+                trackAction('User cancelled download', { bookId });
                 await api.delete(`/download/${bookId}`);
                 setIsDownloading(false);
             } else if (isDownloaded) {
-                // Delete downloaded file
+                trackAction('User deleted downloaded book', { bookId });
                 await api.delete(`/downloaded-file/${bookId}`);
                 setIsDownloaded(false);
             }

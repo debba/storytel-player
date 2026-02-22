@@ -1,5 +1,5 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
-import api from '../utils/api';
+import api, { trackAction } from '../utils/api';
 import {BookmarkPositional} from "../interfaces/bookmarks";
 
 interface UseAudioPlayerProps {
@@ -120,12 +120,14 @@ export const useAudioPlayer = ({bookId, consumableId, playbackRate, onLoadError}
     const skipForward = () => {
         if (audioRef.current) {
             audioRef.current.currentTime = Math.min(audioRef.current.currentTime + 15, duration);
+            trackAction('skip_forward', { bookId, consumableId, seconds: 15 });
         }
     };
 
     const skipBackward = () => {
         if (audioRef.current) {
             audioRef.current.currentTime = Math.max(audioRef.current.currentTime - 15, 0);
+            trackAction('skip_backward', { bookId, consumableId, seconds: 15 });
         }
     };
 
@@ -135,6 +137,7 @@ export const useAudioPlayer = ({bookId, consumableId, playbackRate, onLoadError}
             audioRef.current.playbackRate = playbackRate;
         }
         positionUpdateIntervalRef.current = setInterval(updatePosition, 30000);
+        trackAction('play', { bookId, consumableId });
     };
 
     const handlePause = () => {
@@ -144,6 +147,7 @@ export const useAudioPlayer = ({bookId, consumableId, playbackRate, onLoadError}
             clearInterval(positionUpdateIntervalRef.current);
             positionUpdateIntervalRef.current = null;
         }
+        trackAction('pause', { bookId, consumableId });
     };
 
     const handleRateChange = () => {

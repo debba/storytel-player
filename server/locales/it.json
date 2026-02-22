@@ -166,6 +166,24 @@
     "alwaysOnTopDescription": "La finestra rimarrà sopra le altre finestre",
     "account": "Account",
     "email": "Email",
-    "logout": "Esci"
+    "logout": "Esci",
+    "developer": "Sviluppatore",
+    "viewLogs": "Visualizza Log di Sessione",
+    "language": "Lingua",
+    "languageAuto": "Auto"
+  },
+  "logs": {
+    "title": "Log di Sistema",
+    "refresh": "Aggiorna",
+    "clear": "Svuota",
+    "empty": "Nessun log trovato.",
+    "export": "Esporta",
+    "search": "Cerca log...",
+    "typeAll": "Tutti gli eventi",
+    "typeError": "Errori",
+    "typeHttp": "Traffico HTTP",
+    "typeAction": "Azioni Utente",
+    "confirmClear": "Sei sicuro di voler svuotare i log? L'operazione non può essere annullata.",
+    "details": "Dettagli"
   }
 }

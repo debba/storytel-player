@@ -40,3 +40,13 @@ const api: AxiosInstance = new Proxy(axiosApi, {
 });
 
 export default api;
+
+
+export const trackAction = async (message: string, data?: any) => {
+    try {
+        await api.post('/logs/action', { message, data });
+    } catch (e) {
+        // Silently ignore tracking errors
+        console.error('Failed to track action', e);
+    }
+};

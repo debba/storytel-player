@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import Modal from './Modal';
 
 interface PlaybackSpeedModalProps {
   isOpen: boolean;
@@ -14,19 +15,8 @@ function PlaybackSpeedModal({ isOpen, playbackRate, onClose, onRateChange }: Pla
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-gray-900 rounded-lg p-6 max-w-md w-full mx-4 border border-gray-700">
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="text-lg font-semibold text-white">{t('playbackSpeed.title')}</h3>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-white"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
+    <Modal isOpen={isOpen} onClose={onClose} title={t('playbackSpeed.title')}>
+      <div className="flex flex-col">
 
         {/* Preset Speeds */}
         <div className="mb-6">
@@ -71,12 +61,12 @@ function PlaybackSpeedModal({ isOpen, playbackRate, onClose, onRateChange }: Pla
 
         <button
           onClick={onClose}
-          className="w-full px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors"
+          className="w-full px-4 py-3 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors font-medium mt-4"
         >
           {t('playbackSpeed.confirm')}
         </button>
       </div>
-    </div>
+    </Modal>
   );
 }
 

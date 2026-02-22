@@ -1,5 +1,5 @@
 import {useCallback, useState} from 'react';
-import api from '../utils/api';
+import api, { trackAction } from '../utils/api';
 import {Bookmark} from '../interfaces/bookmarks';
 
 interface UseBookmarksProps {
@@ -74,6 +74,7 @@ export const useBookmarks = ({consumableId, onError}: UseBookmarksProps) => {
                 note: newBookmarkNote
             });
 
+            trackAction('create_bookmark', { consumableId, position: positionInMilliseconds });
             await loadBookmarks();
             setNewBookmarkNote('');
             setShowCreateBookmarkModal(false);
@@ -87,6 +88,7 @@ export const useBookmarks = ({consumableId, onError}: UseBookmarksProps) => {
 
         try {
             await api.delete(`/bookmarks/${consumableId}/${bookmarkToDelete.id}`, {});
+            trackAction('delete_bookmark', { consumableId, bookmarkId: bookmarkToDelete.id });
             await loadBookmarks();
             setShowDeleteConfirmModal(false);
             setBookmarkToDelete(null);
@@ -105,6 +107,7 @@ export const useBookmarks = ({consumableId, onError}: UseBookmarksProps) => {
                 type: 'abook'
             });
 
+            trackAction('edit_bookmark', { consumableId, bookmarkId: bookmarkToEdit.id });
             await loadBookmarks();
             setShowEditBookmarkModal(false);
             setBookmarkToEdit(null);

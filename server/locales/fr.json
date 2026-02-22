@@ -1,0 +1,189 @@
+{
+  "login": {
+    "title": "Se connecter à Storytel",
+    "subtitle": "Accédez à votre bibliothèque de livres audio",
+    "email": "Adresse e-mail",
+    "password": "Mot de passe",
+    "signIn": "Se connecter",
+    "signingIn": "Connexion en cours...",
+    "errors": {
+      "required": "Veuillez entrer votre e-mail et votre mot de passe",
+      "failed": "Échec de la connexion"
+    }
+  },
+  "dashboard": {
+    "title": "Ma Bibliothèque",
+    "logout": "Se déconnecter",
+    "settings": "Paramètres",
+    "search": "Rechercher des livres...",
+    "noBooks": "Aucun livre trouvé",
+    "emptyLibrary": "Votre bibliothèque semble être vide.",
+    "loading": "Chargement de votre bibliothèque...",
+    "loadError": "Échec du chargement de la bibliothèque",
+    "filters": {
+      "notStarted": "Non commencé",
+      "started": "Commencé",
+      "concluded": "Terminé"
+    }
+  },
+  "player": {
+    "chapters": "Chapitres",
+    "bookmarks": "Marque-pages",
+    "addBookmark": "Ajouter un marque-page",
+    "speed": "Vitesse",
+    "goTo": "Aller à",
+    "goto": "Aller à",
+    "playing": "En lecture",
+    "paused": "En pause",
+    "nowPlaying": "En cours de lecture :",
+    "loadingAudio": "Chargement de l'audio...",
+    "loadingBookData": "Chargement des données du livre...",
+    "loadError": "Échec du chargement du flux audio",
+    "loadChaptersError": "Échec du chargement des chapitres",
+    "loadBookmarksError": "Échec du chargement des marque-pages"
+  },
+  "bookmarks": {
+    "title": "Vos Marque-pages",
+    "noBookmarks": "Aucun marque-page enregistré",
+    "createNew": "Créer un nouveau marque-page",
+    "createTitle": "Créer un nouveau marque-page",
+    "editTitle": "Modifier le marque-page",
+    "deleteTitle": "Supprimer le marque-page",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce marque-page ?",
+    "deleteWarning": "Cette action est irréversible.",
+    "currentPosition": "Position actuelle :",
+    "position": "Position :",
+    "note": "Note",
+    "noteOptional": "Note (facultatif)",
+    "notePlaceholderCreate": "Ajouter une note à ce marque-page...",
+    "notePlaceholderEdit": "Modifier la note pour ce marque-page...",
+    "save": "Enregistrer le marque-page",
+    "saveChanges": "Enregistrer les modifications",
+    "tooltipEdit": "Modifier le marque-page",
+    "tooltipDelete": "Supprimer le marque-page"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "close": "Fermer"
+  },
+  "bookCard": {
+    "completed": "Terminé",
+    "remaining": "restant",
+    "author": "Auteur :",
+    "narrator": "Narrateur :"
+  },
+  "bookView": {
+    "saved": "Enregistré",
+    "listen": "Écouter",
+    "language": "Langue",
+    "duration": "Durée",
+    "category": "Catégorie",
+    "noDescription": "Aucune description disponible.",
+    "showMore": "afficher plus",
+    "showLess": "afficher moins",
+    "details": "Détails du livre :"
+  },
+  "chapters": {
+    "title": "Chapitres",
+    "noChapters": "Aucun chapitre disponible",
+    "chapter": "Chapitre"
+  },
+  "gotoModal": {
+    "title": "Aller à l'heure",
+    "description": "Entrez l'heure souhaitée (en tenant compte de la vitesse {{speed}}x)",
+    "hours": "Heures",
+    "minutes": "Min",
+    "seconds": "Sec",
+    "cancel": "Annuler",
+    "go": "Aller"
+  },
+  "playbackSpeed": {
+    "title": "Vitesse de lecture",
+    "presets": "Vitesses prédéfinies",
+    "custom": "Vitesse personnalisée",
+    "confirm": "Confirmer"
+  },
+  "tray": {
+    "noBookPlaying": "Aucun livre en cours de lecture",
+    "showApp": "Afficher l'application",
+    "play": "Lire",
+    "pause": "Pause",
+    "playPause": "Lecture/Pause",
+    "playbackSpeed": "Vitesse de lecture",
+    "logout": "Se déconnecter",
+    "quit": "Quitter"
+  },
+  "logout": {
+    "confirmTitle": "Confirmer la déconnexion",
+    "confirmMessage": "Êtes-vous sûr de vouloir vous déconnecter ?",
+    "confirmButton": "Se déconnecter",
+    "cancelButton": "Annuler"
+  },
+  "download": {
+    "cancelTitle": "Annuler le téléchargement",
+    "cancelMessage": "Êtes-vous sûr de vouloir annuler le téléchargement en cours ?",
+    "cancelWarning": "Le fichier partiellement téléchargé sera supprimé.",
+    "cancelButton": "Annuler le téléchargement",
+    "continueButton": "Continuer le téléchargement",
+    "deleteTitle": "Supprimer le fichier téléchargé",
+    "deleteMessage": "Êtes-vous sûr de vouloir supprimer le fichier téléchargé ?",
+    "deleteWarning": "Vous devrez le télécharger à nouveau pour écouter hors ligne.",
+    "deleteButton": "Supprimer le fichier",
+    "keepButton": "Conserver le fichier"
+  },
+  "updater": {
+    "available": {
+      "title": "Mise à jour disponible",
+      "message": "Une nouvelle version est disponible :",
+      "download": "Télécharger",
+      "later": "Plus tard"
+    },
+    "ready": {
+      "title": "Mise à jour prête",
+      "message": "Mise à jour téléchargée. Redémarrez pour installer la version :",
+      "restart": "Redémarrer maintenant",
+      "later": "Plus tard"
+    }
+  },
+  "welcome": {
+    "title": "Bienvenue sur Storytel Player !",
+    "message": "Merci d'utiliser Storytel Player, une application de bureau open-source pour vos livres audio. Rejoignez notre communauté pour rester informé et partager vos commentaires !",
+    "starGithub": "Mettre une étoile sur GitHub",
+    "joinDiscord": "Rejoindre Discord",
+    "getStarted": "Commencer"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "community": "Communauté",
+    "githubRepo": "Dépôt GitHub",
+    "discordCommunity": "Rejoindre Discord",
+    "appearance": "Apparence",
+    "alwaysOnTop": "Garder la fenêtre toujours au premier plan",
+    "alwaysOnTopDescription": "La fenêtre restera au-dessus des autres fenêtres",
+    "account": "Compte",
+    "email": "E-mail",
+    "logout": "Se déconnecter",
+    "developer": "Développeur",
+    "viewLogs": "Afficher les journaux de session",
+    "language": "Langue",
+    "languageAuto": "Auto"
+  },
+  "logs": {
+    "title": "Journaux de l'application",
+    "refresh": "Actualiser",
+    "clear": "Effacer",
+    "empty": "Aucun journal trouvé.",
+    "export": "Exporter",
+    "search": "Rechercher dans les journaux...",
+    "typeAll": "Tous les événements",
+    "typeError": "Erreurs",
+    "typeHttp": "Trafic HTTP",
+    "typeAction": "Actions de l'utilisateur",
+    "confirmClear": "Êtes-vous sûr de vouloir effacer tous les journaux ? Cette action est irréversible.",
+    "details": "Détails"
+  }
+}

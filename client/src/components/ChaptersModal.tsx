@@ -1,6 +1,7 @@
 import React from 'react';
 import { Chapter } from '../interfaces/chapters';
 import { useTranslation } from 'react-i18next';
+import Modal from './Modal';
 
 interface ChaptersModalProps {
   isOpen: boolean;

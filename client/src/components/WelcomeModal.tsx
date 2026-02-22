@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import storage from '../utils/storage';
+import Modal from './Modal';
 
 interface WelcomeModalProps {
   isOpen: boolean;
@@ -26,21 +27,8 @@ function WelcomeModal({ isOpen, onClose }: WelcomeModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-      <div className="bg-gray-900 rounded-lg p-6 max-w-md w-full mx-4 border border-gray-700">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold text-white">
-            {t('welcome.title')}
-          </h2>
-          <button
-            onClick={handleGetStarted}
-            className="text-gray-400 hover:text-white"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
+    <Modal isOpen={isOpen} onClose={handleGetStarted} title={t('welcome.title')}>
+      <div className="flex flex-col gap-6">
 
         <p className="text-gray-300 mb-6">
           {t('welcome.message')}
@@ -75,7 +63,7 @@ function WelcomeModal({ isOpen, onClose }: WelcomeModalProps) {
           {t('welcome.getStarted')}
         </button>
       </div>
-    </div>
+    </Modal>
   );
 }
 

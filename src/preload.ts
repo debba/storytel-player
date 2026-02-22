@@ -11,6 +11,7 @@ contextBridge.exposeInMainWorld('electronStore', {
 // Locale API
 contextBridge.exposeInMainWorld('electronLocale', {
   getLocale: (): Promise<string> => ipcRenderer.invoke('get-locale'),
+  setLocale: (locale: string): Promise<boolean> => ipcRenderer.invoke('set-locale', locale),
 });
 
 // Window API
@@ -38,6 +39,11 @@ contextBridge.exposeInMainWorld('trayControls', {
   updateAuthState: (isAuthenticated: boolean): void => {
     ipcRenderer.send('update-auth-state', { isAuthenticated });
   },
+});
+
+// Logs API
+contextBridge.exposeInMainWorld('electronLogs', {
+  openLogsFolder: (): Promise<void> => ipcRenderer.invoke('open-logs-folder'),
 });
 
 // Electron API

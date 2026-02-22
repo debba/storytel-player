@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import Modal from './Modal';
 
 interface ConfirmLogoutModalProps {
   isOpen: boolean;
@@ -13,15 +14,12 @@ function ConfirmLogoutModal({ isOpen, onConfirm, onCancel }: ConfirmLogoutModalP
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-      <div className="bg-gray-900 rounded-lg p-6 max-w-md w-full mx-4 border border-gray-700">
-        <h2 className="text-xl font-semibold text-white mb-4">
-          {t('logout.confirmTitle')}
-        </h2>
+    <Modal isOpen={isOpen} onClose={onCancel} title={t('logout.confirmTitle')}>
+      <div className="flex flex-col">
         <p className="text-gray-300 mb-6">
           {t('logout.confirmMessage')}
         </p>
-        <div className="flex justify-end space-x-3">
+        <div className="flex justify-end space-x-3 mt-4">
           <button
             onClick={onCancel}
             className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-md transition-colors"
@@ -36,7 +34,7 @@ function ConfirmLogoutModal({ isOpen, onConfirm, onCancel }: ConfirmLogoutModalP
           </button>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }
 

@@ -1,0 +1,189 @@
+{
+  "login": {
+    "title": "Logga in på Storytel",
+    "subtitle": "Få tillgång till ditt ljudboksbibliotek",
+    "email": "E-postadress",
+    "password": "Lösenord",
+    "signIn": "Logga in",
+    "signingIn": "Loggar in...",
+    "errors": {
+      "required": "Vänligen ange både e-post och lösenord",
+      "failed": "Inloggningen misslyckades"
+    }
+  },
+  "dashboard": {
+    "title": "Mitt bibliotek",
+    "logout": "Logga ut",
+    "settings": "Inställningar",
+    "search": "Sök böcker...",
+    "noBooks": "Inga böcker hittades",
+    "emptyLibrary": "Ditt bibliotek verkar vara tomt.",
+    "loading": "Laddar ditt bibliotek...",
+    "loadError": "Kunde inte ladda bokhyllan",
+    "filters": {
+      "notStarted": "Ej påbörjad",
+      "started": "Påbörjad",
+      "concluded": "Avslutad"
+    }
+  },
+  "player": {
+    "chapters": "Kapitel",
+    "bookmarks": "Bokmärken",
+    "addBookmark": "Lägg till bokmärke",
+    "speed": "Hastighet",
+    "goTo": "Gå till",
+    "goto": "Gå till",
+    "playing": "Spelar",
+    "paused": "Pausad",
+    "nowPlaying": "Spelas nu:",
+    "loadingAudio": "Laddar ljud...",
+    "loadingBookData": "Laddar bokdata...",
+    "loadError": "Kunde inte ladda ljudström",
+    "loadChaptersError": "Kunde inte ladda kapitel",
+    "loadBookmarksError": "Kunde inte ladda bokmärken"
+  },
+  "bookmarks": {
+    "title": "Dina bokmärken",
+    "noBookmarks": "Inga bokmärken sparade",
+    "createNew": "Skapa nytt bokmärke",
+    "createTitle": "Skapa nytt bokmärke",
+    "editTitle": "Redigera bokmärke",
+    "deleteTitle": "Ta bort bokmärke",
+    "deleteConfirm": "Är du säker på att du vill ta bort det här bokmärket?",
+    "deleteWarning": "Denna åtgärd kan inte ångras.",
+    "currentPosition": "Aktuell position:",
+    "position": "Position:",
+    "note": "Anteckning",
+    "noteOptional": "Anteckning (valfritt)",
+    "notePlaceholderCreate": "Lägg till en anteckning till det här bokmärket...",
+    "notePlaceholderEdit": "Redigera anteckningen för det här bokmärket...",
+    "save": "Spara bokmärke",
+    "saveChanges": "Spara ändringar",
+    "tooltipEdit": "Redigera bokmärke",
+    "tooltipDelete": "Ta bort bokmärke"
+  },
+  "common": {
+    "loading": "Laddar...",
+    "error": "Fel",
+    "cancel": "Avbryt",
+    "save": "Spara",
+    "delete": "Ta bort",
+    "close": "Stäng"
+  },
+  "bookCard": {
+    "completed": "Slutförd",
+    "remaining": "kvar",
+    "author": "Författare:",
+    "narrator": "Uppläsare:"
+  },
+  "bookView": {
+    "saved": "Sparad",
+    "listen": "Lyssna",
+    "language": "Språk",
+    "duration": "Längd",
+    "category": "Kategori",
+    "noDescription": "Ingen beskrivning tillgänglig.",
+    "showMore": "visa mer",
+    "showLess": "visa mindre",
+    "details": "Bokdetaljer:"
+  },
+  "chapters": {
+    "title": "Kapitel",
+    "noChapters": "Inga kapitel tillgängliga",
+    "chapter": "Kapitel"
+  },
+  "gotoModal": {
+    "title": "Gå till tid",
+    "description": "Ange önskad tid (med hänsyn till {{speed}}x hastighet)",
+    "hours": "Timmar",
+    "minutes": "Min",
+    "seconds": "Sek",
+    "cancel": "Avbryt",
+    "go": "Gå"
+  },
+  "playbackSpeed": {
+    "title": "Uppspelningshastighet",
+    "presets": "Förinställda hastigheter",
+    "custom": "Anpassad hastighet",
+    "confirm": "Bekräfta"
+  },
+  "tray": {
+    "noBookPlaying": "Ingen bok spelas just nu",
+    "showApp": "Visa app",
+    "play": "Spela",
+    "pause": "Pausa",
+    "playPause": "Spela/Pausa",
+    "playbackSpeed": "Uppspelningshastighet",
+    "logout": "Logga ut",
+    "quit": "Avsluta"
+  },
+  "logout": {
+    "confirmTitle": "Bekräfta utloggning",
+    "confirmMessage": "Är du säker på att du vill logga ut?",
+    "confirmButton": "Logga ut",
+    "cancelButton": "Avbryt"
+  },
+  "download": {
+    "cancelTitle": "Avbryt nedladdning",
+    "cancelMessage": "Är du säker på att du vill avbryta den pågående nedladdningen?",
+    "cancelWarning": "Den delvis nedladdade filen kommer att tas bort.",
+    "cancelButton": "Avbryt nedladdning",
+    "continueButton": "Fortsätt nedladdning",
+    "deleteTitle": "Ta bort nedladdad fil",
+    "deleteMessage": "Är du säker på att du vill ta bort den nedladdade filen?",
+    "deleteWarning": "Du måste ladda ner den igen för att lyssna offline.",
+    "deleteButton": "Ta bort fil",
+    "keepButton": "Behåll fil"
+  },
+  "updater": {
+    "available": {
+      "title": "Uppdatering tillgänglig",
+      "message": "En ny version är tillgänglig:",
+      "download": "Ladda ner",
+      "later": "Senare"
+    },
+    "ready": {
+      "title": "Uppdatering redo",
+      "message": "Uppdatering nedladdad. Starta om för att installera version:",
+      "restart": "Starta om nu",
+      "later": "Senare"
+    }
+  },
+  "welcome": {
+    "title": "Välkommen till Storytel Player!",
+    "message": "Tack för att du använder Storytel Player, en open-source skrivbordsapplikation för dina ljudböcker. Gå med i vår community för att hålla dig uppdaterad och dela feedback!",
+    "starGithub": "Ge en stjärna på GitHub",
+    "joinDiscord": "Gå med i Discord",
+    "getStarted": "Kom igång"
+  },
+  "settings": {
+    "title": "Inställningar",
+    "community": "Community",
+    "githubRepo": "GitHub Repository",
+    "discordCommunity": "Gå med i Discord",
+    "appearance": "Utseende",
+    "alwaysOnTop": "Håll fönstret alltid överst",
+    "alwaysOnTopDescription": "Fönstret kommer att stanna ovanför andra fönster",
+    "account": "Konto",
+    "email": "E-post",
+    "logout": "Logga ut",
+    "developer": "Utvecklare",
+    "viewLogs": "Visa sessionsloggar",
+    "language": "Språk",
+    "languageAuto": "Auto"
+  },
+  "logs": {
+    "title": "Applikationsloggar",
+    "refresh": "Uppdatera",
+    "clear": "Rensa",
+    "empty": "Inga loggar hittades.",
+    "export": "Exportera",
+    "search": "Sök loggar...",
+    "typeAll": "Alla händelser",
+    "typeError": "Fel",
+    "typeHttp": "HTTP-trafik",
+    "typeAction": "Användaråtgärder",
+    "confirmClear": "Är du säker på att du vill rensa alla loggar? Denna åtgärd kan inte ångras.",
+    "details": "Detaljer"
+  }
+}

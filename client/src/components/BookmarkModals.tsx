@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {formatTime} from "../utils/helpers";
 import { Bookmark } from "../interfaces/bookmarks";
+import Modal from './Modal';
 
 interface BookmarkModalsProps {
   // Bookmarks Modal

@@ -27,7 +27,12 @@ export class ServerManager {
     });
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
-        throw new Error('Request failed with status code ' + response.status);
+      let errorData: any = {};
+      try { errorData = response.json(); } catch {}
+      const err: any = new Error(errorData?.error || `Request failed with status code ${response.statusCode}`);
+      err.statusCode = response.statusCode;
+      err.data = errorData;
+      throw err;
     }
 
     return {

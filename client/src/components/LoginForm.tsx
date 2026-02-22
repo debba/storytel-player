@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import api from '../utils/api';
+import api, { trackAction } from '../utils/api';
 import storage from "../utils/storage";
 
 // TODO: Define proper interface for LoginForm props
@@ -26,6 +26,7 @@ function LoginForm({ onLogin }: { onLogin: any }) {
     setError('');
 
     try {
+      trackAction('User attempted login', { email });
       const response = await api.post('/login', { email, password });
       const { token } = response.data;
       await storage.set('token', token);

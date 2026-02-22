@@ -18,6 +18,10 @@ declare global {
     };
     electronLocale?: {
       getLocale: () => Promise<string>;
+      setLocale: (locale: string) => Promise<boolean>;
+    };
+    electronLogs?: {
+      openLogsFolder: () => Promise<void>;
     };
     electronWindow?: {
       setAlwaysOnTop: (alwaysOnTop: boolean) => Promise<void>;

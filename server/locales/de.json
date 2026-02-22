@@ -1,0 +1,189 @@
+{
+  "login": {
+    "title": "Bei Storytel anmelden",
+    "subtitle": "Zugriff auf Ihre Hörbuch-Bibliothek",
+    "email": "E-Mail-Adresse",
+    "password": "Passwort",
+    "signIn": "Anmelden",
+    "signingIn": "Anmeldung läuft...",
+    "errors": {
+      "required": "Bitte geben Sie sowohl E-Mail als auch Passwort ein",
+      "failed": "Anmeldung fehlgeschlagen"
+    }
+  },
+  "dashboard": {
+    "title": "Meine Bibliothek",
+    "logout": "Abmelden",
+    "settings": "Einstellungen",
+    "search": "Bücher suchen...",
+    "noBooks": "Keine Bücher gefunden",
+    "emptyLibrary": "Ihre Bibliothek scheint leer zu sein.",
+    "loading": "Bibliothek wird geladen...",
+    "loadError": "Bücherregal konnte nicht geladen werden",
+    "filters": {
+      "notStarted": "Nicht begonnen",
+      "started": "Begonnen",
+      "concluded": "Abgeschlossen"
+    }
+  },
+  "player": {
+    "chapters": "Kapitel",
+    "bookmarks": "Lesezeichen",
+    "addBookmark": "Lesezeichen hinzufügen",
+    "speed": "Geschwindigkeit",
+    "goTo": "Gehe zu",
+    "goto": "Gehe zu",
+    "playing": "Wiedergabe",
+    "paused": "Pausiert",
+    "nowPlaying": "Aktuelle Wiedergabe:",
+    "loadingAudio": "Audio wird geladen...",
+    "loadingBookData": "Buchdaten werden geladen...",
+    "loadError": "Audiostream konnte nicht geladen werden",
+    "loadChaptersError": "Kapitel konnten nicht geladen werden",
+    "loadBookmarksError": "Lesezeichen konnten nicht geladen werden"
+  },
+  "bookmarks": {
+    "title": "Ihre Lesezeichen",
+    "noBookmarks": "Keine Lesezeichen gespeichert",
+    "createNew": "Neues Lesezeichen erstellen",
+    "createTitle": "Neues Lesezeichen erstellen",
+    "editTitle": "Lesezeichen bearbeiten",
+    "deleteTitle": "Lesezeichen löschen",
+    "deleteConfirm": "Möchten Sie dieses Lesezeichen wirklich löschen?",
+    "deleteWarning": "Diese Aktion kann nicht rückgängig gemacht werden.",
+    "currentPosition": "Aktuelle Position:",
+    "position": "Position:",
+    "note": "Notiz",
+    "noteOptional": "Notiz (optional)",
+    "notePlaceholderCreate": "Fügen Sie diesem Lesezeichen eine Notiz hinzu...",
+    "notePlaceholderEdit": "Bearbeiten Sie die Notiz für dieses Lesezeichen...",
+    "save": "Lesezeichen speichern",
+    "saveChanges": "Änderungen speichern",
+    "tooltipEdit": "Lesezeichen bearbeiten",
+    "tooltipDelete": "Lesezeichen löschen"
+  },
+  "common": {
+    "loading": "Wird geladen...",
+    "error": "Fehler",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "delete": "Löschen",
+    "close": "Schließen"
+  },
+  "bookCard": {
+    "completed": "Abgeschlossen",
+    "remaining": "verbleibend",
+    "author": "Autor:",
+    "narrator": "Sprecher:"
+  },
+  "bookView": {
+    "saved": "Gespeichert",
+    "listen": "Anhören",
+    "language": "Sprache",
+    "duration": "Dauer",
+    "category": "Kategorie",
+    "noDescription": "Keine Beschreibung verfügbar.",
+    "showMore": "mehr anzeigen",
+    "showLess": "weniger anzeigen",
+    "details": "Buchdetails:"
+  },
+  "chapters": {
+    "title": "Kapitel",
+    "noChapters": "Keine Kapitel verfügbar",
+    "chapter": "Kapitel"
+  },
+  "gotoModal": {
+    "title": "Gehe zu Zeit",
+    "description": "Geben Sie die gewünschte Zeit ein (unter Berücksichtigung der {{speed}}x Geschwindigkeit)",
+    "hours": "Stunden",
+    "minutes": "Min",
+    "seconds": "Sek",
+    "cancel": "Abbrechen",
+    "go": "Los"
+  },
+  "playbackSpeed": {
+    "title": "Wiedergabegeschwindigkeit",
+    "presets": "Voreingestellte Geschwindigkeiten",
+    "custom": "Benutzerdefinierte Geschwindigkeit",
+    "confirm": "Bestätigen"
+  },
+  "tray": {
+    "noBookPlaying": "Derzeit wird kein Buch abgespielt",
+    "showApp": "App anzeigen",
+    "play": "Abspielen",
+    "pause": "Pause",
+    "playPause": "Abspielen/Pause",
+    "playbackSpeed": "Wiedergabegeschwindigkeit",
+    "logout": "Abmelden",
+    "quit": "Beenden"
+  },
+  "logout": {
+    "confirmTitle": "Abmelden bestätigen",
+    "confirmMessage": "Möchten Sie sich wirklich abmelden?",
+    "confirmButton": "Abmelden",
+    "cancelButton": "Abbrechen"
+  },
+  "download": {
+    "cancelTitle": "Download abbrechen",
+    "cancelMessage": "Möchten Sie den laufenden Download wirklich abbrechen?",
+    "cancelWarning": "Die teilweise heruntergeladene Datei wird gelöscht.",
+    "cancelButton": "Download abbrechen",
+    "continueButton": "Download fortsetzen",
+    "deleteTitle": "Heruntergeladene Datei löschen",
+    "deleteMessage": "Möchten Sie die heruntergeladene Datei wirklich löschen?",
+    "deleteWarning": "Sie müssen sie erneut herunterladen, um sie offline anzuhören.",
+    "deleteButton": "Datei löschen",
+    "keepButton": "Datei behalten"
+  },
+  "updater": {
+    "available": {
+      "title": "Update verfügbar",
+      "message": "Eine neue Version ist verfügbar:",
+      "download": "Herunterladen",
+      "later": "Später"
+    },
+    "ready": {
+      "title": "Update bereit",
+      "message": "Update heruntergeladen. Starten Sie neu, um die Version zu installieren:",
+      "restart": "Jetzt neu starten",
+      "later": "Später"
+    }
+  },
+  "welcome": {
+    "title": "Willkommen bei Storytel Player!",
+    "message": "Vielen Dank, dass Sie Storytel Player verwenden, eine Open-Source-Desktop-Anwendung für Ihre Hörbücher. Treten Sie unserer Community bei, um auf dem Laufenden zu bleiben und Feedback zu teilen!",
+    "starGithub": "Stern auf GitHub",
+    "joinDiscord": "Discord beitreten",
+    "getStarted": "Loslegen"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "community": "Community",
+    "githubRepo": "GitHub-Repository",
+    "discordCommunity": "Discord beitreten",
+    "appearance": "Erscheinungsbild",
+    "alwaysOnTop": "Fenster immer im Vordergrund halten",
+    "alwaysOnTopDescription": "Das Fenster bleibt über anderen Fenstern",
+    "account": "Konto",
+    "email": "E-Mail",
+    "logout": "Abmelden",
+    "developer": "Entwickler",
+    "viewLogs": "Sitzungsprotokolle anzeigen",
+    "language": "Sprache",
+    "languageAuto": "Auto"
+  },
+  "logs": {
+    "title": "Anwendungsprotokolle",
+    "refresh": "Aktualisieren",
+    "clear": "Leeren",
+    "empty": "Keine Protokolle gefunden.",
+    "export": "Exportieren",
+    "search": "Protokolle durchsuchen...",
+    "typeAll": "Alle Ereignisse",
+    "typeError": "Fehler",
+    "typeHttp": "HTTP-Verkehr",
+    "typeAction": "Benutzeraktionen",
+    "confirmClear": "Möchten Sie wirklich alle Protokolle löschen? Dies kann nicht rückgängig gemacht werden.",
+    "details": "Details"
+  }
+}

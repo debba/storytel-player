@@ -1,0 +1,189 @@
+{
+  "login": {
+    "title": "Iniciar sesión en Storytel",
+    "subtitle": "Accede a tu biblioteca de audiolibros",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "signIn": "Iniciar sesión",
+    "signingIn": "Iniciando sesión...",
+    "errors": {
+      "required": "Por favor, introduce tanto el correo electrónico como la contraseña",
+      "failed": "Error al iniciar sesión"
+    }
+  },
+  "dashboard": {
+    "title": "Mi Biblioteca",
+    "logout": "Cerrar sesión",
+    "settings": "Configuración",
+    "search": "Buscar libros...",
+    "noBooks": "No se encontraron libros",
+    "emptyLibrary": "Tu biblioteca parece estar vacía.",
+    "loading": "Cargando tu biblioteca...",
+    "loadError": "Error al cargar la biblioteca",
+    "filters": {
+      "notStarted": "No empezado",
+      "started": "Empezado",
+      "concluded": "Terminado"
+    }
+  },
+  "player": {
+    "chapters": "Capítulos",
+    "bookmarks": "Marcadores",
+    "addBookmark": "Añadir marcador",
+    "speed": "Velocidad",
+    "goTo": "Ir a",
+    "goto": "Ir a",
+    "playing": "Reproduciendo",
+    "paused": "Pausado",
+    "nowPlaying": "Reproduciendo ahora:",
+    "loadingAudio": "Cargando audio...",
+    "loadingBookData": "Cargando datos del libro...",
+    "loadError": "Error al cargar el flujo de audio",
+    "loadChaptersError": "Error al cargar los capítulos",
+    "loadBookmarksError": "Error al cargar los marcadores"
+  },
+  "bookmarks": {
+    "title": "Tus Marcadores",
+    "noBookmarks": "No hay marcadores guardados",
+    "createNew": "Crear nuevo marcador",
+    "createTitle": "Crear nuevo marcador",
+    "editTitle": "Editar marcador",
+    "deleteTitle": "Eliminar marcador",
+    "deleteConfirm": "¿Estás seguro de que quieres eliminar este marcador?",
+    "deleteWarning": "Esta acción no se puede deshacer.",
+    "currentPosition": "Posición actual:",
+    "position": "Posición:",
+    "note": "Nota",
+    "noteOptional": "Nota (opcional)",
+    "notePlaceholderCreate": "Añade una nota a este marcador...",
+    "notePlaceholderEdit": "Edita la nota de este marcador...",
+    "save": "Guardar marcador",
+    "saveChanges": "Guardar cambios",
+    "tooltipEdit": "Editar marcador",
+    "tooltipDelete": "Eliminar marcador"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "close": "Cerrar"
+  },
+  "bookCard": {
+    "completed": "Completado",
+    "remaining": "restante",
+    "author": "Autor:",
+    "narrator": "Narrador:"
+  },
+  "bookView": {
+    "saved": "Guardado",
+    "listen": "Escuchar",
+    "language": "Idioma",
+    "duration": "Duración",
+    "category": "Categoría",
+    "noDescription": "No hay descripción disponible.",
+    "showMore": "mostrar más",
+    "showLess": "mostrar menos",
+    "details": "Detalles del libro:"
+  },
+  "chapters": {
+    "title": "Capítulos",
+    "noChapters": "No hay capítulos disponibles",
+    "chapter": "Capítulo"
+  },
+  "gotoModal": {
+    "title": "Ir al tiempo",
+    "description": "Introduce el tiempo deseado (considerando la velocidad {{speed}}x)",
+    "hours": "Horas",
+    "minutes": "Min",
+    "seconds": "Seg",
+    "cancel": "Cancelar",
+    "go": "Ir"
+  },
+  "playbackSpeed": {
+    "title": "Velocidad de reproducción",
+    "presets": "Velocidades predefinidas",
+    "custom": "Velocidad personalizada",
+    "confirm": "Confirmar"
+  },
+  "tray": {
+    "noBookPlaying": "Ningún libro reproduciéndose ahora",
+    "showApp": "Mostrar aplicación",
+    "play": "Reproducir",
+    "pause": "Pausar",
+    "playPause": "Reproducir/Pausar",
+    "playbackSpeed": "Velocidad de reproducción",
+    "logout": "Cerrar sesión",
+    "quit": "Salir"
+  },
+  "logout": {
+    "confirmTitle": "Confirmar cierre de sesión",
+    "confirmMessage": "¿Estás seguro de que quieres cerrar sesión?",
+    "confirmButton": "Cerrar sesión",
+    "cancelButton": "Cancelar"
+  },
+  "download": {
+    "cancelTitle": "Cancelar descarga",
+    "cancelMessage": "¿Estás seguro de que quieres cancelar la descarga en curso?",
+    "cancelWarning": "El archivo descargado parcialmente se eliminará.",
+    "cancelButton": "Cancelar descarga",
+    "continueButton": "Continuar descarga",
+    "deleteTitle": "Eliminar archivo descargado",
+    "deleteMessage": "¿Estás seguro de que quieres eliminar el archivo descargado?",
+    "deleteWarning": "Tendrás que descargarlo de nuevo para escuchar sin conexión.",
+    "deleteButton": "Eliminar archivo",
+    "keepButton": "Conservar archivo"
+  },
+  "updater": {
+    "available": {
+      "title": "Actualización disponible",
+      "message": "Hay una nueva versión disponible:",
+      "download": "Descargar",
+      "later": "Más tarde"
+    },
+    "ready": {
+      "title": "Actualización lista",
+      "message": "Actualización descargada. Reinicia para instalar la versión:",
+      "restart": "Reiniciar ahora",
+      "later": "Más tarde"
+    }
+  },
+  "welcome": {
+    "title": "¡Bienvenido a Storytel Player!",
+    "message": "Gracias por usar Storytel Player, una aplicación de escritorio de código abierto para tus audiolibros. ¡Únete a nuestra comunidad para mantenerte actualizado y compartir tus comentarios!",
+    "starGithub": "Dar estrella en GitHub",
+    "joinDiscord": "Unirse a Discord",
+    "getStarted": "Empezar"
+  },
+  "settings": {
+    "title": "Configuración",
+    "community": "Comunidad",
+    "githubRepo": "Repositorio de GitHub",
+    "discordCommunity": "Unirse a Discord",
+    "appearance": "Apariencia",
+    "alwaysOnTop": "Mantener la ventana siempre visible",
+    "alwaysOnTopDescription": "La ventana se mantendrá por encima de otras ventanas",
+    "account": "Cuenta",
+    "email": "Correo electrónico",
+    "logout": "Cerrar sesión",
+    "developer": "Desarrollador",
+    "viewLogs": "Ver registros de sesión",
+    "language": "Idioma",
+    "languageAuto": "Auto"
+  },
+  "logs": {
+    "title": "Registros de la aplicación",
+    "refresh": "Actualizar",
+    "clear": "Borrar",
+    "empty": "No se encontraron registros.",
+    "export": "Exportar",
+    "search": "Buscar registros...",
+    "typeAll": "Todos los eventos",
+    "typeError": "Errores",
+    "typeHttp": "Tráfico HTTP",
+    "typeAction": "Acciones del usuario",
+    "confirmClear": "¿Estás seguro de que quieres borrar todos los registros? Esta acción no se puede deshacer.",
+    "details": "Detalles"
+  }
+}

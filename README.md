@@ -27,6 +27,8 @@
 
 ✅ **Cross-Platform**: Available for Windows, macOS (x64/ARM64), and Linux (x64/ARM64/ARMv7)
 
+✅ **Action Logging**: Internal logging of HTTP requests, responses, and user actions, exportable for debugging
+
 ✅ **Development Mode**: Hot reload for both client and server during development
 
 ✅ **Offline Listening**: Download audiobooks for offline playback
@@ -47,6 +49,7 @@ The application is built with TypeScript and follows a modular architecture:
   - IPC Manager: Inter-process communication between Electron and React
 - **Authentication**: Session-based authentication with secure storage
 - **Audio Streaming**: Direct integration with Storytel's streaming API
+- **Logging**: In-memory and file-based (app.log in the config directory) logging of system events and HTTP traffic
 
 ## Prerequisites
 

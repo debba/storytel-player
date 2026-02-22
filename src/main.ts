@@ -19,6 +19,7 @@ async function initialize(): Promise<void> {
 
     process.env.IS_ELECTRON = 'true';
     process.env.DOWNLOAD_PATH = app.getPath('downloads');
+    process.env.USER_DATA_PATH = app.getPath('userData');
 
     windowManager = new WindowManager(isDev, isDebug);
     const mainWindow = windowManager.create();

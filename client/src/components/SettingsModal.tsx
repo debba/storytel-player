@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import api from '../utils/api';
+import LogsModal from './LogsModal';
+import Modal from './Modal';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -9,15 +11,18 @@ interface SettingsModalProps {
 }
 
 function SettingsModal({ isOpen, onClose, onLogout }: SettingsModalProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [email, setEmail] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [alwaysOnTop, setAlwaysOnTop] = useState<boolean>(false);
+  const [showLogsModal, setShowLogsModal] = useState<boolean>(false);
+  const [appLanguage, setAppLanguage] = useState<string>('auto');
 
   useEffect(() => {
     if (isOpen) {
       fetchAccountInfo();
       fetchAlwaysOnTopSetting();
+      fetchAppLanguage();
     }
   }, [isOpen]);
 
@@ -43,6 +48,17 @@ function SettingsModal({ isOpen, onClose, onLogout }: SettingsModalProps) {
       console.error('Failed to fetch always on top setting:', error);
     }
   };
+  
+  const fetchAppLanguage = async () => {
+    try {
+      if (window.electronStore) {
+        const lang = await window.electronStore.get('appLanguage');
+        setAppLanguage(lang || 'auto');
+      }
+    } catch (error) {
+      console.error('Failed to fetch app language setting:', error);
+    }
+  };
 
   const handleAlwaysOnTopToggle = async () => {
     try {
@@ -53,6 +69,33 @@ function SettingsModal({ isOpen, onClose, onLogout }: SettingsModalProps) {
       }
     } catch (error) {
       console.error('Failed to toggle always on top:', error);
+    }
+  };
+  
+  const handleLanguageChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newLang = e.target.value;
+    setAppLanguage(newLang);
+    
+    try {
+      if (window.electronLocale?.setLocale) {
+        await window.electronLocale.setLocale(newLang);
+        
+        if (newLang === 'auto') {
+          // Re-trigger auto detection in frontend
+          const electronLocale = await window.electronLocale.getLocale();
+          const languageCode = electronLocale.split('-')[0];
+          const supported = ['en', 'it', 'fr', 'es', 'de', 'sv'];
+          if (supported.includes(languageCode)) {
+            i18n.changeLanguage(languageCode);
+          } else {
+            i18n.changeLanguage('en');
+          }
+        } else {
+          i18n.changeLanguage(newLang);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to change language:', error);
     }
   };
 
@@ -67,21 +110,9 @@ function SettingsModal({ isOpen, onClose, onLogout }: SettingsModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-      <div className="bg-gray-900 rounded-lg p-6 max-w-md w-full mx-4 border border-gray-700">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold text-white">
-            {t('settings.title')}
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-white"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
+    <>
+    <Modal isOpen={isOpen} onClose={onClose} title={t('settings.title')}>
+      <div className="flex flex-col">
 
         {/* Appearance Section */}
         <div className="mb-6">
@@ -89,7 +120,7 @@ function SettingsModal({ isOpen, onClose, onLogout }: SettingsModalProps) {
             {t('settings.appearance')}
           </h3>
           <div className="border-t border-gray-700 mb-3"></div>
-          <div className="bg-gray-800 rounded-md p-4">
+          <div className="bg-gray-800 rounded-md p-4 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <div className="text-white font-medium mb-1">
@@ -111,6 +142,25 @@ function SettingsModal({ isOpen, onClose, onLogout }: SettingsModalProps) {
                   }`}
                 />
               </button>
+            </div>
+            
+            <div className="flex items-center justify-between pt-4 border-t border-gray-700">
+              <div className="text-white font-medium">
+                {t('settings.language', 'Language')}
+              </div>
+              <select
+                value={appLanguage}
+                onChange={handleLanguageChange}
+                className="bg-gray-900 text-white border border-gray-700 rounded px-3 py-1 outline-none focus:border-orange-500"
+              >
+                <option value="auto">{t('settings.languageAuto', 'Auto')}</option>
+                <option value="en">English</option>
+                <option value="it">Italiano</option>
+                <option value="fr">Français</option>
+                <option value="es">Español</option>
+                <option value="de">Deutsch</option>
+                <option value="sv">Svenska</option>
+              </select>
             </div>
           </div>
         </div>
@@ -144,6 +194,25 @@ function SettingsModal({ isOpen, onClose, onLogout }: SettingsModalProps) {
           </div>
         </div>
 
+        {/* Developer Section */}
+        <div className="mb-6">
+          <h3 className="text-sm font-semibold text-gray-400 uppercase mb-3">
+            {t('settings.developer', 'Developer')}
+          </h3>
+          <div className="border-t border-gray-700 mb-3"></div>
+          <div className="space-y-2">
+            <button
+              onClick={() => setShowLogsModal(true)}
+              className="w-full flex items-center justify-between px-4 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-md transition-colors"
+            >
+              <span>{t('settings.viewLogs', 'View Session Logs')}</span>
+              <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
         {/* Account Section */}
         <div>
           <h3 className="text-sm font-semibold text-gray-400 uppercase mb-3">
@@ -169,7 +238,13 @@ function SettingsModal({ isOpen, onClose, onLogout }: SettingsModalProps) {
           </button>
         </div>
       </div>
-    </div>
+    </Modal>
+      
+    <LogsModal
+      isOpen={showLogsModal}
+      onClose={() => setShowLogsModal(false)}
+    />
+    </>
   );
 }
 

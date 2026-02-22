@@ -1,4 +1,5 @@
-import { ipcMain, IpcMainInvokeEvent } from 'electron';
+import { ipcMain, IpcMainInvokeEvent, shell } from 'electron';
+import path from 'path';
 import { storeManager } from './store';
 import { ServerManager } from './server';
 import { TrayManager } from './tray';
@@ -23,6 +24,7 @@ export class IpcManager {
     this.setupTrayHandlers();
     this.setupLocaleHandlers();
     this.setupWindowHandlers();
+    this.setupLogsHandlers();
   }
 
   private setupStoreHandlers(): void {
@@ -121,6 +123,30 @@ export class IpcManager {
   private setupLocaleHandlers(): void {
     ipcMain.handle('get-locale', () => {
       return i18n.getLanguage();
+    });
+
+    ipcMain.handle('set-locale', (_event: IpcMainInvokeEvent, locale: string) => {
+      storeManager.set('appLanguage', locale);
+      
+      // Update the current language in i18n
+      i18n.detectLanguage();
+      
+      // Refresh fastify translations
+      const fastifyServer = this.serverManager.getServer();
+      if (fastifyServer) {
+        i18n.initialize(fastifyServer).catch(err => {
+          console.error('Failed to reinitialize i18n:', err);
+        });
+      }
+      
+      return true;
+    });
+  }
+
+  private setupLogsHandlers(): void {
+    ipcMain.handle('open-logs-folder', () => {
+      const logPath = path.join(process.env.USER_DATA_PATH || '', 'app.log');
+      shell.showItemInFolder(logPath);
     });
   }
 

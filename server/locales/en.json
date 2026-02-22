@@ -166,6 +166,24 @@
     "alwaysOnTopDescription": "Window will stay above other windows",
     "account": "Account",
     "email": "Email",
-    "logout": "Logout"
+    "logout": "Logout",
+    "developer": "Developer",
+    "viewLogs": "View Session Logs",
+    "language": "Language",
+    "languageAuto": "Auto"
+  },
+  "logs": {
+    "title": "Application Logs",
+    "refresh": "Refresh",
+    "clear": "Clear",
+    "empty": "No logs found.",
+    "export": "Export",
+    "search": "Search logs...",
+    "typeAll": "All Events",
+    "typeError": "Errors",
+    "typeHttp": "HTTP Traffic",
+    "typeAction": "User Actions",
+    "confirmClear": "Are you sure you want to clear all logs? This cannot be undone.",
+    "details": "Details"
   }
 }
