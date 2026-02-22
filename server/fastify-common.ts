@@ -489,7 +489,6 @@ fastify.get<{
       }
       reply.send(translations.default);
     } else {
-      const translationsIt = await import("./locales/it.json");
       const translationsEn = await import("./locales/en.json");
       const translationsIt = await import("./locales/it.json");
       const translationsFr = await import("./locales/fr.json");
@@ -497,7 +496,6 @@ fastify.get<{
       const translationsDe = await import("./locales/de.json");
       const translationsSv = await import("./locales/sv.json");
       reply.send({
-        it: translationsIt.default,
         en: translationsEn.default,
         it: translationsIt.default,
         fr: translationsFr.default,
