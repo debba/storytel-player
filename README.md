@@ -10,6 +10,8 @@
 
 **Discord** - [Join our discord server](https://discord.gg/YrZPHAwMSG) and chat with the maintainers.
 
+<img src="docs/assets/og_image.png" width="90%"></img>
+
 ## Release Download:
 [![Windows](https://img.shields.io/badge/Windows-Download-blue?logo=windows)](https://github.com/debba/storytel-player/releases/download/v1.2.8/Storytel-Player-Setup-1.2.8.exe) [![macOS](https://img.shields.io/badge/macOS-Download-black?logo=apple)](https://github.com/debba/storytel-player/releases/download/v1.2.8/Storytel-Player-1.2.8.dmg) [![Linux](https://img.shields.io/badge/Linux-Download-green?logo=linux)](https://github.com/debba/storytel-player/releases/download/v1.2.8/Storytel-Player-1.2.8.AppImage)
 
@@ -31,10 +33,6 @@
 
 > [!NOTE]
 > This is an independent project, not affiliated with Storytel
-
-## Screenshots
-
-<img src="docs/assets/og_image.png" width="90%"></img>
 
 ## Architecture
 
