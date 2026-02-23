@@ -8,7 +8,8 @@
     "signingIn": "Connexion en cours...",
     "errors": {
       "required": "Veuillez entrer votre e-mail et votre mot de passe",
-      "failed": "Échec de la connexion"
+      "failed": "Échec de la connexion",
+      "sessionExpired": "Votre session a expiré. Veuillez vous reconnecter."
     }
   },
   "dashboard": {

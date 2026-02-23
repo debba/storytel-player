@@ -8,7 +8,8 @@
     "signingIn": "Accesso in corso...",
     "errors": {
       "required": "Inserisci sia email che password",
-      "failed": "Accesso fallito"
+      "failed": "Accesso fallito",
+      "sessionExpired": "La tua sessione è scaduta. Effettua nuovamente il login."
     }
   },
   "dashboard": {

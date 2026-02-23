@@ -8,7 +8,8 @@
     "signingIn": "Anmeldung läuft...",
     "errors": {
       "required": "Bitte geben Sie sowohl E-Mail als auch Passwort ein",
-      "failed": "Anmeldung fehlgeschlagen"
+      "failed": "Anmeldung fehlgeschlagen",
+      "sessionExpired": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an."
     }
   },
   "dashboard": {

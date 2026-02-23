@@ -21,6 +21,16 @@ axiosApi.interceptors.request.use(async (config) => {
     return config;
 });
 
+axiosApi.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 401 && !error.config?.url?.includes('/login')) {
+            window.dispatchEvent(new Event('unauthorized'));
+        }
+        return Promise.reject(error);
+    }
+);
+
 const api: AxiosInstance = new Proxy(axiosApi, {
     get(target, prop: string) {
         if (!window.electronApi) return (target as any)[prop];
@@ -31,7 +41,12 @@ const api: AxiosInstance = new Proxy(axiosApi, {
                 const headers = { ...(config?.headers || {}), ...(token ? { Authorization: `Bearer ${token}` } : {}) };
                 const data = prop === "get" || prop === "delete" ? null : dataOrConfig;
                 const finalConfig = { ...config, headers };
-                return window.electronApi[prop](`/api${url}`, data, finalConfig);
+                return window.electronApi[prop](`/api${url}`, data, finalConfig).catch((error: any) => {
+                    if ((error?.response?.status === 401 || error?.status === 401) && !url.includes('/login')) {
+                        window.dispatchEvent(new Event('unauthorized'));
+                    }
+                    return Promise.reject(error);
+                });
             };
         }
 

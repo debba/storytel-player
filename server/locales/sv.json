@@ -8,7 +8,8 @@
     "signingIn": "Loggar in...",
     "errors": {
       "required": "Vänligen ange både e-post och lösenord",
-      "failed": "Inloggningen misslyckades"
+      "failed": "Inloggningen misslyckades",
+      "sessionExpired": "Din session har gått ut. Vänligen logga in igen."
     }
   },
   "dashboard": {

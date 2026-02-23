@@ -37,6 +37,14 @@ dotenv.config({
   quiet: true,
 });
 
+// Sends 401 when the Storytel session expired, 500 for all other errors.
+function replyError(reply: FastifyReply, error: any) {
+  if (error.isStorytelUnauthorized) {
+    return reply.code(401).send({ error: error.message });
+  }
+  return reply.code(500).send({ error: error.message });
+}
+
 const JWT_SECRET =
   process.env.JWT_SECRET ||
   "your-super-secret-jwt-key-change-this-in-production";
@@ -134,7 +142,7 @@ fastify.get(
       const bookshelf = await storytelClient.getBookshelf();
       reply.send(bookshelf);
     } catch (error: any) {
-      reply.code(500).send({ error: error.message });
+      replyError(reply, error);
     }
   },
 );
@@ -191,7 +199,7 @@ fastify.post<{
         reply.send({ streamUrl, remote: true });
       }
     } catch (error: any) {
-      reply.code(500).send({ error: error.message });
+      replyError(reply, error);
     }
   },
 );
@@ -223,7 +231,7 @@ fastify.post<{
 
       reply.send({ success: true, message: "Bookmark saved" });
     } catch (error: any) {
-      reply.code(500).send({ error: error.message });
+      replyError(reply, error);
     }
   },
 );
@@ -251,7 +259,7 @@ fastify.delete<{
 
       reply.send({ success: true, message: "Bookmark removed" });
     } catch (error: any) {
-      reply.code(500).send({ error: error.message });
+      replyError(reply, error);
     }
   },
 );
@@ -284,7 +292,7 @@ fastify.put<{
 
       reply.send({ success: true, message: "Bookmark removed" });
     } catch (error: any) {
-      reply.code(500).send({ error: error.message });
+      replyError(reply, error);
     }
   },
 );
@@ -308,7 +316,7 @@ fastify.get(
       const bookmarks = await storytelClient.getBookmarkPositional();
       reply.send(bookmarks);
     } catch (error: any) {
-      reply.code(500).send({ error: error.message });
+      replyError(reply, error);
     }
   },
 );
@@ -337,7 +345,7 @@ fastify.get<{
         await storytelClient.getBookmarkPositional(consumableId);
       reply.send(bookmarks);
     } catch (error: any) {
-      reply.code(500).send({ error: error.message });
+      replyError(reply, error);
     }
   },
 );
@@ -373,7 +381,7 @@ fastify.put<{
       );
       reply.send(updated);
     } catch (error: any) {
-      reply.code(500).send({ error: error.message });
+      replyError(reply, error);
     }
   },
 );
@@ -401,7 +409,7 @@ fastify.get<{
       const bookmarks = await storytelClient.getBookmark(consumableId);
       reply.send(bookmarks);
     } catch (error: any) {
-      reply.code(500).send({ error: error.message });
+      replyError(reply, error);
     }
   },
 );
@@ -428,7 +436,7 @@ fastify.get<{
         await storytelClient.getPlayBookMetaData(consumableId);
       reply.send(bookInfoContent);
     } catch (error: any) {
-      reply.code(500).send({ error: error.message });
+      replyError(reply, error);
     }
   },
 );
@@ -453,7 +461,7 @@ fastify.get(
     try {
       reply.send({ email: request.user.email });
     } catch (error: any) {
-      reply.code(500).send({ error: error.message });
+      replyError(reply, error);
     }
   },
 );
@@ -617,7 +625,7 @@ fastify.post<{
         }
       }
     } catch (error: any) {
-      reply.code(500).send({ error: error.message });
+      replyError(reply, error);
     }
   },
 );
@@ -665,7 +673,7 @@ fastify.delete<{
       reply.send({ success: true, message: "Download cancelled" });
     } catch (error: any) {
       console.error("Error cancelling download:", error);
-      reply.code(500).send({ error: error.message });
+      replyError(reply, error);
     }
   },
 );
@@ -718,7 +726,7 @@ fastify.get<{ Params: { bookId: string } }>(
         return reply;
       }
     } catch (error: any) {
-      reply.code(500).send({ error: error.message });
+      replyError(reply, error);
     }
   },
 );
@@ -742,7 +750,7 @@ fastify.get<{
       const stream = fs.createReadStream(localFilePath);
       reply.type("audio/mpeg").send(stream);
     } catch (error: any) {
-      reply.code(500).send({ error: error.message });
+      replyError(reply, error);
     }
   },
 );
@@ -763,7 +771,7 @@ fastify.get<{
       const exists = fs.existsSync(localFilePath);
       reply.send({ downloaded: exists });
     } catch (error: any) {
-      reply.code(500).send({ error: error.message });
+      replyError(reply, error);
     }
   },
 );
@@ -790,7 +798,7 @@ fastify.delete<{
 
       reply.send({ success: true, message: "File deleted successfully" });
     } catch (error: any) {
-      reply.code(500).send({ error: error.message });
+      replyError(reply, error);
     }
   },
 );

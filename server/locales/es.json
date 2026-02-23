@@ -8,7 +8,8 @@
     "signingIn": "Iniciando sesión...",
     "errors": {
       "required": "Por favor, introduce tanto el correo electrónico como la contraseña",
-      "failed": "Error al iniciar sesión"
+      "failed": "Error al iniciar sesión",
+      "sessionExpired": "Tu sesión ha expirado. Por favor, inicia sesión de nuevo."
     }
   },
   "dashboard": {

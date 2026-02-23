@@ -25,6 +25,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [triggerLogout, setTriggerLogout] = useState(false);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const [sessionExpired, setSessionExpired] = useState(false);
 
   useEffect(() => {
     checkAuthStatus();
@@ -35,6 +36,19 @@ function App() {
         setTriggerLogout(true);
       });
     }
+  }, []);
+
+  useEffect(() => {
+    const handleUnauthorized = async () => {
+      await storage.remove("token");
+      setIsAuthenticated(false);
+      setSessionExpired(true);
+      if (window.trayControls?.updateAuthState) {
+        window.trayControls.updateAuthState(false);
+      }
+    };
+    window.addEventListener("unauthorized", handleUnauthorized);
+    return () => window.removeEventListener("unauthorized", handleUnauthorized);
   }, []);
 
   const checkAuthStatus = async () => {
@@ -80,6 +94,7 @@ function App() {
 
   const handleLogin = () => {
     setIsAuthenticated(true);
+    setSessionExpired(false);
     if (window.trayControls?.updateAuthState) {
       window.trayControls.updateAuthState(true);
     }
@@ -120,7 +135,7 @@ function App() {
             path="/login"
             element={
               !isAuthenticated ? (
-                <LoginForm onLogin={handleLogin} />
+                <LoginForm onLogin={handleLogin} sessionExpired={sessionExpired} />
               ) : (
                 <Navigate to="/" replace />
               )

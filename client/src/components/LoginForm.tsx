@@ -4,8 +4,12 @@ import { useTranslation } from 'react-i18next';
 import api, { trackAction } from '../utils/api';
 import storage from "../utils/storage";
 
-// TODO: Define proper interface for LoginForm props
-function LoginForm({ onLogin }: { onLogin: any }) {
+interface LoginFormProps {
+  onLogin: () => void;
+  sessionExpired?: boolean;
+}
+
+function LoginForm({ onLogin, sessionExpired }: LoginFormProps) {
   const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -55,6 +59,11 @@ function LoginForm({ onLogin }: { onLogin: any }) {
                 {t('login.subtitle')}
               </p>
             </div>
+            {sessionExpired && (
+              <div className="text-amber-400 text-sm text-center bg-amber-900/20 p-2 rounded-md border border-amber-700">
+                {t('login.errors.sessionExpired')}
+              </div>
+            )}
             <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
               <div className="space-y-4">
                 <div>

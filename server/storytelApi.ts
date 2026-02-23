@@ -89,6 +89,13 @@ class StorytelClient {
           url: cleanUrl,
           data: error.response?.data || error.message,
         });
+        // Propagate Storytel 401 as a distinct error type so Fastify routes
+        // can return 401 to the frontend instead of a generic 500.
+        if (error.response?.status === 401) {
+          const authError: any = new Error("Storytel session expired");
+          authError.isStorytelUnauthorized = true;
+          return Promise.reject(authError);
+        }
         return Promise.reject(error);
       },
     );
@@ -130,6 +137,7 @@ class StorytelClient {
       });
       return response.data.bookmarks;
     } catch (error: any) {
+      if (error.isStorytelUnauthorized) throw error;
       throw new Error(`Failed to get bookmark positional: ${error.message}`);
     }
   }
@@ -161,6 +169,7 @@ class StorytelClient {
       );
       return response.data;
     } catch (error: any) {
+      if (error.isStorytelUnauthorized) throw error;
       throw new Error(`Failed to get bookmark positional: ${error.message}`);
     }
   }
@@ -177,6 +186,7 @@ class StorytelClient {
         ),
       };
     } catch (error: any) {
+      if (error.isStorytelUnauthorized) throw error;
       console.error(error);
       throw new Error(`Failed to get bookshelf: ${error.message}`);
     }
@@ -193,6 +203,7 @@ class StorytelClient {
       });
       return response.data;
     } catch (error: any) {
+      if (error.isStorytelUnauthorized) throw error;
       throw new Error(`Failed to get bookinfo: ${error.message}`);
     }
   }
@@ -206,6 +217,7 @@ class StorytelClient {
         (response.request as any).res.responseUrl || response.headers.location
       );
     } catch (error: any) {
+      if (error.isStorytelUnauthorized) throw error;
       if (error.response && error.response.headers.location) {
         return error.response.headers.location;
       }
@@ -225,6 +237,7 @@ class StorytelClient {
       });
       return response.data;
     } catch (error: any) {
+      if (error.isStorytelUnauthorized) throw error;
       throw new Error(`Failed to get bookmark: ${error.message}`);
     }
   }
@@ -252,6 +265,7 @@ class StorytelClient {
         },
       );
     } catch (error: any) {
+      if (error.isStorytelUnauthorized) throw error;
       throw new Error(`Failed to set bookmark: ${error.message}`);
     }
   }
@@ -279,6 +293,7 @@ class StorytelClient {
         },
       });
     } catch (error: any) {
+      if (error.isStorytelUnauthorized) throw error;
       throw new Error(`Failed to update bookmark: ${error.message}`);
     }
   }
@@ -305,6 +320,7 @@ class StorytelClient {
         },
       });
     } catch (error: any) {
+      if (error.isStorytelUnauthorized) throw error;
       throw new Error(`Failed to delete bookmark: ${error.message}`);
     }
   }
