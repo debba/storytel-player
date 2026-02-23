@@ -1,3 +1,17 @@
+## [1.2.10](https://github.com/debba/storytel-player/compare/v1.2.9...v1.2.10) (2026-02-23)
+
+
+### Bug Fixes
+
+* **core:** improve 401 handling and error propagation across IPC ([006fa5b](https://github.com/debba/storytel-player/commit/006fa5bfcbf83b43779483f87ae3d97098c4d146))
+
+
+### Features
+
+* add session expiration handling across client and server ([09c12ca](https://github.com/debba/storytel-player/commit/09c12ca90800803907e56f4738c94645e085715b))
+
+
+
 ## [1.2.9](https://github.com/debba/storytel-player/compare/v1.2.8...v1.2.9) (2026-02-22)
 
 
