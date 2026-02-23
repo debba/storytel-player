@@ -29,10 +29,15 @@ export class ServerManager {
     if (response.statusCode < 200 || response.statusCode >= 300) {
       let errorData: any = {};
       try { errorData = response.json(); } catch {}
-      const err: any = new Error(errorData?.error || `Request failed with status code ${response.statusCode}`);
-      err.statusCode = response.statusCode;
-      err.data = errorData;
-      throw err;
+      // Return a plain object instead of throwing so that the statusCode
+      // survives the Electron IPC structured-clone boundary (custom Error
+      // properties are stripped when crossing main→renderer).
+      return {
+        __isError: true,
+        statusCode: response.statusCode,
+        error: errorData?.error || `Request failed with status code ${response.statusCode}`,
+        data: errorData,
+      };
     }
 
     return {

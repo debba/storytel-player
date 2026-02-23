@@ -441,6 +441,8 @@ fastify.get<{
   },
 );
 
+
+
 // Route per controllare stato autenticazione
 fastify.get("/api/auth/status", async (request, reply) => {
   try {

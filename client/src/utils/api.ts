@@ -24,7 +24,8 @@ axiosApi.interceptors.request.use(async (config) => {
 axiosApi.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 401 && !error.config?.url?.includes('/login')) {
+        const hadToken = !!error.config?.headers?.Authorization;
+        if (error.response?.status === 401 && hadToken && !error.config?.url?.includes('/login')) {
             window.dispatchEvent(new Event('unauthorized'));
         }
         return Promise.reject(error);
@@ -41,8 +42,22 @@ const api: AxiosInstance = new Proxy(axiosApi, {
                 const headers = { ...(config?.headers || {}), ...(token ? { Authorization: `Bearer ${token}` } : {}) };
                 const data = prop === "get" || prop === "delete" ? null : dataOrConfig;
                 const finalConfig = { ...config, headers };
-                return window.electronApi[prop](`/api${url}`, data, finalConfig).catch((error: any) => {
-                    if ((error?.response?.status === 401 || error?.status === 401) && !url.includes('/login')) {
+                return window.electronApi[prop](`/api${url}`, data, finalConfig).then((result: any) => {
+                    if (result?.__isError) {
+                        const hadToken = !!finalConfig.headers?.Authorization;
+                        if (result.statusCode === 401 && hadToken && !url.includes('/login')) {
+                            window.dispatchEvent(new Event('unauthorized'));
+                        }
+                        const err: any = new Error(result.error);
+                        err.response = { status: result.statusCode, data: result.data };
+                        return Promise.reject(err);
+                    }
+                    return result;
+                }).catch((error: any) => {
+                    // Fallback for unexpected IPC/network errors
+                    const hadToken = !!finalConfig.headers?.Authorization;
+                    const status = error?.response?.status ?? error?.status ?? error?.statusCode;
+                    if (status === 401 && hadToken && !url.includes('/login')) {
                         window.dispatchEvent(new Event('unauthorized'));
                     }
                     return Promise.reject(error);
