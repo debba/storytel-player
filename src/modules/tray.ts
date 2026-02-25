@@ -1,4 +1,4 @@
-import {Tray, Menu, app, shell, dialog} from 'electron';
+import {Tray, Menu, app, shell, dialog, nativeImage} from 'electron';
 import * as path from 'path';
 import {PlayingState} from '../types';
 import {WindowManager} from './window';
@@ -18,8 +18,17 @@ export class TrayManager {
     }
 
     create(): void {
-        const iconPath = path.join(__dirname, '../../../assets/icon.png');
-        this.tray = new Tray(iconPath);
+        let iconPath: string;
+        
+        if (process.platform === 'darwin') {
+            iconPath = path.join(__dirname, '../../../assets/tray-icon-mac.png');
+        } else {
+            iconPath = path.join(__dirname, '../../../assets/tray-icon.png');
+        }
+        
+        let trayIcon = nativeImage.createFromPath(iconPath);
+        
+        this.tray = new Tray(trayIcon);
 
         this.updateMenu();
         this.tray.setToolTip('Storytel Player');
@@ -88,7 +97,7 @@ export class TrayManager {
         menuTemplate.push({
             label: "About",
             click: () => {
-                const appInfo = [];
+                const appInfo: string[] = [];
                 appInfo.push(`storytel-player@${app.getVersion()}\n`);
                 for (const prop in process.versions) {
                     if (
