@@ -1,3 +1,17 @@
+## [1.2.11](https://github.com/debba/storytel-player/compare/v1.2.10...v1.2.11) (2026-02-25)
+
+
+### Bug Fixes
+
+* **tray:** set template image on macOS tray icon ([27ae4d1](https://github.com/debba/storytel-player/commit/27ae4d132de810b634064c68f57a79f50aa2fcd3))
+
+
+### Features
+
+* **tray:** add platform-specific tray icons and use nativeImage ([058087c](https://github.com/debba/storytel-player/commit/058087cf97ce1eeb20298668242b40d2429a167b))
+
+
+
 ## [1.2.10](https://github.com/debba/storytel-player/compare/v1.2.9...v1.2.10) (2026-02-23)
 
 
