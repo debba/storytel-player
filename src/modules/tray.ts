@@ -27,6 +27,9 @@ export class TrayManager {
         }
         
         let trayIcon = nativeImage.createFromPath(iconPath);
+        if (process.platform === 'darwin') {
+            trayIcon.setTemplateImage(true);
+        }
         
         this.tray = new Tray(trayIcon);
 
