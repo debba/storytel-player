@@ -16,9 +16,18 @@
 ## Release Download:
 [![Windows](https://img.shields.io/badge/Windows-Download-blue?logo=windows)](https://github.com/debba/storytel-player/releases/download/v1.2.12/Storytel-Player-Setup-1.2.12.exe) [![macOS](https://img.shields.io/badge/macOS-Download-black?logo=apple)](https://github.com/debba/storytel-player/releases/download/v1.2.12/Storytel-Player-1.2.12.dmg) [![Linux](https://img.shields.io/badge/Linux-Download-green?logo=linux)](https://github.com/debba/storytel-player/releases/download/v1.2.12/Storytel-Player-1.2.12.AppImage)
 
+## What's New in v1.2.12
+
+- **Logs modal**: view and export application logs directly from the dashboard
+- **Library search**: real-time filtering by title, author, or narrator with a Ctrl/Cmd+K keyboard shortcut to focus the search input
+- **Log rotation**: log file is automatically rotated when it exceeds 10 MB, keeping up to 5 archived files (`app.1.log` … `app.5.log`)
+- **Increased timeouts**: higher request timeouts for more resilient streaming
+
+---
+
 ✅ **Native Desktop App**: Cross-platform application with system tray integration and single instance lock
 
-✅ **Audiobook Library**: Browse your Storytel library with cover art and progress tracking
+✅ **Audiobook Library**: Browse your Storytel library with cover art and progress tracking. Supports real-time search by title, author, or narrator (Ctrl/Cmd+K shortcut)
 
 ✅ **Audio Player**: HTML5 audio player with playback controls and bookmarks
 
@@ -28,7 +37,7 @@
 
 ✅ **Cross-Platform**: Available for Windows, macOS (x64/ARM64), and Linux (x64/ARM64/ARMv7)
 
-✅ **Action Logging**: Internal logging of HTTP requests, responses, and user actions, exportable for debugging
+✅ **Action Logging**: Internal logging of HTTP requests, responses, and user actions, exportable for debugging. Log rotation is applied automatically (max 10 MB per file, up to 5 archived files)
 
 ✅ **Development Mode**: Hot reload for both client and server during development
 
