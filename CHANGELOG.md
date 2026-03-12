@@ -1,3 +1,13 @@
+## [1.2.12](https://github.com/debba/storytel-player/compare/v1.2.11...v1.2.12) (2026-03-12)
+
+
+### Features
+
+* **client:** add logs modal and search hotkeys, increase timeouts ([cda8c45](https://github.com/debba/storytel-player/commit/cda8c45179c13622abfcd16076326fdc84ea6daf))
+* **server:** add log rotation and size limit for logger ([37e75a5](https://github.com/debba/storytel-player/commit/37e75a57c1a52ed0b0606b3540a403c3bb006fcc))
+
+
+
 ## [1.2.11](https://github.com/debba/storytel-player/compare/v1.2.10...v1.2.11) (2026-02-25)
 
 
