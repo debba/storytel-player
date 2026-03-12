@@ -35,7 +35,7 @@ class StorytelClient {
       validateStatus: function (status) {
         return status < 400;
       },
-      timeout: 15000,
+      timeout: 30000,
       params: {
         version: "25.38.0",
       },

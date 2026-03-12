@@ -14,6 +14,7 @@ import api from "./utils/api";
 import storage from "./utils/storage";
 import BookView from "./components/BookView";
 import WelcomeModal from "./components/WelcomeModal";
+import LogsModal from "./components/LogsModal";
 
 const useMemoryRouter =
   import.meta.env.VITE_REACT_APP_USE_MEMORY_ROUTER === "true";
@@ -25,6 +26,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [triggerLogout, setTriggerLogout] = useState(false);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const [showLogsModal, setShowLogsModal] = useState(false);
   const [sessionExpired, setSessionExpired] = useState(false);
 
   useEffect(() => {
@@ -36,6 +38,15 @@ function App() {
         setTriggerLogout(true);
       });
     }
+
+    // Keyboard shortcut Ctrl+Alt+D to open logs modal
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 'd') {
+        setShowLogsModal(true);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   useEffect(() => {
@@ -178,6 +189,10 @@ function App() {
             onClose={handleWelcomeClose}
           />
         )}
+        <LogsModal
+          isOpen={showLogsModal}
+          onClose={() => setShowLogsModal(false)}
+        />
       </div>
     </Router>
   );

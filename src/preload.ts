@@ -44,6 +44,9 @@ contextBridge.exposeInMainWorld('trayControls', {
 // Logs API
 contextBridge.exposeInMainWorld('electronLogs', {
   openLogsFolder: (): Promise<void> => ipcRenderer.invoke('open-logs-folder'),
+  onOpenLogsModal: (callback: () => void): void => {
+    ipcRenderer.on('open-logs-modal', callback);
+  },
 });
 
 // Electron API

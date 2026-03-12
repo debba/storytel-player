@@ -40,6 +40,7 @@ async function initialize(): Promise<void> {
 
     ipcManager = new IpcManager(serverManager, trayManager, windowManager);
     ipcManager.setupHandlers();
+
     // Initialize auto-updater
     updaterManager = new UpdaterManager(mainWindow, isDev);
     updaterManager.initialize();

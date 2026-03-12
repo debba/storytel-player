@@ -22,6 +22,7 @@ declare global {
     };
     electronLogs?: {
       openLogsFolder: () => Promise<void>;
+      onOpenLogsModal: (callback: () => void) => void;
     };
     electronWindow?: {
       setAlwaysOnTop: (alwaysOnTop: boolean) => Promise<void>;
