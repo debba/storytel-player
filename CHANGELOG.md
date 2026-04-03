@@ -1,3 +1,12 @@
+## [1.2.13](https://github.com/debba/storytel-player/compare/v1.2.12...v1.2.13) (2026-04-03)
+
+
+### Features
+
+* **docs:** add separate macOS Intel and Apple Silicon downloads ([091c8b5](https://github.com/debba/storytel-player/commit/091c8b5d47bc251c4c4489508f7789e32d4fa733))
+
+
+
 ## [1.2.12](https://github.com/debba/storytel-player/compare/v1.2.11...v1.2.12) (2026-03-12)
 
 
