@@ -14,7 +14,14 @@
 <img src="docs/assets/og_image.png" width="90%"></img>
 
 ## Release Download:
-[![Windows](https://img.shields.io/badge/Windows-Download-blue?logo=windows)](https://github.com/debba/storytel-player/releases/download/v1.2.13/Storytel-Player-Setup-1.2.13.exe) [![macOS Intel](https://img.shields.io/badge/macOS_Intel-Download-black?logo=apple)](https://github.com/debba/storytel-player/releases/download/v1.2.13/Storytel-Player-1.2.13.dmg) [![macOS Apple Silicon](https://img.shields.io/badge/macOS_Apple_Silicon-Download-black?logo=apple)](https://github.com/debba/storytel-player/releases/download/v1.2.13/Storytel-Player-1.2.12-arm64.dmg) [![Linux](https://img.shields.io/badge/Linux-Download-green?logo=linux)](https://github.com/debba/storytel-player/releases/download/v1.2.13/Storytel-Player-1.2.13.AppImage)
+[![Windows](https://img.shields.io/badge/Windows-Download-blue?logo=windows)](https://github.com/debba/storytel-player/releases/download/v1.2.13/Storytel-Player-Setup-1.2.13.exe) [![macOS Intel](https://img.shields.io/badge/macOS_Intel-Download-black?logo=apple)](https://github.com/debba/storytel-player/releases/download/v1.2.13/Storytel-Player-1.2.13.dmg) [![macOS Apple Silicon](https://img.shields.io/badge/macOS_Apple_Silicon-Download-black?logo=apple)](https://github.com/debba/storytel-player/releases/download/v1.2.13/Storytel-Player-1.2.13-arm64.dmg) [![Linux](https://img.shields.io/badge/Linux-Download-green?logo=linux)](https://github.com/debba/storytel-player/releases/download/v1.2.13/Storytel-Player-1.2.13.AppImage)
+
+## What's New in v1.2.13
+
+- **macOS Apple Silicon support**: added native ARM64 build for Apple Silicon Macs (M1/M2/M3/M4), available as a separate DMG download
+- **CI/CD**: updated GitHub Actions workflow to build and publish macOS ARM64 artifacts
+
+> No functional changes — this release adds the missing macOS ARM64 build to the release pipeline.
 
 ## What's New in v1.2.12
 
