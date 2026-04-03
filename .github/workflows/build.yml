@@ -33,7 +33,6 @@ jobs:
         run: npm run electron:dist:linux:x64 -- --publish always
 
   linux_arm64:
-    needs: linux_x64
     runs-on: ubuntu-latest
 
     steps:
@@ -53,7 +52,6 @@ jobs:
         run: npm run electron:dist:linux:arm64 -- --publish always
 
   linux_arm:
-    needs: linux_arm64
     runs-on: ubuntu-latest
 
     steps:
@@ -73,7 +71,6 @@ jobs:
         run: npm run electron:dist:linux:arm -- --publish always
 
   dmg_x64:
-    needs: linux_arm
     runs-on: macos-latest
 
     steps:
@@ -93,7 +90,6 @@ jobs:
         run: npm run electron:dist:mac:x64 -- --publish always
 
   dmg_arm64:
-    needs: dmg_x64
     runs-on: macos-latest
 
     steps:
@@ -113,7 +109,6 @@ jobs:
         run: npm run electron:dist:mac:arm64 -- --publish always
 
   exe:
-    needs: dmg_arm64
     runs-on: windows-latest
 
     steps:
