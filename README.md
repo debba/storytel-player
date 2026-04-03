@@ -14,7 +14,7 @@
 <img src="docs/assets/og_image.png" width="90%"></img>
 
 ## Release Download:
-[![Windows](https://img.shields.io/badge/Windows-Download-blue?logo=windows)](https://github.com/debba/storytel-player/releases/download/v1.2.12/Storytel-Player-Setup-1.2.12.exe) [![macOS](https://img.shields.io/badge/macOS-Download-black?logo=apple)](https://github.com/debba/storytel-player/releases/download/v1.2.12/Storytel-Player-1.2.12.dmg) [![Linux](https://img.shields.io/badge/Linux-Download-green?logo=linux)](https://github.com/debba/storytel-player/releases/download/v1.2.12/Storytel-Player-1.2.12.AppImage)
+[![Windows](https://img.shields.io/badge/Windows-Download-blue?logo=windows)](https://github.com/debba/storytel-player/releases/download/v1.2.12/Storytel-Player-Setup-1.2.12.exe) [![macOS Intel](https://img.shields.io/badge/macOS_Intel-Download-black?logo=apple)](https://github.com/debba/storytel-player/releases/download/v1.2.12/Storytel-Player-1.2.12.dmg) [![macOS Apple Silicon](https://img.shields.io/badge/macOS_Apple_Silicon-Download-black?logo=apple)](https://github.com/debba/storytel-player/releases/download/v1.2.12/Storytel-Player-1.2.12-arm64.dmg) [![Linux](https://img.shields.io/badge/Linux-Download-green?logo=linux)](https://github.com/debba/storytel-player/releases/download/v1.2.12/Storytel-Player-1.2.12.AppImage)
 
 ## What's New in v1.2.12
 

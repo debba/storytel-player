@@ -72,7 +72,7 @@ jobs:
         if: contains(github.ref, 'master')
         run: npm run electron:dist:linux:arm -- --publish always
 
-  dmg:
+  dmg_x64:
     needs: linux_arm
     runs-on: macos-latest
 
@@ -92,8 +92,28 @@ jobs:
         if: contains(github.ref, 'master')
         run: npm run electron:dist:mac:x64 -- --publish always
 
+  dmg_arm64:
+    needs: dmg_x64
+    runs-on: macos-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+
+      - name: Install Node.js and NPM
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build
+        run: npm run install-all
+
+      - name: Release
+        if: contains(github.ref, 'master')
+        run: npm run electron:dist:mac:arm64 -- --publish always
+
   exe:
-    needs: dmg
+    needs: dmg_arm64
     runs-on: windows-latest
 
     steps:
