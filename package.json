@@ -82,6 +82,7 @@
     ],
     "mac": {
       "category": "public.app-category.audio",
+      "artifactName": "${productName}-${version}-mac-${arch}.${ext}",
       "publish": {
         "provider": "github",
         "releaseType": "draft"
