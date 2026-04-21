@@ -113,7 +113,7 @@ fastify.post<{
 
     reply.send({ success: true, message: "Login successful", token });
   } catch (error: any) {
-    reply.code(401).send({ error: error.message });
+    replyError(reply, error);
   }
 });
 
