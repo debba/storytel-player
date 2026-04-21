@@ -124,11 +124,20 @@ class StorytelClient {
   }
 
   async login(email: string, password: string): Promise<LoginData> {
-    const encryptedPassword = encryptPassword(password.trim());
-    const url = `https://www.storytel.com/api/login.action?m=1&uid=${email.trim()}&pwd=${encryptedPassword}`;
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
+    const encryptedPassword = encryptPassword(trimmedPassword);
+    const url = "https://www.storytel.com/api/login.action";
+    const params = {
+      m: 1,
+      uid: trimmedEmail,
+      pwd: encryptedPassword,
+    };
 
     try {
-      const response = await this.client.get<LoginData>(url);
+      const response = await this.client.get<LoginData>(url, {
+        params,
+      });
       this.loginData = response.data;
       return this.loginData;
     } catch (error: any) {
