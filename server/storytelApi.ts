@@ -21,6 +21,13 @@ interface BookmarkResponse {
   bookmarks: Bookmark[];
 }
 
+interface StorytelAuthError extends Error {
+  isStorytelUnauthorized: boolean;
+  storytelStatus?: number;
+  storytelData?: unknown;
+  isLoginFailure?: boolean;
+}
+
 class StorytelClient {
   private client: AxiosInstance;
   public loginData: LoginData;
@@ -77,6 +84,7 @@ class StorytelClient {
       },
       (error) => {
         const url = error.config?.url || "";
+        const isLoginRequest = url.includes("login.action");
         let cleanUrl = url;
         if (cleanUrl.includes("login.action")) {
           cleanUrl = cleanUrl.replace(/pwd=[^&]+/, "pwd=***");
@@ -92,8 +100,15 @@ class StorytelClient {
         // Propagate Storytel 401 as a distinct error type so Fastify routes
         // can return 401 to the frontend instead of a generic 500.
         if (error.response?.status === 401) {
-          const authError: any = new Error("Storytel session expired");
+          const authError: StorytelAuthError = new Error(
+            isLoginRequest
+              ? "Storytel login rejected"
+              : "Storytel session expired",
+          ) as StorytelAuthError;
           authError.isStorytelUnauthorized = true;
+          authError.isLoginFailure = isLoginRequest;
+          authError.storytelStatus = error.response.status;
+          authError.storytelData = error.response.data;
           return Promise.reject(authError);
         }
         return Promise.reject(error);
@@ -109,14 +124,26 @@ class StorytelClient {
   }
 
   async login(email: string, password: string): Promise<LoginData> {
-    const encryptedPassword = encryptPassword(password.trim());
-    const url = `https://www.storytel.com/api/login.action?m=1&uid=${email.trim()}&pwd=${encryptedPassword}`;
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
+    const encryptedPassword = encryptPassword(trimmedPassword);
+    const url = "https://www.storytel.com/api/login.action";
+    const params = {
+      m: 1,
+      uid: trimmedEmail,
+      pwd: encryptedPassword,
+    };
 
     try {
-      const response = await this.client.get<LoginData>(url);
+      const response = await this.client.get<LoginData>(url, {
+        params,
+      });
       this.loginData = response.data;
       return this.loginData;
     } catch (error: any) {
+      if (error.isStorytelUnauthorized) {
+        throw error;
+      }
       throw new Error(`Login failed: ${error.message}`);
     }
   }
