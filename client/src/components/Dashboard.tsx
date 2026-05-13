@@ -60,7 +60,17 @@ function Dashboard({onLogout, triggerLogout, setTriggerLogout}: DashboardProps) 
             const response = await api.get<BookShelfResponse>('/bookshelf');
             setBooks(response.data.books);
         } catch (error: any) {
-            setError(error.response?.data?.error || t('dashboard.loadError'));
+            // Bookshelf requires Storytel API; on failure (typically offline)
+            // fall back to whatever is cached from previous downloads. If the
+            // offline endpoint responds we trust it even when empty, so the
+            // user sees the normal "no books" empty state instead of the raw
+            // network error.
+            try {
+                const offline = await api.get<BookShelfResponse>('/offline/bookshelf');
+                setBooks(offline.data?.books || []);
+            } catch {
+                setError(error.response?.data?.error || t('dashboard.loadError'));
+            }
         } finally {
             setIsLoading(false);
         }

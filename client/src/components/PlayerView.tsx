@@ -131,7 +131,8 @@ function PlayerView() {
             trackAction('User initiated download', { bookId: book?.id, bookName: book?.book?.name || "Unknown" });
 
             const response = await api.post('/download', {
-                bookId
+                bookId,
+                book,
             });
 
             if (response && (response as any).data?.success) {

@@ -21,9 +21,26 @@ interface BookmarkResponse {
   bookmarks: Bookmark[];
 }
 
+export interface SsoSession {
+  storytelSession: string;
+  firebaseRefreshToken: string;
+  firebaseApiKey: string;
+  email: string;
+  cid: string;
+}
+
+const FIREBASE_TOKEN_URL = 'https://securetoken.googleapis.com';
+// The Storytel Firebase API key is browser-restricted: requests without a
+// matching Referer get 403 API_KEY_HTTP_REFERRER_BLOCKED. The Web SDK runs
+// on www.storytel.com, so we mimic that origin from the server.
+const FIREBASE_REFERER = 'https://www.storytel.com/';
+const FIREBASE_ID_TOKEN_TTL_BUFFER_SECONDS = 60;
+
 class StorytelClient {
   private client: AxiosInstance;
   public loginData: LoginData;
+  private ssoSession: SsoSession | null = null;
+  private cachedFirebaseIdToken: { token: string; expiresAt: number } | null = null;
 
   constructor() {
     this.client = axios.create({
@@ -115,10 +132,89 @@ class StorytelClient {
     try {
       const response = await this.client.get<LoginData>(url);
       this.loginData = response.data;
+      this.ssoSession = null;
+      this.cachedFirebaseIdToken = null;
       return this.loginData;
     } catch (error: any) {
       throw new Error(`Login failed: ${error.message}`);
     }
+  }
+
+  loginViaSso(session: SsoSession): void {
+    this.ssoSession = session;
+    this.cachedFirebaseIdToken = null;
+    // Mark legacy credentials as unset so any accidental fallback path errors
+    // visibly instead of using stale data.
+    this.loginData = {
+      accountInfo: { jwt: '', singleSignToken: '' },
+    };
+  }
+
+  getSsoSession(): SsoSession | null {
+    return this.ssoSession;
+  }
+
+  // Token to send as ?token=... on the legacy *.action endpoints. In SSO mode
+  // we substitute the Firebase Session Cookie, which the Storytel API treats
+  // interchangeably with the singleSignToken returned by login.action.
+  private getLegacyActionToken(): string {
+    if (this.ssoSession) return this.ssoSession.storytelSession;
+    return this.loginData.accountInfo.singleSignToken;
+  }
+
+  private async ensureFirebaseIdToken(): Promise<string> {
+    if (!this.ssoSession) {
+      throw new Error('ensureFirebaseIdToken called outside SSO mode');
+    }
+    const now = Math.floor(Date.now() / 1000);
+    const cached = this.cachedFirebaseIdToken;
+    if (cached && cached.expiresAt - FIREBASE_ID_TOKEN_TTL_BUFFER_SECONDS > now) {
+      return cached.token;
+    }
+    const params = new URLSearchParams();
+    params.set('grant_type', 'refresh_token');
+    params.set('refresh_token', this.ssoSession.firebaseRefreshToken);
+    try {
+      const response = await axios.post<{
+        access_token: string;
+        expires_in: string;
+        refresh_token?: string;
+      }>(
+        `${FIREBASE_TOKEN_URL}/v1/token?key=${this.ssoSession.firebaseApiKey}`,
+        params.toString(),
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            Referer: FIREBASE_REFERER,
+            Origin: 'https://www.storytel.com',
+          },
+          timeout: 15000,
+        }
+      );
+      const accessToken = response.data.access_token;
+      const expiresIn = parseInt(response.data.expires_in, 10) || 3600;
+      this.cachedFirebaseIdToken = {
+        token: accessToken,
+        expiresAt: now + expiresIn,
+      };
+      return accessToken;
+    } catch (error: any) {
+      const status = error.response?.status;
+      if (status === 400 || status === 401 || status === 403) {
+        const authError: any = new Error('Firebase refresh token rejected');
+        authError.isStorytelUnauthorized = true;
+        throw authError;
+      }
+      throw new Error(`Firebase token refresh failed: ${error.message}`);
+    }
+  }
+
+  // Bearer to send on api.storytel.net/* endpoints. SSO mode: fresh Firebase
+  // ID token (auto-refreshed via the long-lived refresh token). Legacy mode:
+  // the JWT returned by login.action.
+  private async getApiBearer(): Promise<string> {
+    if (this.ssoSession) return this.ensureFirebaseIdToken();
+    return this.loginData.accountInfo.jwt;
   }
 
   async getBookmarkPositional(
@@ -127,12 +223,13 @@ class StorytelClient {
     const url = `https://api.storytel.net/bookmarks/positional?kidsMode=false&orderBy=updated&orderDirection=desc`;
 
     try {
+      const bearer = await this.getApiBearer();
       const response = await this.client.get<{ bookmarks: Bookmark[] }>(url, {
         params: {
           ...(consumableId && { consumableIds: consumableId }),
         },
         headers: {
-          Authorization: `Bearer ${this.loginData.accountInfo.jwt}`,
+          Authorization: `Bearer ${bearer}`,
         },
       });
       return response.data.bookmarks;
@@ -150,6 +247,7 @@ class StorytelClient {
     const url = `https://api.storytel.net/bookmarks/positional`;
 
     try {
+      const bearer = await this.getApiBearer();
       const response = await this.client.post(
         url,
         {
@@ -163,7 +261,7 @@ class StorytelClient {
         },
         {
           headers: {
-            Authorization: `Bearer ${this.loginData.accountInfo.jwt}`,
+            Authorization: `Bearer ${bearer}`,
           },
         },
       );
@@ -175,7 +273,7 @@ class StorytelClient {
   }
 
   async getBookshelf(): Promise<any> {
-    const url = `https://www.storytel.com/api/getBookShelf.action?token=${this.loginData.accountInfo.singleSignToken}`;
+    const url = `https://www.storytel.com/api/getBookShelf.action?token=${encodeURIComponent(this.getLegacyActionToken())}`;
 
     try {
       const response = await this.client.get(url);
@@ -196,9 +294,10 @@ class StorytelClient {
     const url = `https://api.storytel.net/playback-metadata/consumable/${consumableId}`;
 
     try {
+      const bearer = await this.getApiBearer();
       const response = await this.client.get(url, {
         headers: {
-          Authorization: `Bearer ${this.loginData.accountInfo.jwt}`,
+          Authorization: `Bearer ${bearer}`,
         },
       });
       return response.data;
@@ -209,7 +308,7 @@ class StorytelClient {
   }
 
   async getStreamUrl(bookId: string): Promise<string> {
-    const url = `https://www.storytel.com/mp3streamRangeReq?startposition=0&programId=${bookId}&token=${this.loginData.accountInfo.singleSignToken}`;
+    const url = `https://www.storytel.com/mp3streamRangeReq?startposition=0&programId=${bookId}&token=${encodeURIComponent(this.getLegacyActionToken())}`;
 
     try {
       const response = await this.client.get(url);
@@ -229,9 +328,10 @@ class StorytelClient {
     const url = `https://api.storytel.net/bookmarks/manual?type=abook&consumableId=${consumableId}`;
 
     try {
+      const bearer = await this.getApiBearer();
       const response = await this.client.get<BookmarkResponse>(url, {
         headers: {
-          Authorization: `Bearer ${this.loginData.accountInfo.jwt}`,
+          Authorization: `Bearer ${bearer}`,
           Accept: "application/vnd.storytel.bookmark+json;v=2.0",
         },
       });
@@ -249,6 +349,7 @@ class StorytelClient {
   ): Promise<void> {
     const url = "https://api.storytel.net/bookmarks/manual";
     try {
+      const bearer = await this.getApiBearer();
       await this.client.post(
         url,
         {
@@ -259,7 +360,7 @@ class StorytelClient {
         },
         {
           headers: {
-            Authorization: `Bearer ${this.loginData.accountInfo.jwt}`,
+            Authorization: `Bearer ${bearer}`,
             Accept: "application/vnd.storytel.bookmark+json;v=2.0",
           },
         },
@@ -286,9 +387,10 @@ class StorytelClient {
 
     const url = `https://api.storytel.net/bookmarks/manual/${bookmarkId}?id=${bookmarkId}`;
     try {
+      const bearer = await this.getApiBearer();
       await this.client.put(url, bookmarkData, {
         headers: {
-          Authorization: `Bearer ${this.loginData.accountInfo.jwt}`,
+          Authorization: `Bearer ${bearer}`,
           Accept: "application/vnd.storytel.bookmark+json;v=2.0",
         },
       });
@@ -313,9 +415,10 @@ class StorytelClient {
 
     const url = `https://api.storytel.net/bookmarks/manual/${bookmarkId}?id=${bookmarkId}`;
     try {
+      const bearer = await this.getApiBearer();
       await this.client.delete(url, {
         headers: {
-          Authorization: `Bearer ${this.loginData.accountInfo.jwt}`,
+          Authorization: `Bearer ${bearer}`,
           Accept: "application/vnd.storytel.bookmark+json;v=2.0",
         },
       });

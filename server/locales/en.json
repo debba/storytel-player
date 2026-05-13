@@ -6,6 +6,10 @@
     "password": "Password",
     "signIn": "Sign in",
     "signingIn": "Signing in...",
+    "ssoDivider": "or",
+    "ssoGoogle": "Continue with Google",
+    "ssoApple": "Continue with Apple",
+    "ssoOpening": "Opening Storytel login...",
     "errors": {
       "required": "Please enter both email and password",
       "failed": "Login failed",

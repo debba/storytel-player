@@ -28,5 +28,18 @@ declare global {
       setAlwaysOnTop: (alwaysOnTop: boolean) => Promise<void>;
       isAlwaysOnTop: () => Promise<boolean>;
     };
+    electronAuth?: {
+      openSsoWindow: (provider?: 'google' | 'apple') => Promise<{
+        cancelled: boolean;
+        credentials?: {
+          storytelSession: string;
+          firebaseRefreshToken: string;
+          firebaseApiKey: string;
+          email: string;
+          cid: string;
+        };
+        error?: string;
+      }>;
+    };
   }
 }
