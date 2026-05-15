@@ -30,7 +30,7 @@ jobs:
           sed -i "s/^sha256sums=.*/sha256sums=('${{ steps.shasum.outputs.sha256 }}')/" PKGBUILD
 
       - name: Publish to AUR
-        uses: KSXGitHub/github-actions-deploy-aur@v2
+        uses: KSXGitHub/github-actions-deploy-aur@v4.1.3
         with:
           pkgname: storytel-player-bin
           pkgbuild: ./aur/PKGBUILD
