@@ -15,8 +15,44 @@ function LoginForm({ onLogin, sessionExpired }: LoginFormProps) {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSsoLoading, setIsSsoLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const ssoAvailable = typeof window !== 'undefined' && !!window.electronAuth;
+
+  const [ssoProvider, setSsoProvider] = useState<'google' | 'apple' | null>(null);
+
+  const handleSsoLogin = async (provider: 'google' | 'apple') => {
+    if (!window.electronAuth) return;
+    setIsSsoLoading(true);
+    setSsoProvider(provider);
+    setError('');
+    try {
+      trackAction('User attempted SSO login', { provider });
+      const result = await window.electronAuth.openSsoWindow(provider);
+      if (result.cancelled) {
+        setIsSsoLoading(false);
+        setSsoProvider(null);
+        return;
+      }
+      if (result.error || !result.credentials) {
+        setError(result.error ?? t('login.errors.failed'));
+        setIsSsoLoading(false);
+        setSsoProvider(null);
+        return;
+      }
+      const response = await api.post('/sso-login', result.credentials);
+      const { token } = response.data;
+      await storage.set('token', token);
+      onLogin();
+      navigate('/');
+    } catch (err: any) {
+      setError(err?.response?.data?.error ?? err?.message ?? t('login.errors.failed'));
+    } finally {
+      setIsSsoLoading(false);
+      setSsoProvider(null);
+    }
+  };
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -142,6 +178,46 @@ function LoginForm({ onLogin, sessionExpired }: LoginFormProps) {
                 </button>
               </div>
             </form>
+            {ssoAvailable && (
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 h-px bg-gray-700" />
+                  <span className="text-xs uppercase tracking-wider text-gray-500">
+                    {t('login.ssoDivider')}
+                  </span>
+                  <div className="flex-1 h-px bg-gray-700" />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleSsoLogin('google')}
+                  disabled={isSsoLoading || isLoading}
+                  className="w-full flex items-center justify-center gap-2 py-2 px-4 border border-gray-600 text-sm font-medium rounded-md text-white bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 48 48" aria-hidden="true">
+                    <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.5-5.9 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34 5.1 29.3 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21 21-9.4 21-21c0-1.2-.1-2.4-.4-3.5z"/>
+                    <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 16 19 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34 5.1 29.3 3 24 3 16.3 3 9.7 7.4 6.3 14.7z"/>
+                    <path fill="#4CAF50" d="M24 45c5.2 0 9.9-2 13.4-5.3l-6.2-5.2C29.2 36 26.7 37 24 37c-5.4 0-9.7-3.4-11.3-8.1L6.1 34C9.5 41.6 16.1 45 24 45z"/>
+                    <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4.1 5.5l6.2 5.2c-.4.4 6.6-4.8 6.6-14.2 0-1.2-.1-2.4-.4-3.5z"/>
+                  </svg>
+                  {isSsoLoading && ssoProvider === 'google'
+                    ? t('login.ssoOpening')
+                    : t('login.ssoGoogle')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleSsoLogin('apple')}
+                  disabled={isSsoLoading || isLoading}
+                  className="w-full flex items-center justify-center gap-2 py-2 px-4 border border-gray-600 text-sm font-medium rounded-md text-white bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                  </svg>
+                  {isSsoLoading && ssoProvider === 'apple'
+                    ? t('login.ssoOpening')
+                    : t('login.ssoApple')}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </main>

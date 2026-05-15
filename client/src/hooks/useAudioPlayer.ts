@@ -1,6 +1,40 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 import api, { trackAction } from '../utils/api';
+import storage from '../utils/storage';
 import {BookmarkPositional} from "../interfaces/bookmarks";
+
+interface LocalPosition {
+    position: number;
+    updatedAt: string;
+}
+
+const positionStorageKey = (consumableId: string) => `pos:${consumableId}`;
+
+const readLocalPosition = async (consumableId: string): Promise<LocalPosition | null> => {
+    try {
+        const raw = await storage.get(positionStorageKey(consumableId));
+        if (!raw) return null;
+        const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+        if (typeof parsed?.position === 'number' && typeof parsed?.updatedAt === 'string') {
+            return parsed as LocalPosition;
+        }
+        return null;
+    } catch {
+        return null;
+    }
+};
+
+const writeLocalPosition = async (consumableId: string, position: number) => {
+    try {
+        const payload: LocalPosition = {
+            position,
+            updatedAt: new Date().toISOString(),
+        };
+        await storage.set(positionStorageKey(consumableId), JSON.stringify(payload));
+    } catch {
+        // best-effort cache; ignore failures
+    }
+};
 
 interface UseAudioPlayerProps {
     bookId: string | undefined;
@@ -37,29 +71,51 @@ export const useAudioPlayer = ({bookId, consumableId, playbackRate, onLoadError}
     const updatePosition = useCallback(async () => {
         if (!audioRef.current || !consumableId) return;
 
+        const position = Math.floor(audioRef.current.currentTime * 1000);
+        // Always persist locally first so offline listening is not lost.
+        await writeLocalPosition(consumableId, position);
+
         try {
-            const position = Math.floor(audioRef.current.currentTime * 1000);
             await api.put(`/bookmark-positional/${consumableId}`, {position});
         } catch (error) {
-            console.error('Failed to update position:', error);
+            console.warn('Failed to sync position to API, kept locally', error);
         }
     }, [consumableId]);
 
     const goToPosition = useCallback(async () => {
+        // Try remote first, then compare with local cache: the most recent
+        // timestamp wins so a position listened offline is not overwritten
+        // by a stale remote value once the app is online again.
+        let remote: { position: number; updatedAt: string | null } | null = null;
         try {
             const response = await api.get<BookmarkPositional[]>(`/bookmark-positional/${consumableId}`);
-            const {data} = response;
-
-            const position = data?.find(
-                format => format.type === 'abook'
-            )?.position || 0;
-
-            if (audioRef.current) {
-                audioRef.current.currentTime = Math.floor(position / 1000);
-                audioRef.current.play();
+            const entry = response.data?.find(format => format.type === 'abook');
+            if (entry) {
+                remote = {
+                    position: entry.position || 0,
+                    updatedAt: entry.updatedTime || null,
+                };
             }
         } catch (error) {
-            console.error('Failed to go to position:', error);
+            console.warn('Failed to fetch remote position, will use local cache if available', error);
+        }
+
+        const local = await readLocalPosition(consumableId);
+
+        let chosenPosition = 0;
+        if (remote && local) {
+            const remoteTime = remote.updatedAt ? Date.parse(remote.updatedAt) : 0;
+            const localTime = Date.parse(local.updatedAt);
+            chosenPosition = localTime > remoteTime ? local.position : remote.position;
+        } else if (remote) {
+            chosenPosition = remote.position;
+        } else if (local) {
+            chosenPosition = local.position;
+        }
+
+        if (audioRef.current) {
+            audioRef.current.currentTime = Math.floor(chosenPosition / 1000);
+            audioRef.current.play();
         }
     }, [consumableId]);
 

@@ -6,6 +6,10 @@
     "password": "Password",
     "signIn": "Accedi",
     "signingIn": "Accesso in corso...",
+    "ssoDivider": "oppure",
+    "ssoGoogle": "Continua con Google",
+    "ssoApple": "Continua con Apple",
+    "ssoOpening": "Apertura login Storytel...",
     "errors": {
       "required": "Inserisci sia email che password",
       "failed": "Accesso fallito",

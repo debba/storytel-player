@@ -15,20 +15,24 @@ export const useChapters = ({consumableId, currentTime, onError}: UseChaptersPro
     const [showChaptersModal, setShowChaptersModal] = useState(false);
 
     const loadChapters = useCallback(async () => {
+        const extractChapters = (data: BookMetaData) =>
+            data.formats?.find(format => format.type === 'abook')?.chapters || [];
+
         try {
             const response = await api.get<BookMetaData>(`/bookmetadata/${consumableId}`);
-            const {data} = response;
-
-            const chapters = data.formats?.find(
-                format => format.type === 'abook'
-            )?.chapters || [];
-
-            setChapters(chapters);
-
+            setChapters(extractChapters(response.data));
         } catch (error: any) {
-            onError(error.response?.data?.error || 'Failed to load chapters');
+            // Fall back to the offline cache persisted at download time.
+            // If even the offline cache is missing we just leave chapters empty
+            // instead of blocking the whole PlayerView with an error state.
+            try {
+                const offline = await api.get<BookMetaData>(`/offline/bookmetadata/${consumableId}`);
+                setChapters(extractChapters(offline.data));
+            } catch {
+                setChapters([]);
+            }
         }
-    }, [consumableId, onError]);
+    }, [consumableId]);
 
     const currentChapter = useMemo(() => {
         let cumulativeTime = 0;

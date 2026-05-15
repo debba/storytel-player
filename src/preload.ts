@@ -63,3 +63,24 @@ contextBridge.exposeInMainWorld('electronApi', {
   delete: (url: string, _: any, config?: ApiConfig): Promise<any> =>
     ipcRenderer.invoke('api:delete', url, config),
 });
+
+// Auth / SSO API
+interface SsoCredentials {
+  storytelSession: string;
+  firebaseRefreshToken: string;
+  firebaseApiKey: string;
+  email: string;
+  cid: string;
+}
+interface SsoLoginResult {
+  cancelled: boolean;
+  credentials?: SsoCredentials;
+  error?: string;
+}
+
+type SsoProvider = 'google' | 'apple';
+
+contextBridge.exposeInMainWorld('electronAuth', {
+  openSsoWindow: (provider?: SsoProvider): Promise<SsoLoginResult> =>
+    ipcRenderer.invoke('auth:open-sso-window', provider),
+});

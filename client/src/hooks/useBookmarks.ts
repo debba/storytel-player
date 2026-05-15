@@ -23,10 +23,14 @@ export const useBookmarks = ({consumableId, onError}: UseBookmarksProps) => {
             const response = await api.get(`/bookmarks/${consumableId}`);
             const {data} = response;
             setBookmarks(data.bookmarks);
-        } catch (error: any) {
-            onError(error.response?.data?.error || 'Failed to load bookmarks');
+        } catch (error) {
+            // Manual bookmarks are not cached locally yet: when the Storytel
+            // API is unreachable we silently degrade to an empty list instead
+            // of blocking the whole PlayerView with an error.
+            console.warn('Failed to load bookmarks, falling back to empty list', error);
+            setBookmarks([]);
         }
-    }, [consumableId, onError]);
+    }, [consumableId]);
 
     const goToBookmark = useCallback((position: number, audioRef: React.RefObject<HTMLAudioElement | null>) => {
         if (audioRef.current) {

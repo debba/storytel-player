@@ -9,11 +9,42 @@ import path from "path";
 import axios from "axios";
 import { appLogger } from "./logger";
 
-// Extend JWT user type
+// Extend JWT user type. Legacy (email/password) login populates storytelToken
+// and jwt; SSO login populates the sso* fields instead and leaves the legacy
+// ones empty. Email is set in both cases.
 interface JWTUser {
+  email: string;
   storytelToken: string;
   jwt: string;
-  email: string;
+  ssoStorytelSession?: string;
+  ssoFirebaseRefreshToken?: string;
+  ssoFirebaseApiKey?: string;
+  ssoCid?: string;
+}
+
+function hydrateStorytelClient(user: JWTUser): StorytelClient {
+  const client = new StorytelClient();
+  if (
+    user.ssoStorytelSession &&
+    user.ssoFirebaseRefreshToken &&
+    user.ssoFirebaseApiKey
+  ) {
+    client.loginViaSso({
+      storytelSession: user.ssoStorytelSession,
+      firebaseRefreshToken: user.ssoFirebaseRefreshToken,
+      firebaseApiKey: user.ssoFirebaseApiKey,
+      email: user.email,
+      cid: user.ssoCid ?? "",
+    });
+  } else {
+    client.loginData = {
+      accountInfo: {
+        singleSignToken: user.storytelToken ?? "",
+        jwt: user.jwt ?? "",
+      },
+    };
+  }
+  return client;
 }
 
 // Extend FastifyRequest with user property
@@ -117,6 +148,48 @@ fastify.post<{
   }
 });
 
+// Route per SSO login (Google / Apple via Storytel web flow). The Electron
+// SsoManager captures the storytel_session cookie and the Firebase refresh
+// token from the in-app webview after the user completes Storytel's web
+// login, then POSTs them here so we mint our own JWT just like /api/login.
+fastify.post<{
+  Body: {
+    storytelSession: string;
+    firebaseRefreshToken: string;
+    firebaseApiKey: string;
+    email?: string;
+    cid?: string;
+  };
+}>("/api/sso-login", async (request, reply) => {
+  try {
+    const {
+      storytelSession,
+      firebaseRefreshToken,
+      firebaseApiKey,
+      email,
+      cid,
+    } = request.body;
+
+    if (!storytelSession || !firebaseRefreshToken || !firebaseApiKey) {
+      return reply.code(400).send({ error: "Missing SSO credentials" });
+    }
+
+    const token = fastify.jwt.sign({
+      email: email ?? "",
+      storytelToken: "",
+      jwt: "",
+      ssoStorytelSession: storytelSession,
+      ssoFirebaseRefreshToken: firebaseRefreshToken,
+      ssoFirebaseApiKey: firebaseApiKey,
+      ssoCid: cid ?? "",
+    });
+
+    reply.send({ success: true, message: "SSO login successful", token });
+  } catch (error: any) {
+    reply.code(401).send({ error: error.message });
+  }
+});
+
 // Route per logout
 fastify.post("/api/logout", async (_request, reply) => {
   reply.send({ success: true, message: "Logged out successfully" });
@@ -130,14 +203,7 @@ fastify.get(
   },
   async (request, reply) => {
     try {
-      const storytelClient = new StorytelClient();
-
-      storytelClient.loginData = {
-        accountInfo: {
-          singleSignToken: request.user.storytelToken,
-          jwt: "",
-        },
-      };
+      const storytelClient = hydrateStorytelClient(request.user);
 
       const bookshelf = await storytelClient.getBookshelf();
       reply.send(bookshelf);
@@ -187,14 +253,7 @@ fastify.post<{
           });
         }
       } else {
-        const storytelClient = new StorytelClient();
-        // Set the login data from JWT token
-        storytelClient.loginData = {
-          accountInfo: {
-            singleSignToken: request.user.storytelToken,
-            jwt: "",
-          },
-        };
+        const storytelClient = hydrateStorytelClient(request.user);
         const streamUrl = await storytelClient.getStreamUrl(bookId);
         reply.send({ streamUrl, remote: true });
       }
@@ -218,14 +277,7 @@ fastify.post<{
       const { consumableId } = request.params;
       const { position, note } = request.body;
 
-      const storytelClient = new StorytelClient();
-      // Set the login data from JWT token
-      storytelClient.loginData = {
-        accountInfo: {
-          jwt: request.user.jwt,
-          singleSignToken: "",
-        },
-      };
+      const storytelClient = hydrateStorytelClient(request.user);
 
       await storytelClient.setBookmark(consumableId, position, note);
 
@@ -246,14 +298,7 @@ fastify.delete<{
   async (request, reply) => {
     try {
       const { consumableId, bookmarkId } = request.params;
-      const storytelClient = new StorytelClient();
-      // Set the login data from JWT token
-      storytelClient.loginData = {
-        accountInfo: {
-          jwt: request.user.jwt,
-          singleSignToken: "",
-        },
-      };
+      const storytelClient = hydrateStorytelClient(request.user);
 
       await storytelClient.deleteBookmark(consumableId, bookmarkId);
 
@@ -275,14 +320,7 @@ fastify.put<{
   async (request, reply) => {
     try {
       const { consumableId, bookmarkId } = request.params;
-      const storytelClient = new StorytelClient();
-      // Set the login data from JWT token
-      storytelClient.loginData = {
-        accountInfo: {
-          jwt: request.user.jwt,
-          singleSignToken: "",
-        },
-      };
+      const storytelClient = hydrateStorytelClient(request.user);
 
       await storytelClient.updateBookmark(
         consumableId,
@@ -304,14 +342,7 @@ fastify.get(
   },
   async (request, reply) => {
     try {
-      const storytelClient = new StorytelClient();
-      // Set the login data from JWT token
-      storytelClient.loginData = {
-        accountInfo: {
-          jwt: request.user.jwt,
-          singleSignToken: "",
-        },
-      };
+      const storytelClient = hydrateStorytelClient(request.user);
 
       const bookmarks = await storytelClient.getBookmarkPositional();
       reply.send(bookmarks);
@@ -332,14 +363,7 @@ fastify.get<{
     try {
       const { consumableId } = request.params;
 
-      const storytelClient = new StorytelClient();
-      // Set the login data from JWT token
-      storytelClient.loginData = {
-        accountInfo: {
-          jwt: request.user.jwt,
-          singleSignToken: "",
-        },
-      };
+      const storytelClient = hydrateStorytelClient(request.user);
 
       const bookmarks =
         await storytelClient.getBookmarkPositional(consumableId);
@@ -363,14 +387,7 @@ fastify.put<{
       const { consumableId } = request.params;
       const { position } = request.body;
 
-      const storytelClient = new StorytelClient();
-      // Set the login data from JWT token
-      storytelClient.loginData = {
-        accountInfo: {
-          jwt: request.user.jwt,
-          singleSignToken: "",
-        },
-      };
+      const storytelClient = hydrateStorytelClient(request.user);
 
       const deviceId =
         process.env.DEVICE_ID || crypto.randomUUID().toUpperCase();
@@ -395,16 +412,8 @@ fastify.get<{
   },
   async (request, reply) => {
     try {
-      const storytelClient = new StorytelClient();
       const { consumableId } = request.params;
-
-      // Set the login data from JWT token
-      storytelClient.loginData = {
-        accountInfo: {
-          jwt: request.user.jwt,
-          singleSignToken: "",
-        },
-      };
+      const storytelClient = hydrateStorytelClient(request.user);
 
       const bookmarks = await storytelClient.getBookmark(consumableId);
       reply.send(bookmarks);
@@ -424,14 +433,7 @@ fastify.get<{
   async (request, reply) => {
     try {
       const { consumableId } = request.params;
-      const storytelClient = new StorytelClient();
-
-      storytelClient.loginData = {
-        accountInfo: {
-          jwt: request.user.jwt,
-          singleSignToken: "",
-        },
-      };
+      const storytelClient = hydrateStorytelClient(request.user);
       const bookInfoContent =
         await storytelClient.getPlayBookMetaData(consumableId);
       reply.send(bookInfoContent);
@@ -546,13 +548,7 @@ fastify.post<{
       }
 
       // Get stream URL
-      const storytelClient = new StorytelClient();
-      storytelClient.loginData = {
-        accountInfo: {
-          singleSignToken: request.user.storytelToken,
-          jwt: "",
-        },
-      };
+      const storytelClient = hydrateStorytelClient(request.user);
       const streamUrl = await storytelClient.getStreamUrl(bookId);
 
       // Create AbortController for this download

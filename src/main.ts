@@ -4,6 +4,7 @@ import {TrayManager} from './modules/tray';
 import {ServerManager} from './modules/server';
 import {IpcManager} from './modules/ipc';
 import {UpdaterManager} from './modules/updater';
+import {SsoManager} from './modules/sso';
 import {i18n} from './i18n';
 
 const isDev = process.env.NODE_ENV === 'development';
@@ -14,6 +15,7 @@ let trayManager: TrayManager;
 let serverManager: ServerManager;
 let ipcManager: IpcManager;
 let updaterManager: UpdaterManager;
+let ssoManager: SsoManager;
 
 async function initialize(): Promise<void> {
 
@@ -38,7 +40,9 @@ async function initialize(): Promise<void> {
     trayManager = new TrayManager(windowManager);
     trayManager.create();
 
-    ipcManager = new IpcManager(serverManager, trayManager, windowManager);
+    ssoManager = new SsoManager();
+
+    ipcManager = new IpcManager(serverManager, trayManager, windowManager, ssoManager);
     ipcManager.setupHandlers();
 
     // Initialize auto-updater
