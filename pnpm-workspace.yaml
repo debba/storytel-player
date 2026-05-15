@@ -1,0 +1,4 @@
+allowBuilds:
+  core-js: true
+  electron: true
+  electron-winstaller: true
