@@ -21,20 +21,12 @@ interface BookmarkResponse {
   bookmarks: Bookmark[];
 }
 
-export interface SsoSession {
-  storytelSession: string;
-  firebaseRefreshToken: string;
-  firebaseApiKey: string;
-  email: string;
-  cid: string;
+interface StorytelAuthError extends Error {
+  isStorytelUnauthorized: boolean;
+  storytelStatus?: number;
+  storytelData?: unknown;
+  isLoginFailure?: boolean;
 }
-
-const FIREBASE_TOKEN_URL = 'https://securetoken.googleapis.com';
-// The Storytel Firebase API key is browser-restricted: requests without a
-// matching Referer get 403 API_KEY_HTTP_REFERRER_BLOCKED. The Web SDK runs
-// on www.storytel.com, so we mimic that origin from the server.
-const FIREBASE_REFERER = 'https://www.storytel.com/';
-const FIREBASE_ID_TOKEN_TTL_BUFFER_SECONDS = 60;
 
 class StorytelClient {
   private client: AxiosInstance;
@@ -94,6 +86,7 @@ class StorytelClient {
       },
       (error) => {
         const url = error.config?.url || "";
+        const isLoginRequest = url.includes("login.action");
         let cleanUrl = url;
         if (cleanUrl.includes("login.action")) {
           cleanUrl = cleanUrl.replace(/pwd=[^&]+/, "pwd=***");
@@ -109,8 +102,15 @@ class StorytelClient {
         // Propagate Storytel 401 as a distinct error type so Fastify routes
         // can return 401 to the frontend instead of a generic 500.
         if (error.response?.status === 401) {
-          const authError: any = new Error("Storytel session expired");
+          const authError: StorytelAuthError = new Error(
+            isLoginRequest
+              ? "Storytel login rejected"
+              : "Storytel session expired",
+          ) as StorytelAuthError;
           authError.isStorytelUnauthorized = true;
+          authError.isLoginFailure = isLoginRequest;
+          authError.storytelStatus = error.response.status;
+          authError.storytelData = error.response.data;
           return Promise.reject(authError);
         }
         return Promise.reject(error);
@@ -126,16 +126,28 @@ class StorytelClient {
   }
 
   async login(email: string, password: string): Promise<LoginData> {
-    const encryptedPassword = encryptPassword(password.trim());
-    const url = `https://www.storytel.com/api/login.action?m=1&uid=${email.trim()}&pwd=${encryptedPassword}`;
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
+    const encryptedPassword = encryptPassword(trimmedPassword);
+    const url = "https://www.storytel.com/api/login.action";
+    const params = {
+      m: 1,
+      uid: trimmedEmail,
+      pwd: encryptedPassword,
+    };
 
     try {
-      const response = await this.client.get<LoginData>(url);
+      const response = await this.client.get<LoginData>(url, {
+        params,
+      });
       this.loginData = response.data;
       this.ssoSession = null;
       this.cachedFirebaseIdToken = null;
       return this.loginData;
     } catch (error: any) {
+      if (error.isStorytelUnauthorized) {
+        throw error;
+      }
       throw new Error(`Login failed: ${error.message}`);
     }
   }
