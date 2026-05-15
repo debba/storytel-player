@@ -1,3 +1,10 @@
+## [1.2.14](https://github.com/debba/storytel-player/compare/v1.2.13...v1.2.14) (2026-05-15)
+
+
+### Bug Fixes
+
+* **server:** encode Storytel login params ([da15430](https://github.com/debba/storytel-player/commit/da15430f6b5e5bfc53c916c0c3f1158d04022eeb))
+* **server:** propagate Storytel 401 login errors ([6cbcd17](https://github.com/debba/storytel-player/commit/6cbcd1760d493639facf26454b8e9aa0888a7cfe))
 
 ## [1.2.13](https://github.com/debba/storytel-player/compare/v1.2.12...v1.2.13) (2026-04-03)
 
