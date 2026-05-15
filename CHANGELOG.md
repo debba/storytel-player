@@ -1,6 +1,11 @@
 ## [1.2.14](https://github.com/debba/storytel-player/compare/v1.2.13...v1.2.14) (2026-05-15)
 
 
+### Features
+
+* **sso:** add SSO login flow and offline fallbacks ([abdbe98](https://github.com/debba/storytel-player/commit/abdbe98e8edb4477ad909e033c5b12aee8661377))
+
+
 ### Bug Fixes
 
 * **server:** encode Storytel login params ([da15430](https://github.com/debba/storytel-player/commit/da15430f6b5e5bfc53c916c0c3f1158d04022eeb))
