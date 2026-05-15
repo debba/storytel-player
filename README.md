@@ -16,19 +16,9 @@
 ## Release Download:
 [![Windows](https://img.shields.io/badge/Windows-Download-blue?logo=windows)](https://github.com/debba/storytel-player/releases/download/v1.2.14/Storytel-Player-Setup-1.2.14.exe) [![macOS Intel](https://img.shields.io/badge/macOS_Intel-Download-black?logo=apple)](https://github.com/debba/storytel-player/releases/download/v1.2.14/Storytel-Player-1.2.14.dmg) [![macOS Apple Silicon](https://img.shields.io/badge/macOS_Apple_Silicon-Download-black?logo=apple)](https://github.com/debba/storytel-player/releases/download/v1.2.14/Storytel-Player-1.2.13-arm64.dmg) [![Linux](https://img.shields.io/badge/Linux-Download-green?logo=linux)](https://github.com/debba/storytel-player/releases/download/v1.2.14/Storytel-Player-1.2.14.AppImage)
 
-## What's New in v1.2.13
+## What's New
 
-- **macOS Apple Silicon support**: added native ARM64 build for Apple Silicon Macs (M1/M2/M3/M4), available as a separate DMG download
-- **CI/CD**: updated GitHub Actions workflow to build and publish macOS ARM64 artifacts
-
-> No functional changes — this release adds the missing macOS ARM64 build to the release pipeline.
-
-## What's New in v1.2.12
-
-- **Logs modal**: view and export application logs directly from the dashboard
-- **Library search**: real-time filtering by title, author, or narrator with a Ctrl/Cmd+K keyboard shortcut to focus the search input
-- **Log rotation**: log file is automatically rotated when it exceeds 10 MB, keeping up to 5 archived files (`app.1.log` … `app.5.log`)
-- **Increased timeouts**: higher request timeouts for more resilient streaming
+See the [CHANGELOG](CHANGELOG.md) for the full list of changes across all releases.
 
 ---
 
