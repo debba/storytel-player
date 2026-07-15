@@ -20,6 +20,8 @@ export interface BookShelfEntity {
     shareUrl: string
     status: number
     subscribesToSerie: number
+    stateUpdateTime?: string
+    positionUpdatedTime?: string
 }
 
 export interface Abook {

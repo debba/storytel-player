@@ -51,6 +51,17 @@ function Dashboard({onLogout, triggerLogout, setTriggerLogout}: DashboardProps) 
                 book.abook?.narratorAsString?.toLowerCase().includes(q)
             );
         }
+
+        result.sort((a, b) => {
+            const getTimestamp = (book: BookShelfEntity): number => {
+                if (book.positionUpdatedTime) return new Date(book.positionUpdatedTime).getTime();
+                if (book.stateUpdateTime) return new Date(book.stateUpdateTime).getTime();
+                return 0;
+            };
+
+            return getTimestamp(b) - getTimestamp(a);
+        });
+
         setFilteredBooks(result);
     }, [filterStatus, books, searchQuery])
 

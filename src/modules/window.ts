@@ -1,6 +1,7 @@
 import {BrowserWindow, Menu, app} from 'electron';
 import {spawn, ChildProcess} from 'child_process';
 import * as path from 'path';
+import * as fs from 'fs';
 import {WindowConfig} from '../types';
 import {storeManager} from './store';
 
@@ -77,14 +78,38 @@ export class WindowManager {
     }
 
     private startDevelopmentServers(): void {
+        const cwdRelative = path.join(__dirname, '../../../');
+        const cwd = fs.realpathSync.native(cwdRelative);
+
+        const clientLogFile = path.join(app.getPath('userData'), 'client.log');
+        const outFd = fs.openSync(clientLogFile, 'w');
+        const errFd = fs.openSync(clientLogFile, 'a');
+
         this.clientProcess = spawn('npm', ['run', 'client'], {
-            cwd: path.join(__dirname, '../../../'),
-            stdio: 'inherit',
+            cwd: cwd,
+            stdio: ['pipe', outFd, errFd],
+            shell: true,
         });
 
-        setTimeout(() => {
-            this.mainWindow?.loadURL('http://localhost:3000');
-        }, 5000);
+        this.attemptLoadUrl('http://localhost:3000');
+    }
+
+    private attemptLoadUrl(url: string, maxAttempts: number = 30, delayMs: number = 1000): void {
+        let attempts = 0;
+
+        const tryLoad = () => {
+            attempts++;
+            this.mainWindow?.loadURL(url).catch(() => {
+                if (attempts < maxAttempts) {
+                    setTimeout(tryLoad, delayMs);
+                } else {
+                    console.error(`Failed to load ${url} after ${maxAttempts} attempts`);
+                    this.mainWindow?.webContents.send('error', 'Failed to connect to dev server');
+                }
+            });
+        };
+
+        tryLoad();
     }
 
     private startProductionServer(): void {

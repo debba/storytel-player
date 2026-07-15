@@ -210,12 +210,15 @@ export class SsoManager {
                 const key = entry && entry.fbase_key;
                 if (typeof key === 'string' && key.startsWith('firebase:authUser:') && key.endsWith(':[DEFAULT]')) {
                   const apiKey = key.slice('firebase:authUser:'.length, key.length - ':[DEFAULT]'.length);
-                  const refresh = entry && entry.value && entry.value.stsTokenManager && entry.value.stsTokenManager.refreshToken;
+                  const tokenMgr = entry && entry.value && entry.value.stsTokenManager;
+                  const refresh = tokenMgr && tokenMgr.refreshToken;
                   if (refresh) return { refreshToken: refresh, apiKey };
                 }
               }
+              console.error('[sso] no valid firebase auth entry found');
               return null;
             } catch (e) {
+              console.error('[sso] firebase extraction error:', e && e.message);
               return null;
             }
           })()`,
@@ -247,14 +250,20 @@ export class SsoManager {
           const currentHost = new URL(win.webContents.getURL()).hostname;
           if (currentHost !== 'www.storytel.com') {
             await win.webContents.loadURL(STORYTEL_WWW_STORAGE_TARGET);
-            await new Promise((r) => setTimeout(r, 800));
+            await new Promise((r) => setTimeout(r, 1500));
           }
 
-          const fb = await extractFirebaseRefreshToken();
+          let fb = await extractFirebaseRefreshToken();
+          if (!fb) {
+            console.warn('[sso] firebase token not found on first attempt, retrying after 1s...');
+            await new Promise((r) => setTimeout(r, 1000));
+            fb = await extractFirebaseRefreshToken();
+          }
+
           if (!fb) {
             finish({
               cancelled: false,
-              error: 'Firebase refresh token not found in IndexedDB',
+              error: 'Firebase refresh token not found in IndexedDB after retries',
             });
             return;
           }

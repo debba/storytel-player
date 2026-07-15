@@ -546,7 +546,7 @@ fastify.get<{
 
 // Route per scaricare il file audio da remoto
 fastify.post<{
-  Body: { bookId: string };
+  Body: { bookId: string; consumableId?: string };
 }>(
   "/api/download",
   {
@@ -554,7 +554,7 @@ fastify.post<{
   },
   async (request, reply) => {
     try {
-      const { bookId } = request.body;
+      const { bookId, consumableId } = request.body;
       const localFilePath = path.join(DOWNLOADS_DIR, `${bookId}.mp3`);
 
       // Check if already exists
@@ -572,7 +572,11 @@ fastify.post<{
 
       // Get stream URL
       const storytelClient = hydrateStorytelClient(request.user);
-      const streamUrl = await storytelClient.getStreamUrl(bookId);
+      // Prefer the new api.storytel.net assets endpoint (needs consumableId);
+      // fall back to the legacy programId-based stream if not provided.
+      const streamUrl = consumableId
+        ? await storytelClient.getAudioStreamUrl(consumableId)
+        : await storytelClient.getStreamUrl(bookId);
 
       // Create AbortController for this download
       const controller = new AbortController();

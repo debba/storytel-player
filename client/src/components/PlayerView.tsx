@@ -132,6 +132,7 @@ function PlayerView() {
 
             const response = await api.post('/download', {
                 bookId,
+                consumableId: book?.book?.consumableId,
                 book,
             });
 

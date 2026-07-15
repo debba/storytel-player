@@ -1,3 +1,23 @@
+# [1.3.0](https://github.com/debba/storytel-player/compare/v1.2.16...v1.3.0) (2026-07-15)
+
+
+### Bug Fixes
+
+* **bookshelf:** correct status mapping for API states ([5b05a53](https://github.com/debba/storytel-player/commit/5b05a53e9742a1156683dd7c383835c2034a62c0))
+* **sso:** add retry logic and error logging for firebase token extraction ([ff020bf](https://github.com/debba/storytel-player/commit/ff020bf9ad0d6f84fef6a888346e6e6d73b21054))
+* use new Storytel assets endpoint for audiobook download ([0abc0ff](https://github.com/debba/storytel-player/commit/0abc0ff899d302539562508b72cbea8cc03526af)), closes [#26](https://github.com/debba/storytel-player/issues/26)
+
+
+### Features
+
+* **bookshelf:** add timestamps for sorting books by listening recency ([d467a29](https://github.com/debba/storytel-player/commit/d467a298e8b9f557b4759b80776d3f4cad5af447))
+* **electron:** add development scripts and improve server startup ([064dede](https://github.com/debba/storytel-player/commit/064dede3110522135da098dd9aba51393ef36fec))
+
+
+### Reverts
+
+* Revert "docs: update changelog for firebase token retry fix" ([d6f53f9](https://github.com/debba/storytel-player/commit/d6f53f99e948b30ae19920f8a452f0f1748eb988))
+
 ## [1.2.16](https://github.com/debba/storytel-player/compare/v1.2.15...v1.2.16) (2026-07-13)
 
 

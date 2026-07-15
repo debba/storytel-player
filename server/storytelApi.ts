@@ -392,12 +392,12 @@ class StorytelClient {
       const items = response.data?.items;
       if (!items || typeof items !== "object") return { books: [] };
 
-      // Library state -> legacy numeric status (1 = in progress / to read,
-      // 2 = finished). The Dashboard keeps only {1,2} by default.
+      // Library state -> legacy numeric status (1 = not started, 2 = in progress,
+      // 3 = finished). Dashboard filters use {1,2,3}.
       const stateToStatus: Record<string, number> = {
-        CONSUMING: 1,
         WILL_CONSUME: 1,
-        CONSUMED: 2,
+        CONSUMING: 2,
+        CONSUMED: 3,
       };
 
       const books = Object.values(items)
@@ -420,6 +420,8 @@ class StorytelClient {
           return {
             id: model.id,
             status: stateToStatus[model.state] ?? 1,
+            stateUpdateTime: model.stateUpdateTime,
+            positionUpdatedTime: abookFormat?.position?.updatedTime,
             book: {
               name: model.title,
               authorsAsString: join(model.authors),
