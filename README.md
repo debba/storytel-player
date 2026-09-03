@@ -22,15 +22,21 @@ See the [CHANGELOG](CHANGELOG.md) for the full list of changes across all releas
 
 ---
 
+✅ **Modern Desktop Interface**: Dark theme with Storytel Orange accents, rounded cards and filter pills, laid out for a 1280×800 desktop window
+
+✅ **Catalog Search**: Search the whole Storytel catalog by title, author or narrator (Ctrl/Cmd+K). Filters, results and a live preview side by side; add to your library or start listening in one click. Results are scoped to your Storytel market and limited to audiobooks
+
+✅ **Background Playback**: Audio keeps playing while you navigate; a persistent mini-player keeps play/pause, skip, speed, chapters and sleep timer within reach
+
 ✅ **Native Desktop App**: Cross-platform application with system tray integration and single instance lock
 
-✅ **Audiobook Library**: Browse your Storytel library with cover art and progress tracking. Supports real-time search by title, author, or narrator (Ctrl/Cmd+K shortcut)
+✅ **Audiobook Library**: Browse your Storytel bookshelf with cover art, progress tracking and status filters
 
-✅ **Audio Player**: HTML5 audio player with playback controls and bookmarks
+✅ **Audio Player**: Chapters, bookmarks, playback speed, sleep timer, multiple audio tracks and automatic resume
 
-✅ **Session Management**: Secure authentication with persistent storage via electron-store
+✅ **Session Management**: Secure authentication with persistent storage via electron-store, automatic session refresh and transparent retry
 
-✅ **Internationalization**: Multi-language support (i18next) with automatic language detection
+✅ **Internationalization**: English, Italian, German, Spanish, French, Swedish and Finnish (i18next) with automatic language detection
 
 ✅ **Cross-Platform**: Available for Windows, macOS (x64/ARM64), and Linux (x64/ARM64/ARMv7)
 
@@ -49,7 +55,7 @@ The application is built with TypeScript and follows a modular architecture:
 
 - **Frontend**: React 18 with TypeScript, Tailwind CSS, and Vite (port 3000 in dev mode)
 - **Backend**: Fastify server with TypeScript and RESTful API (port 8080)
-- **Desktop**: Electron 38+ with TypeScript
+- **Desktop**: Electron 43 with TypeScript
   - Window Manager: Main window handling with development/production modes
   - Tray Manager: System tray integration
   - Server Manager: Embedded Fastify server management

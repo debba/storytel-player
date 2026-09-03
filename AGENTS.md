@@ -7,7 +7,7 @@
 ### Tech Stack
 - **Frontend**: React 18 + TypeScript + Tailwind CSS + Vite
 - **Backend**: Fastify 5 + TypeScript
-- **Desktop**: Electron 38+
+- **Desktop**: Electron 43
 - **Internationalization**: i18next (multi-language support)
 - **State Management**: electron-store for persistent storage
 - **Build Tools**: Vite, esbuild, electron-builder
