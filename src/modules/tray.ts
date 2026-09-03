@@ -98,7 +98,7 @@ export class TrayManager {
         menuTemplate.push({type: 'separator'});
 
         menuTemplate.push({
-            label: "About",
+            label: i18n.t('tray.about'),
             click: () => {
                 const appInfo: string[] = [];
                 appInfo.push(`storytel-player@${app.getVersion()}\n`);
@@ -114,7 +114,7 @@ export class TrayManager {
                 }
                 dialog.showMessageBoxSync(this.windowManager.getWindow()!, {
                     buttons: ["OK"],
-                    title: "About",
+                    title: i18n.t('tray.about'),
                     normalizeAccessKeys: true,
                     defaultId: 0,
                     cancelId: 0,
@@ -123,10 +123,10 @@ export class TrayManager {
                 });
             }
         }, {
-            label: "Help",
+            label: i18n.t('tray.help'),
             submenu: [
                 {
-                    label: "Github Project",
+                    label: i18n.t('settings.githubRepo'),
                     click: () =>
                         shell.openExternal(
                             "https://github.com/debba/storytel-player"

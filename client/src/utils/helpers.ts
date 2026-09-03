@@ -112,27 +112,36 @@ export const formatTime = (seconds: number) => {
 };
 
 
-export const formatMicrosecondsTime = (microseconds: number) => {
+export interface TimeUnitLabels {
+    hours: string;
+    minutes: string;
+    seconds?: string;
+}
+
+export const formatMicrosecondsTime = (
+    microseconds: number,
+    units: TimeUnitLabels
+): string => {
     const totalSeconds = Math.floor(microseconds / 1000 / 1000);
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
-    return `${hours} h ${minutes} min`;
+    return `${hours} ${units.hours} ${minutes} ${units.minutes}`;
 };
 
-export const formatTimeNatural = (seconds: number) => {
+export const formatTimeNatural = (seconds: number, units: Required<TimeUnitLabels>): string => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     const secs = Math.floor(seconds % 60);
 
     const parts = [];
     if (hours > 0) {
-        parts.push(`${hours}h`);
+        parts.push(`${hours} ${units.hours}`);
     }
     if (minutes > 0) {
-        parts.push(`${minutes}min`);
+        parts.push(`${minutes} ${units.minutes}`);
     }
     if (secs > 0 || parts.length === 0) {
-        parts.push(`${secs}s`);
+        parts.push(`${secs} ${units.seconds}`);
     }
 
     return parts.join(' ');

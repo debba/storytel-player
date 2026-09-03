@@ -90,7 +90,7 @@ export function ChaptersPopover({
                     </span>
                   )}
                   <span className="truncate text-left">
-                    {ch.title || `${t('chapters.chapter', 'Kapitel')} ${chNum}`}
+                    {ch.title || `${t('chapters.chapter')} ${chNum}`}
                   </span>
                 </div>
                 <span className="font-mono text-[11px] opacity-70 flex-shrink-0 tabular-nums">

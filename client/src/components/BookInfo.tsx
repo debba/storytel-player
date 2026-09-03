@@ -60,7 +60,11 @@ const BookInfo: React.FC<BookInfoProps> = ({
                     <div className="text-left flex-1">
                         <p className="text-base text-white">{currentChapter.title}</p>
                         <p className="text-sm text-gray-400">
-                            {formatTimeNatural((currentChapter.end - currentTime) / playbackRate)}
+                            {formatTimeNatural((currentChapter.end - currentTime) / playbackRate, {
+                                hours: t('goto.hours'),
+                                minutes: t('goto.minutes'),
+                                seconds: t('goto.seconds'),
+                            })}
                         </p>
                     </div>
                 )}

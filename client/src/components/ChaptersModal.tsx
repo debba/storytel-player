@@ -73,7 +73,7 @@ function ChaptersModal({
                   <div className="flex items-center justify-between p-3.5">
                     <div className="flex-1 min-w-0 mr-3">
                       <h4 className="font-medium text-white text-sm truncate">
-                        {chapter.title || `${t('chapters.chapter', 'Kapitel')} ${chapter.number || index + 1}`}
+                        {chapter.title || `${t('chapters.chapter')} ${chapter.number || index + 1}`}
                       </h4>
                       {isCurrentChapter ? (
                         <div className="flex justify-between items-center mt-1">

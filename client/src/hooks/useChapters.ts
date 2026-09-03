@@ -54,7 +54,7 @@ export const useChapters = ({ consumableId, currentTime, onError }: UseChaptersP
       if (currentTime >= chapter.start && currentTime < chapter.end) {
         return {
           ...chapter,
-          title: chapter.title || `${t('chapters.track', { defaultValue: t('chapters.chapter', { defaultValue: 'Ljudspår' }) })} ${chapter.number}`,
+          title: chapter.title || `${t('chapters.track')} ${chapter.number}`,
         };
       }
     }
@@ -63,7 +63,7 @@ export const useChapters = ({ consumableId, currentTime, onError }: UseChaptersP
     if (currentTime >= last.start) {
       return {
         ...last,
-        title: last.title || `${t('chapters.track', { defaultValue: t('chapters.chapter', { defaultValue: 'Ljudspår' }) })} ${last.number}`,
+        title: last.title || `${t('chapters.track')} ${last.number}`,
       };
     }
 

@@ -2,6 +2,7 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 import api, { trackAction } from '../utils/api';
 import storage from '../utils/storage';
 import {BookmarkPositional} from "../interfaces/bookmarks";
+import i18n from '../i18n';
 
 interface LocalPosition {
     position: number;
@@ -62,7 +63,7 @@ export const useAudioPlayer = ({bookId, consumableId, playbackRate, onLoadError}
             const response = await api.post('/stream', {bookId, consumableId});
             setAudioSrc(response.data.streamUrl);
         } catch (err: any) {
-            onLoadError(err.response?.data?.error || 'Failed to load audio');
+            onLoadError(err.response?.data?.error || i18n.t('player.loadError'));
         } finally {
             setIsLoading(false);
         }

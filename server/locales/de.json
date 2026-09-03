@@ -160,6 +160,8 @@
     "pause": "Pause",
     "playPause": "Abspielen/Pause",
     "playbackSpeed": "Wiedergabegeschwindigkeit",
+    "about": "Über",
+    "help": "Hilfe",
     "logout": "Abmelden",
     "quit": "Beenden"
   },
@@ -179,7 +181,9 @@
     "deleteMessage": "Möchten Sie die heruntergeladene Datei wirklich löschen?",
     "deleteWarning": "Sie müssen sie erneut herunterladen, um sie offline anzuhören.",
     "deleteButton": "Datei löschen",
-    "keepButton": "Datei behalten"
+    "keepButton": "Datei behalten",
+    "failed": "Download fehlgeschlagen",
+    "operationFailed": "Die heruntergeladene Datei konnte nicht aktualisiert werden"
   },
   "updater": {
     "available": {

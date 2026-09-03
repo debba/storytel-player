@@ -160,6 +160,8 @@
     "pause": "Tauko",
     "playPause": "Toista/Tauko",
     "playbackSpeed": "Toistonopeus",
+    "about": "Tietoja",
+    "help": "Ohje",
     "logout": "Kirjaudu ulos",
     "quit": "Lopeta"
   },
@@ -179,7 +181,9 @@
     "deleteMessage": "Haluatko varmasti poistaa ladatun tiedoston?",
     "deleteWarning": "Sinun on ladattava se uudelleen kuunnellaksesi ilman verkkoyhteyttä.",
     "deleteButton": "Poista tiedosto",
-    "keepButton": "Säilytä tiedosto"
+    "keepButton": "Säilytä tiedosto",
+    "failed": "Lataus epäonnistui",
+    "operationFailed": "Ladattua tiedostoa ei voitu päivittää"
   },
   "updater": {
     "available": {

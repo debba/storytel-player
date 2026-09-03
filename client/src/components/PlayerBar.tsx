@@ -63,7 +63,7 @@ export function PlayerBar() {
     return null;
   }
 
-  const bookTitle = activeBook?.book?.name || 'Storytel Audiobook';
+  const bookTitle = activeBook?.book?.name || `Storytel ${t('search.audiobook')}`;
   const authorName = activeBook?.book?.authorsAsString || activeBook?.abook?.narratorAsString || '';
   const coverUrl = activeBook?.book?.largeCover || activeBook?.book?.largeCoverE || '';
   const progressPercent = duration > 0 ? Math.min(Math.max((currentTime / duration) * 100, 0), 100) : 0;
