@@ -32,7 +32,12 @@ async function initialize(): Promise<void> {
     // Initialize i18n with the Fastify server
     const fastifyServer = serverManager.getServer();
     if (fastifyServer) {
-        i18n.setAppLocale(app.getLocale());
+        // Full ordered OS preference list ('sv-FI', 'en-FI', ...) so a user
+        // whose first language we don't ship still gets their second choice
+        // instead of falling straight through to English.
+        i18n.setSystemLanguages([...app.getPreferredSystemLanguages(), app.getLocale()]);
+        // Where the user is, which the language alone does not tell us.
+        i18n.setRegion(app.getLocaleCountryCode() || null);
         i18n.detectLanguage();
         await i18n.initialize(fastifyServer);
     }

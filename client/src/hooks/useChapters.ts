@@ -1,74 +1,90 @@
-import {useCallback, useMemo, useState} from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import api from '../utils/api';
-import {Chapter} from '../interfaces/chapters';
-import {t} from "i18next";
-import {BookMetaData} from "../interfaces/books";
+import { Chapter } from '../interfaces/chapters';
+import { extractChaptersFromResponse, generateAudioTracks } from '../utils/chapters';
+import { t } from 'i18next';
 
 interface UseChaptersProps {
-    consumableId: string;
-    currentTime: number;
-    onError: (error: string) => void;
+  consumableId: string;
+  currentTime: number;
+  onError: (error: string) => void;
 }
 
-export const useChapters = ({consumableId, currentTime, onError}: UseChaptersProps) => {
-    const [chapters, setChapters] = useState<Chapter[]>([]);
-    const [showChaptersModal, setShowChaptersModal] = useState(false);
+export const useChapters = ({ consumableId, currentTime, onError }: UseChaptersProps) => {
+  const [chapters, setChapters] = useState<Chapter[]>([]);
+  const [showChaptersModal, setShowChaptersModal] = useState(false);
 
-    const loadChapters = useCallback(async () => {
-        const extractChapters = (data: BookMetaData) =>
-            data.formats?.find(format => format.type === 'abook')?.chapters || [];
+  const loadChapters = useCallback(async (knownDurationSeconds?: number) => {
+    if (!consumableId) return;
 
-        try {
-            const response = await api.get<BookMetaData>(`/bookmetadata/${consumableId}`);
-            setChapters(extractChapters(response.data));
-        } catch (error: any) {
-            // Fall back to the offline cache persisted at download time.
-            // If even the offline cache is missing we just leave chapters empty
-            // instead of blocking the whole PlayerView with an error state.
-            try {
-                const offline = await api.get<BookMetaData>(`/offline/bookmetadata/${consumableId}`);
-                setChapters(extractChapters(offline.data));
-            } catch {
-                setChapters([]);
-            }
-        }
-    }, [consumableId]);
+    try {
+      const response = await api.get(`/bookmetadata/${consumableId}`);
+      const list = extractChaptersFromResponse(response.data);
+      if (list.length > 0) {
+        setChapters(list);
+        return;
+      }
+    } catch {
+      // Try fallback to /book-details
+    }
 
-    const currentChapter = useMemo(() => {
-        let cumulativeTime = 0;
+    try {
+      const details = await api.get(`/book-details/${consumableId}`);
+      const list = extractChaptersFromResponse(details.data);
+      if (list.length > 0) {
+        setChapters(list);
+        return;
+      }
+    } catch {
+      // Empty chapters on fallback failure
+    }
 
-        for (let i = 0; i < chapters?.length; i++) {
-            const chapter = chapters[i];
-            const chapterStart = cumulativeTime;
-            const chapterEnd = cumulativeTime + (chapter.durationInSeconds || 0);
+    if (knownDurationSeconds && knownDurationSeconds > 0) {
+      setChapters(generateAudioTracks(knownDurationSeconds));
+    } else {
+      setChapters([]);
+    }
+  }, [consumableId]);
 
-            if (currentTime >= chapterStart && currentTime < chapterEnd) {
-                return {
-                    ...chapter,
-                    title: chapter.title || `${t('chapters.chapter')} ${chapter.number}`,
-                    start: chapterStart,
-                    end: chapterEnd
-                };
-            }
+  const currentChapter = useMemo(() => {
+    if (!chapters || chapters.length === 0) return null;
 
-            cumulativeTime = chapterEnd;
-        }
+    for (let i = 0; i < chapters.length; i++) {
+      const chapter = chapters[i];
+      if (currentTime >= chapter.start && currentTime < chapter.end) {
+        return {
+          ...chapter,
+          title: chapter.title || `${t('chapters.track', { defaultValue: t('chapters.chapter', { defaultValue: 'Ljudspår' }) })} ${chapter.number}`,
+        };
+      }
+    }
 
-        return null;
-    }, [chapters, currentTime]);
+    const last = chapters[chapters.length - 1];
+    if (currentTime >= last.start) {
+      return {
+        ...last,
+        title: last.title || `${t('chapters.track', { defaultValue: t('chapters.chapter', { defaultValue: 'Ljudspår' }) })} ${last.number}`,
+      };
+    }
 
-    const handleChapterClick = (chapterStartTime: number, audioRef: React.RefObject<HTMLAudioElement | null>) => {
-        if (audioRef.current) {
-            audioRef.current.currentTime = chapterStartTime;
-        }
-    };
+    return null;
+  }, [chapters, currentTime]);
 
-    return {
-        chapters,
-        currentChapter,
-        showChaptersModal,
-        setShowChaptersModal,
-        loadChapters,
-        handleChapterClick,
-    };
+  const handleChapterClick = (
+    chapterStartTime: number,
+    audioRef: React.RefObject<HTMLAudioElement | null>
+  ) => {
+    if (audioRef.current && typeof chapterStartTime === 'number' && !isNaN(chapterStartTime)) {
+      audioRef.current.currentTime = chapterStartTime;
+    }
+  };
+
+  return {
+    chapters,
+    currentChapter,
+    showChaptersModal,
+    setShowChaptersModal,
+    loadChapters,
+    handleChapterClick,
+  };
 };

@@ -6,6 +6,10 @@
     "password": "Mot de passe",
     "signIn": "Se connecter",
     "signingIn": "Connexion en cours...",
+    "ssoDivider": "ou",
+    "ssoGoogle": "Continuer avec Google",
+    "ssoApple": "Continuer avec Apple",
+    "ssoOpening": "Ouverture de la connexion Storytel...",
     "errors": {
       "required": "Veuillez entrer votre e-mail et votre mot de passe",
       "failed": "Échec de la connexion",
@@ -14,11 +18,17 @@
   },
   "dashboard": {
     "title": "Ma Bibliothèque",
+    "bookCount_one": "{{count}} livre",
+    "bookCount_other": "{{count}} livres",
     "logout": "Se déconnecter",
     "settings": "Paramètres",
-    "search": "Rechercher des livres...",
+    "search": "Rechercher dans ma bibliothèque...",
+    "searchCatalogPrompt": "Rechercher dans le catalogue Storytel",
+    "exploreCatalog": "Explorer le catalogue (⌘K)",
     "noBooks": "Aucun livre trouvé",
     "emptyLibrary": "Votre bibliothèque semble être vide.",
+    "noFilterMatch": "Aucun livre ne correspond à votre filtre.",
+    "resetFilters": "Réinitialiser les filtres",
     "loading": "Chargement de votre bibliothèque...",
     "loadError": "Échec du chargement de la bibliothèque",
     "filters": {
@@ -32,6 +42,8 @@
     "bookmarks": "Marque-pages",
     "addBookmark": "Ajouter un marque-page",
     "speed": "Vitesse",
+    "skipBackward": "-{{seconds}} secondes",
+    "skipForward": "+{{seconds}} secondes",
     "goTo": "Aller à",
     "goto": "Aller à",
     "playing": "En lecture",
@@ -41,7 +53,13 @@
     "loadingBookData": "Chargement des données du livre...",
     "loadError": "Échec du chargement du flux audio",
     "loadChaptersError": "Échec du chargement des chapitres",
-    "loadBookmarksError": "Échec du chargement des marque-pages"
+    "loadBookmarksError": "Échec du chargement des marque-pages",
+    "sleepTimer": "Minuteur de sommeil",
+    "endOfChapter": "Fin du chapitre",
+    "off": "Désactivé",
+    "expand": "Ouvrir le lecteur complet",
+    "volume": "Volume",
+    "chapterOf": "Chapitre {{current}} sur {{total}}"
   },
   "bookmarks": {
     "title": "Vos Marque-pages",
@@ -74,6 +92,7 @@
     "error": "Erreur",
     "cancel": "Annuler",
     "save": "Enregistrer",
+    "saving": "Enregistrement...",
     "delete": "Supprimer",
     "close": "Fermer"
   },
@@ -83,21 +102,40 @@
     "author": "Auteur :",
     "narrator": "Narrateur :"
   },
+  "bookshelf": {
+    "remove": "Retirer de la bibliothèque",
+    "removeTitle": "Retirer le livre ?",
+    "removeMessage": "« {{title}} » sera retiré de votre bibliothèque Storytel. Vous pouvez le rajouter depuis la recherche à tout moment.",
+    "removeConfirm": "Retirer",
+    "removed": "Retiré de votre bibliothèque",
+    "errors": {
+      "removeFailed": "Impossible de retirer le livre de votre bibliothèque.",
+      "removeNotConfirmed": "Storytel a accepté la demande mais le livre est toujours dans votre bibliothèque."
+    }
+  },
   "bookView": {
     "saved": "Enregistré",
+    "addToLibrary": "Ajouter à la bibliothèque",
+    "inLibrary": "Dans la bibliothèque",
+    "savedToLibrary": "Livre ajouté à votre bibliothèque !",
     "listen": "Écouter",
     "language": "Langue",
     "duration": "Durée",
+    "narrator": "Narrateur",
     "category": "Catégorie",
+    "description": "Description",
     "noDescription": "Aucune description disponible.",
     "showMore": "afficher plus",
     "showLess": "afficher moins",
-    "details": "Détails du livre :"
+    "details": "Détails du livre :",
+    "loadError": "Impossible de charger les détails du livre"
   },
   "chapters": {
-    "title": "Chapitres",
-    "noChapters": "Aucun chapitre disponible",
-    "chapter": "Chapitre"
+    "title": "Pistes audio & Chapitres",
+    "noChapters": "Aucune piste disponible",
+    "chapter": "Chapitre",
+    "track": "Piste",
+    "tracks": "Pistes audio"
   },
   "gotoModal": {
     "title": "Aller à l'heure",
@@ -179,6 +217,16 @@
     "language": "Langue",
     "languageAuto": "Auto"
   },
+  "language": {
+    "title": "Langue",
+    "subtitle": "Choisissez la langue de l'interface de l'application.",
+    "auto": "Automatique",
+    "autoDescription": "Suivre la langue du système",
+    "autoResolved": "Suit le système · {{language}}",
+    "systemPreference": "Langues du système : {{languages}}",
+    "change": "Changer de langue ({{language}})",
+    "catalogNote": "Ceci ne modifie que l'interface de l'application. Les livres disponibles, et dans quelles langues, dépendent du pays de votre compte Storytel."
+  },
   "logs": {
     "title": "Journaux de l'application",
     "refresh": "Actualiser",
@@ -192,5 +240,50 @@
     "typeAction": "Actions de l'utilisateur",
     "confirmClear": "Êtes-vous sûr de vouloir effacer tous les journaux ? Cette action est irréversible.",
     "details": "Détails"
+  },
+  "floatingMenu": {
+    "library": "Bibliothèque",
+    "search": "Rechercher dans le catalogue Storytel",
+    "player": "Lecteur",
+    "settings": "Paramètres",
+    "dockLabel": "Barre de navigation flottante"
+  },
+  "search": {
+    "title": "Rechercher dans le catalogue Storytel",
+    "placeholder": "Rechercher par titre, auteur ou narrateur...",
+    "results": "Résultats de recherche",
+    "hitCount_one": "{{count}} résultat",
+    "hitCount_other": "{{count}} résultats",
+    "hitCountFiltered": "{{count}} sur {{total}} résultats",
+    "sortLabel": "Trier :",
+    "sortRelevance": "Les plus pertinents",
+    "sortTitle": "Titre (A–Z)",
+    "sortDuration": "Les plus longs d'abord",
+    "noResults": "Aucun livre trouvé pour",
+    "searching": "Recherche en cours...",
+    "initialPrompt": "Recherchez parmi des milliers de livres audio et e-books sur Storytel",
+    "selectBookHint": "Sélectionnez un livre pour l'aperçu",
+    "play": "Écouter",
+    "details": "Détails",
+    "addToBookshelf": "Ajouter à la bibliothèque",
+    "addedToBookshelf": "Ajouté à la bibliothèque",
+    "audiobook": "Livre audio",
+    "ebook": "E-book",
+    "hours": "h",
+    "minutes": "min",
+    "shortcut": "Appuyez sur ⌘K / Ctrl+K à tout moment",
+    "allLanguages": "Tous",
+    "filterByLanguage": "Langue",
+    "filterByLength": "Durée",
+    "allLengths": "Toutes les durées",
+    "autoFilterHint": "Présélectionné selon vos langues. Choisissez « Toutes » pour voir tous les résultats.",
+    "noResultsHint": "Vérifiez l'orthographe ou essayez un autre terme de recherche",
+    "noResultsInLanguages": "Aucun résultat en {{languages}}.",
+    "noFilterMatch": "Aucun résultat avec les filtres sélectionnés",
+    "showAllLanguages": "Afficher toutes les langues ({{total}})",
+    "errors": {
+      "addToBookshelfFailed": "Impossible d'ajouter le livre à la bibliothèque. Il n'est peut-être pas disponible dans la région de votre compte.",
+      "addToBookshelfNotConfirmed": "Storytel a accepté la demande mais le livre n'est pas apparu dans votre bibliothèque. Il n'est peut-être pas inclus dans votre abonnement."
+    }
   }
 }

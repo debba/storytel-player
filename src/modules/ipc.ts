@@ -134,21 +134,33 @@ export class IpcManager {
       return i18n.getLanguage();
     });
 
-    ipcMain.handle('set-locale', (_event: IpcMainInvokeEvent, locale: string) => {
+    // Everything the renderer needs to render the picker: the stored mode, the
+    // language actually in use, and what 'auto' currently resolves to.
+    ipcMain.handle('get-locale-state', () => {
+      return i18n.getState();
+    });
+
+    ipcMain.handle('set-locale', async (_event: IpcMainInvokeEvent, locale: string) => {
       storeManager.set('appLanguage', locale);
-      
+
       // Update the current language in i18n
       i18n.detectLanguage();
-      
-      // Refresh fastify translations
+
+      // Refresh fastify translations (tray menu, native dialogs) before
+      // answering, so the renderer never reads a half-applied state.
       const fastifyServer = this.serverManager.getServer();
       if (fastifyServer) {
-        i18n.initialize(fastifyServer).catch(err => {
+        try {
+          await i18n.initialize(fastifyServer);
+        } catch (err) {
           console.error('Failed to reinitialize i18n:', err);
-        });
+        }
       }
-      
-      return true;
+
+      // Rebuild the tray menu so its labels follow the new language too.
+      this.trayManager.updateMenu();
+
+      return i18n.getState();
     });
   }
 

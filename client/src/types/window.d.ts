@@ -2,6 +2,20 @@
 export {};
 
 declare global {
+  /** Mirrors `LanguageState` in the Electron main process (src/i18n/index.ts). */
+  interface AppLanguageState {
+    /** 'auto', or an explicit language code the user picked. */
+    mode: string;
+    /** The language actually in use once 'auto' has been resolved. */
+    resolved: string;
+    /** OS languages, most preferred first (e.g. ['sv-FI', 'en-FI']). */
+    systemLanguages: string[];
+    /** What 'auto' resolves to right now. */
+    systemResolved: string;
+    /** OS country code ('FI'), i.e. where the user is - not their language. */
+    region: string | null;
+  }
+
   interface Window {
     // TODO: Define proper types for tray control methods based on actual Electron IPC
     trayControls?: {
@@ -18,7 +32,8 @@ declare global {
     };
     electronLocale?: {
       getLocale: () => Promise<string>;
-      setLocale: (locale: string) => Promise<boolean>;
+      getState: () => Promise<AppLanguageState>;
+      setLocale: (locale: string) => Promise<AppLanguageState>;
     };
     electronLogs?: {
       openLogsFolder: () => Promise<void>;

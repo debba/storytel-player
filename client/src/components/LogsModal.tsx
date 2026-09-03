@@ -206,7 +206,7 @@ function LogsModal({ isOpen, onClose }: LogsModalProps) {
                 {type === 'all' && t('logs.typeAll', 'All Events')}
                 {type === 'error' && t('logs.typeError', 'Errors')}
                 {type === 'http' && t('logs.typeHttp', 'HTTP Traffic')}
-                {type === 'action' && t('logs.typeAction', 'Actions')}
+                {type === 'action' && t('logs.typeAction', 'User Actions')}
               </button>
             ))}
           </div>

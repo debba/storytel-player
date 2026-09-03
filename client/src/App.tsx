@@ -5,6 +5,8 @@ import {
   Navigate,
   MemoryRouter,
   BrowserRouter,
+  useLocation,
+  useSearchParams,
 } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import LoginForm from "./components/LoginForm";
@@ -15,10 +17,53 @@ import storage from "./utils/storage";
 import BookView from "./components/BookView";
 import WelcomeModal from "./components/WelcomeModal";
 import LogsModal from "./components/LogsModal";
+import SettingsModal from "./components/SettingsModal";
+import ConfirmLogoutModal from "./components/ConfirmLogoutModal";
+import TopBar from "./components/TopBar";
+import PlayerBar from "./components/PlayerBar";
+import SearchView from "./components/SearchView";
+import { AudioProvider } from "./contexts/AudioContext";
 
 const useMemoryRouter =
   import.meta.env.VITE_REACT_APP_USE_MEMORY_ROUTER === "true";
 const Router = useMemoryRouter ? MemoryRouter : BrowserRouter;
+
+function AuthenticatedLayout({
+  children,
+  onOpenSettings,
+  onLogout,
+}: {
+  children: React.ReactNode;
+  onOpenSettings: () => void;
+  onLogout: () => void;
+}) {
+  const location = useLocation();
+  const isPlayerView = location.pathname.startsWith('/player/');
+  const [searchParams] = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
+
+  // Keep topbar search in sync if url search param changes
+  useEffect(() => {
+    const q = searchParams.get('q') || '';
+    setSearchQuery(q);
+  }, [searchParams]);
+
+  return (
+    <div className="h-screen w-screen flex flex-col overflow-hidden bg-[#0A0A0A] text-white select-none">
+      {!isPlayerView && (
+        <TopBar
+          onOpenSettings={onOpenSettings}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+        />
+      )}
+      <main className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden relative flex flex-col">
+        {children}
+      </main>
+      {!isPlayerView && <PlayerBar />}
+    </div>
+  );
+}
 
 function App() {
   const { t } = useTranslation();
@@ -27,6 +72,8 @@ function App() {
   const [triggerLogout, setTriggerLogout] = useState(false);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [showLogsModal, setShowLogsModal] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [sessionExpired, setSessionExpired] = useState(false);
 
   useEffect(() => {
@@ -39,15 +86,24 @@ function App() {
       });
     }
 
-    // Keyboard shortcut Ctrl+Alt+D to open logs modal
+    // Global keyboard shortcuts
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.altKey && e.key === 'd') {
+      // Ctrl+Alt+D -> Logs modal
+      if ((e.ctrlKey || e.metaKey) && e.altKey && e.key.toLowerCase() === 'd') {
+        e.preventDefault();
         setShowLogsModal(true);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
+
+  useEffect(() => {
+    if (triggerLogout) {
+      setShowConfirmModal(true);
+      setTriggerLogout(false);
+    }
+  }, [triggerLogout]);
 
   useEffect(() => {
     const handleUnauthorized = async () => {
@@ -124,6 +180,8 @@ function App() {
     } finally {
       await storage.remove("token");
       setIsAuthenticated(false);
+      setShowConfirmModal(false);
+      setShowSettingsModal(false);
       if (window.trayControls?.updateAuthState) {
         window.trayControls.updateAuthState(false);
       }
@@ -132,68 +190,74 @@ function App() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-xl text-gray-600">{t("common.loading")}</div>
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+        <div className="text-sm font-medium text-gray-400">{t("common.loading")}</div>
       </div>
     );
   }
 
   return (
     <Router>
-      <div className="scrollable in-h-screen bg-gray-100">
-        <Routes>
-          <Route
-            path="/login"
-            element={
-              !isAuthenticated ? (
-                <LoginForm onLogin={handleLogin} sessionExpired={sessionExpired} />
-              ) : (
-                <Navigate to="/" replace />
-              )
-            }
-          />
-          <Route
-            path="/"
-            element={
-              isAuthenticated ? (
-                <Dashboard
-                  onLogout={handleLogout}
-                  triggerLogout={triggerLogout}
-                  setTriggerLogout={setTriggerLogout}
-                />
-              ) : (
-                <Navigate to="/login" replace />
-              )
-            }
-          />
-          <Route
-            path="/player/:bookId"
-            element={
-              isAuthenticated ? (
-                <PlayerView />
-              ) : (
-                <Navigate to="/login" replace />
-              )
-            }
-          />
-          <Route
-            path="/book/:bookId"
-            element={
-              isAuthenticated ? <BookView /> : <Navigate to="/login" replace />
-            }
-          />
-        </Routes>
-        {isAuthenticated && (
-          <WelcomeModal
-            isOpen={showWelcomeModal}
-            onClose={handleWelcomeClose}
-          />
+      <AudioProvider>
+        {isAuthenticated ? (
+          <AuthenticatedLayout
+            onOpenSettings={() => setShowSettingsModal(true)}
+            onLogout={() => setShowConfirmModal(true)}
+          >
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <Dashboard
+                    onLogout={handleLogout}
+                    triggerLogout={triggerLogout}
+                    setTriggerLogout={setTriggerLogout}
+                  />
+                }
+              />
+              <Route path="/search" element={<SearchView />} />
+              <Route path="/player/:bookId" element={<PlayerView />} />
+              <Route path="/book/:bookId" element={<BookView />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+
+            {/* Modals */}
+            <SettingsModal
+              isOpen={showSettingsModal}
+              onClose={() => setShowSettingsModal(false)}
+              onLogout={() => {
+                setShowSettingsModal(false);
+                setShowConfirmModal(true);
+              }}
+            />
+            <ConfirmLogoutModal
+              isOpen={showConfirmModal}
+              onConfirm={handleLogout}
+              onCancel={() => setShowConfirmModal(false)}
+            />
+            <WelcomeModal
+              isOpen={showWelcomeModal}
+              onClose={handleWelcomeClose}
+            />
+            <LogsModal
+              isOpen={showLogsModal}
+              onClose={() => setShowLogsModal(false)}
+            />
+          </AuthenticatedLayout>
+        ) : (
+          <div className="min-h-screen bg-[#0A0A0A]">
+            <Routes>
+              <Route
+                path="/login"
+                element={
+                  <LoginForm onLogin={handleLogin} sessionExpired={sessionExpired} />
+                }
+              />
+              <Route path="*" element={<Navigate to="/login" replace />} />
+            </Routes>
+          </div>
         )}
-        <LogsModal
-          isOpen={showLogsModal}
-          onClose={() => setShowLogsModal(false)}
-        />
-      </div>
+      </AudioProvider>
     </Router>
   );
 }

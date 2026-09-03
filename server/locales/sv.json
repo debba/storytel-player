@@ -6,6 +6,10 @@
     "password": "Lösenord",
     "signIn": "Logga in",
     "signingIn": "Loggar in...",
+    "ssoDivider": "eller",
+    "ssoGoogle": "Fortsätt med Google",
+    "ssoApple": "Fortsätt med Apple",
+    "ssoOpening": "Öppnar Storytel-inloggning...",
     "errors": {
       "required": "Vänligen ange både e-post och lösenord",
       "failed": "Inloggningen misslyckades",
@@ -14,11 +18,17 @@
   },
   "dashboard": {
     "title": "Mitt bibliotek",
+    "bookCount_one": "{{count}} bok",
+    "bookCount_other": "{{count}} böcker",
     "logout": "Logga ut",
     "settings": "Inställningar",
-    "search": "Sök böcker...",
+    "search": "Sök i mitt bibliotek...",
+    "searchCatalogPrompt": "Sök i hela Storytels katalog",
+    "exploreCatalog": "Utforska katalogen (⌘K)",
     "noBooks": "Inga böcker hittades",
     "emptyLibrary": "Ditt bibliotek verkar vara tomt.",
+    "noFilterMatch": "Inga böcker matchade ditt filter.",
+    "resetFilters": "Återställ filter",
     "loading": "Laddar ditt bibliotek...",
     "loadError": "Kunde inte ladda bokhyllan",
     "filters": {
@@ -28,10 +38,12 @@
     }
   },
   "player": {
-    "chapters": "Kapitel",
+    "chapters": "Ljudspår",
     "bookmarks": "Bokmärken",
     "addBookmark": "Lägg till bokmärke",
     "speed": "Hastighet",
+    "skipBackward": "-{{seconds}} sekunder",
+    "skipForward": "+{{seconds}} sekunder",
     "goTo": "Gå till",
     "goto": "Gå till",
     "playing": "Spelar",
@@ -41,7 +53,13 @@
     "loadingBookData": "Laddar bokdata...",
     "loadError": "Kunde inte ladda ljudström",
     "loadChaptersError": "Kunde inte ladda kapitel",
-    "loadBookmarksError": "Kunde inte ladda bokmärken"
+    "loadBookmarksError": "Kunde inte ladda bokmärken",
+    "sleepTimer": "Sovtimer",
+    "endOfChapter": "Slutet av kapitlet",
+    "off": "Av",
+    "expand": "Öppna full spelare",
+    "volume": "Volym",
+    "chapterOf": "Kapitel {{current}} av {{total}}"
   },
   "bookmarks": {
     "title": "Dina bokmärken",
@@ -74,6 +92,7 @@
     "error": "Fel",
     "cancel": "Avbryt",
     "save": "Spara",
+    "saving": "Sparar...",
     "delete": "Ta bort",
     "close": "Stäng"
   },
@@ -83,21 +102,40 @@
     "author": "Författare:",
     "narrator": "Uppläsare:"
   },
+  "bookshelf": {
+    "remove": "Ta bort från bokhyllan",
+    "removeTitle": "Ta bort boken?",
+    "removeMessage": "”{{title}}” tas bort från din Storytel-bokhylla. Du kan lägga tillbaka den via sökningen när du vill.",
+    "removeConfirm": "Ta bort",
+    "removed": "Borttagen från din bokhylla",
+    "errors": {
+      "removeFailed": "Kunde inte ta bort boken från din bokhylla.",
+      "removeNotConfirmed": "Storytel tog emot förfrågan men boken finns kvar i din bokhylla."
+    }
+  },
   "bookView": {
     "saved": "Sparad",
+    "addToLibrary": "Lägg till i bokhylla",
+    "inLibrary": "I bokhyllan",
+    "savedToLibrary": "Boken har lagts till i din bokhylla!",
     "listen": "Lyssna",
     "language": "Språk",
     "duration": "Längd",
+    "narrator": "Uppläsare",
     "category": "Kategori",
+    "description": "Beskrivning",
     "noDescription": "Ingen beskrivning tillgänglig.",
     "showMore": "visa mer",
     "showLess": "visa mindre",
-    "details": "Bokdetaljer:"
+    "details": "Bokdetaljer:",
+    "loadError": "Kunde inte ladda bokinformationen"
   },
   "chapters": {
-    "title": "Kapitel",
-    "noChapters": "Inga kapitel tillgängliga",
-    "chapter": "Kapitel"
+    "title": "Ljudspår & Kapitel",
+    "noChapters": "Inga ljudspår tillgängliga",
+    "chapter": "Kapitel",
+    "track": "Ljudspår",
+    "tracks": "Ljudspår"
   },
   "gotoModal": {
     "title": "Gå till tid",
@@ -179,6 +217,16 @@
     "language": "Språk",
     "languageAuto": "Auto"
   },
+  "language": {
+    "title": "Språk",
+    "subtitle": "Välj språk för appens gränssnitt.",
+    "auto": "Automatiskt",
+    "autoDescription": "Följ systemets språk",
+    "autoResolved": "Följer systemet · {{language}}",
+    "systemPreference": "Systemspråk: {{languages}}",
+    "change": "Byt språk ({{language}})",
+    "catalogNote": "Detta ändrar bara appens gränssnitt. Vilka böcker du hittar, och på vilka språk, avgörs av landet för ditt Storytel-konto."
+  },
   "logs": {
     "title": "Applikationsloggar",
     "refresh": "Uppdatera",
@@ -192,5 +240,50 @@
     "typeAction": "Användaråtgärder",
     "confirmClear": "Är du säker på att du vill rensa alla loggar? Denna åtgärd kan inte ångras.",
     "details": "Detaljer"
+  },
+  "floatingMenu": {
+    "library": "Bokhylla",
+    "search": "Sök i Storytels katalog",
+    "player": "Spelare",
+    "settings": "Inställningar",
+    "dockLabel": "Flytande navigeringspanel"
+  },
+  "search": {
+    "title": "Sök i Storytels utbud",
+    "placeholder": "Sök efter titel, författare eller uppläsare...",
+    "results": "Sökresultat",
+    "hitCount_one": "{{count}} träff",
+    "hitCount_other": "{{count}} träffar",
+    "hitCountFiltered": "{{count}} av {{total}} träffar",
+    "sortLabel": "Sortera:",
+    "sortRelevance": "Mest relevant",
+    "sortTitle": "Titel (A–Ö)",
+    "sortDuration": "Längst först",
+    "noResults": "Inga böcker hittades för",
+    "searching": "Söker...",
+    "initialPrompt": "Sök bland hundratusentals ljudböcker och e-böcker på Storytel",
+    "selectBookHint": "Välj en bok för att förhandsgranska",
+    "play": "Spela",
+    "details": "Detaljer",
+    "addToBookshelf": "Lägg till i bokhylla",
+    "addedToBookshelf": "Tillagd i bokhyllan",
+    "audiobook": "Ljudbok",
+    "ebook": "E-bok",
+    "hours": "tim",
+    "minutes": "min",
+    "shortcut": "Tryck ⌘K / Ctrl+K när som helst",
+    "allLanguages": "Alla",
+    "filterByLanguage": "Språk",
+    "filterByLength": "Längd",
+    "allLengths": "Alla längder",
+    "autoFilterHint": "Förvalt utifrån dina språk. Välj ”Alla” för att se alla träffar.",
+    "noResultsHint": "Kontrollera stavningen eller sök på ett annat sökord",
+    "noResultsInLanguages": "Inga träffar på {{languages}}.",
+    "noFilterMatch": "Inga träffar med valda filter",
+    "showAllLanguages": "Visa alla språk ({{total}})",
+    "errors": {
+      "addToBookshelfFailed": "Kunde inte lägga till boken i bokhyllan. Den kanske inte ingår i ditt lands abonnemang.",
+      "addToBookshelfNotConfirmed": "Storytel tog emot begäran men boken dök inte upp i din bokhylla. Den kanske inte ingår i ditt abonnemang."
+    }
   }
 }
