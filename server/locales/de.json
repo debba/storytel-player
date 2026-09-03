@@ -32,6 +32,7 @@
     "loading": "Bibliothek wird geladen...",
     "loadError": "Bücherregal konnte nicht geladen werden",
     "filters": {
+      "all": "Alle",
       "notStarted": "Nicht begonnen",
       "started": "Begonnen",
       "concluded": "Abgeschlossen"

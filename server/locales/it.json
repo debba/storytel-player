@@ -32,6 +32,7 @@
     "loading": "Caricamento della tua libreria...",
     "loadError": "Impossibile caricare la libreria",
     "filters": {
+      "all": "Tutti",
       "notStarted": "Non iniziati",
       "started": "In corso",
       "concluded": "Conclusi"

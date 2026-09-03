@@ -240,7 +240,7 @@ export function Dashboard({ onLogout, triggerLogout, setTriggerLogout }: Dashboa
         {/* Filter Status Tabs */}
         <div className="flex items-center gap-2 mb-7 overflow-x-auto pb-1 no-scrollbar border-b border-white/[0.06] pt-1">
           {[
-            { status: null, label: 'Alla', count: counts.all },
+            { status: null, label: t('dashboard.filters.all', 'All'), count: counts.all },
             { status: 2, label: t('dashboard.filters.started', 'Started'), count: counts.started },
             { status: 1, label: t('dashboard.filters.notStarted', 'Not started'), count: counts.notStarted },
             { status: 3, label: t('dashboard.filters.concluded', 'Concluded'), count: counts.concluded },

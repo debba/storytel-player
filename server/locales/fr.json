@@ -32,6 +32,7 @@
     "loading": "Chargement de votre bibliothèque...",
     "loadError": "Échec du chargement de la bibliothèque",
     "filters": {
+      "all": "Tous",
       "notStarted": "Non commencé",
       "started": "Commencé",
       "concluded": "Terminé"

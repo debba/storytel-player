@@ -32,6 +32,7 @@
     "loading": "Loading your library...",
     "loadError": "Failed to load bookshelf",
     "filters": {
+      "all": "All",
       "notStarted": "Not started",
       "started": "Started",
       "concluded": "Concluded"

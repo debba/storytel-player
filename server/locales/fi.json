@@ -32,6 +32,7 @@
     "loading": "Ladataan kirjastoasi...",
     "loadError": "Kirjahyllyn lataaminen epäonnistui",
     "filters": {
+      "all": "Kaikki",
       "notStarted": "Ei aloitettu",
       "started": "Aloitettu",
       "concluded": "Kuunneltu"

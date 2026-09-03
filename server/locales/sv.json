@@ -32,6 +32,7 @@
     "loading": "Laddar ditt bibliotek...",
     "loadError": "Kunde inte ladda bokhyllan",
     "filters": {
+      "all": "Alla",
       "notStarted": "Ej påbörjad",
       "started": "Påbörjad",
       "concluded": "Avslutad"

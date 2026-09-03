@@ -32,6 +32,7 @@
     "loading": "Cargando tu biblioteca...",
     "loadError": "Error al cargar la biblioteca",
     "filters": {
+      "all": "Todos",
       "notStarted": "No empezado",
       "started": "Empezado",
       "concluded": "Terminado"
