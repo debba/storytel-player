@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import LoadingState from './LoadingState';
@@ -12,7 +12,7 @@ import PlayerControls from "./PlayerControls";
 import BookInfo from "./BookInfo";
 import DownloadCancelModal from "./DownloadCancelModal";
 import {BookShelfEntity} from "../interfaces/books";
-import {useAudioPlayer} from "../hooks/useAudioPlayer";
+import {useAudioContext} from "../contexts/AudioContext";
 import {useBookmarks} from "../hooks/useBookmarks";
 import {useChapters} from "../hooks/useChapters";
 import {useGotoModal} from "../hooks/useGotoModal";
@@ -25,51 +25,147 @@ function PlayerView() {
     const {bookId} = useParams();
     const location = useLocation();
     const navigate = useNavigate();
+    const audio = useAudioContext();
 
-    const book: BookShelfEntity = location.state?.book;
+    const [fetchedBook, setFetchedBook] = useState<BookShelfEntity | null>(null);
+
+    // Reset fetched book details when switching to a different book
+    useEffect(() => {
+        setFetchedBook(null);
+    }, [bookId]);
+
+    // Check if the central active book matches this route's bookId
+    const isCurrentActiveBook =
+        audio.activeBook &&
+        (String(audio.activeBookId) === String(bookId) ||
+         String(audio.activeBook.id) === String(bookId) ||
+         String(audio.activeBook.book?.consumableId) === String(bookId) ||
+         String(audio.activeBook.abook?.id) === String(bookId));
+
+    // Check if navigation state book matches this route's bookId
+    const stateBookMatches =
+        location.state?.book &&
+        (String(location.state.book.id) === String(bookId) ||
+         String(location.state.book.book?.consumableId) === String(bookId) ||
+         String(location.state.book.abook?.id) === String(bookId));
+
+    // Check if fetched fallback book matches this route's bookId
+    const fetchedBookMatches =
+        fetchedBook &&
+        (String(fetchedBook.id) === String(bookId) ||
+         String(fetchedBook.book?.consumableId) === String(bookId) ||
+         String(fetchedBook.abook?.id) === String(bookId));
+
+    const book: BookShelfEntity | null =
+        (stateBookMatches ? location.state.book : null) ||
+        (fetchedBookMatches ? fetchedBook : null) ||
+        (isCurrentActiveBook ? audio.activeBook : null);
+
+    // The play buttons navigate here with `autoPlay` in the router state; opening
+    // the player any other way (mini player, deep link) only loads the book.
+    const autoPlayRequested = location.state?.autoPlay === true;
+    const activeConsumableId = book?.book?.consumableId || bookId || '';
 
     const [error, setError] = useState('');
     const [isLoadingBookData, setIsLoadingBookData] = useState(true);
-    const [playbackRate, setPlaybackRate] = useState(1.0);
     const [showPlaybackSpeedModal, setShowPlaybackSpeedModal] = useState(false);
     const [showKeyOverlay, setShowKeyOverlay] = useState<'play' | 'pause' | 'forward' | 'backward' | null>(null);
     const [isDownloaded, setIsDownloaded] = useState(false);
     const [isDownloading, setIsDownloading] = useState(false);
     const [showDownloadCancelModal, setShowDownloadCancelModal] = useState(false);
 
-    // Audio player hook
-    const audioPlayer = useAudioPlayer({
-        bookId,
-        consumableId: book?.book?.consumableId,
-        playbackRate,
-        onLoadError: setError,
-    });
+    // Fetch fallback book details if not available
+    useEffect(() => {
+        const hasBookDetails = stateBookMatches || isCurrentActiveBook;
+        if (!hasBookDetails && bookId) {
+            let cancelled = false;
+            api.get(`/book-details/${bookId}`)
+                .then((res) => {
+                    if (cancelled) return;
+                    const data = res.data || {};
+                    const formats = data.formats || [];
+                    const abook = formats.find((f: any) => f.type === 'abook');
+                    const ebook = formats.find((f: any) => f.type === 'ebook');
+                    const cover = abook?.cover?.url || ebook?.cover?.url || data.cover?.url || '';
+                    const authors = (data.authors || []).map((a: any) => a.name).join(', ');
+                    const narrators = (data.narrators || []).map((n: any) => n.name).join(', ');
+                    const entity: any = {
+                        id: bookId,
+                        status: 2,
+                        book: {
+                            name: data.title || '',
+                            authorsAsString: authors,
+                            consumableId: String(bookId),
+                            largeCover: cover,
+                            largeCoverE: '',
+                            category: { title: data.category?.name || '' },
+                            language: { localizedName: '' }
+                        },
+                        abook: abook ? {
+                            id: abook.id || bookId,
+                            narratorAsString: narrators,
+                            time: (abook.durationInMilliseconds || 0) * 1000,
+                            description: data.description || ''
+                        } : null,
+                        abookMark: null,
+                        ebook: ebook || null
+                    };
+                    setFetchedBook(entity);
+                })
+                .catch((e) => {
+                    if (!cancelled) {
+                        console.error("Failed to fetch fallback book details:", e);
+                    }
+                });
+
+            return () => {
+                cancelled = true;
+            };
+        }
+    }, [bookId, stateBookMatches, isCurrentActiveBook]);
+
+    // Load book into central audio player. The play intent belongs to the
+    // navigation, so it is honoured on the first run - which also resumes a book
+    // that is loaded but paused - and afterwards only while the stream is still
+    // missing. A re-run (the book details arriving, say, or React invoking the
+    // effect twice in development) can therefore neither swallow the intent nor
+    // resume playback the user has just paused.
+    const lastBookIdRef = useRef<string | null>(null);
+    useEffect(() => {
+        if (bookId) {
+            const isNewBook = lastBookIdRef.current !== bookId;
+            lastBookIdRef.current = bookId;
+            const isAlreadyLoaded = audio.activeBookId === bookId && !isNewBook && !!audio.audioSrc;
+            const autoPlay = autoPlayRequested && (isNewBook || !isAlreadyLoaded);
+            audio.loadBook(book, bookId, autoPlay);
+        }
+    }, [bookId, book, autoPlayRequested, audio.loadBook]);
 
     // Bookmarks hook
     const bookmarks = useBookmarks({
-        consumableId: book?.book?.consumableId,
+        consumableId: activeConsumableId,
         onError: setError,
     });
 
     // Chapters hook
     const chapters = useChapters({
-        consumableId: book?.book?.consumableId,
-        currentTime: audioPlayer.currentTime,
+        consumableId: activeConsumableId,
+        currentTime: audio.currentTime,
         onError: setError,
     });
 
     // Goto modal hook
     const gotoModal = useGotoModal({
-        onSeek: audioPlayer.handleSeek,
-        duration: audioPlayer.duration,
-        playbackRate,
-        currentTime: audioPlayer.currentTime,
+        onSeek: audio.seek,
+        duration: audio.duration,
+        playbackRate: audio.playbackRate,
+        currentTime: audio.currentTime,
     });
 
     // Load book data (chapters and bookmarks)
     useEffect(() => {
         const loadBookData = async () => {
-            if (book) {
+            if (activeConsumableId) {
                 setIsLoadingBookData(true);
                 try {
                     await Promise.all([
@@ -79,7 +175,9 @@ function PlayerView() {
                 } finally {
                     setIsLoadingBookData(false);
                 }
-                document.title = truncateTitle(book.book.name);
+                if (book) {
+                    document.title = truncateTitle(book.book.name);
+                }
             }
         };
 
@@ -87,12 +185,8 @@ function PlayerView() {
 
         return () => {
             document.title = 'Storytel Player';
-            // Clear tray when leaving PlayerView
-            if (window.trayControls && window.trayControls.updatePlayingState) {
-                window.trayControls.updatePlayingState(false, null);
-            }
         };
-    }, [book]);
+    }, [activeConsumableId, book]);
 
     // Check download status on mount
     useEffect(() => {
@@ -101,8 +195,8 @@ function PlayerView() {
                 try {
                     const {data: statusData} = await api.get(`/download-status/${bookId}`);
                     setIsDownloaded(statusData.downloaded);
-                } catch (error) {
-                    console.error('Failed to check download status', error);
+                } catch (err) {
+                    console.error('Failed to check download status', err);
                 }
             }
         };
@@ -113,10 +207,8 @@ function PlayerView() {
     // Handle download button click
     const handleDownloadClick = async () => {
         if (isDownloading || isDownloaded) {
-            // Show confirmation modal for cancel or delete
             setShowDownloadCancelModal(true);
         } else {
-            // Start download directly
             await handleDownload();
         }
     };
@@ -125,14 +217,13 @@ function PlayerView() {
     const handleDownload = async () => {
         if (!bookId || isDownloading) return;
 
-        const isElectron = !!window.electronStore
         setIsDownloading(true);
         try {
             trackAction('User initiated download', { bookId: book?.id, bookName: book?.book?.name || "Unknown" });
 
             const response = await api.post('/download', {
                 bookId,
-                consumableId: book?.book?.consumableId,
+                consumableId: activeConsumableId,
                 book,
             });
 
@@ -143,10 +234,10 @@ function PlayerView() {
                     setError((response as any)?.data?.error || 'Download failed');
                 }
             }
-        } catch (error: any) {
-            const errorMsg = error?.data?.error || error?.response?.data?.error;
+        } catch (err: any) {
+            const errorMsg = err?.data?.error || err?.response?.data?.error;
             if (errorMsg !== 'Download cancelled' && errorMsg !== 'canceled') {
-                setError(errorMsg || error.message || 'Download failed');
+                setError(errorMsg || err.message || 'Download failed');
             }
         } finally {
             setIsDownloading(false);
@@ -169,63 +260,41 @@ function PlayerView() {
                 await api.delete(`/downloaded-file/${bookId}`);
                 setIsDownloaded(false);
             }
-        } catch (error: any) {
-            setError(error.response?.data?.error || error.message || 'Operation failed');
+        } catch (err: any) {
+            setError(err.response?.data?.error || err.message || 'Operation failed');
             setShowDownloadCancelModal(false);
         }
     };
 
     // Playback rate change handler
     const handlePlaybackRateChange = (newRate: number) => {
-        setPlaybackRate(newRate);
-        if (audioPlayer.audioRef.current) {
-            audioPlayer.audioRef.current.playbackRate = newRate;
-        }
+        audio.setRate(newRate);
         setShowPlaybackSpeedModal(false);
     };
-
-    // Tray event listeners
-    useEffect(() => {
-        if (window.trayControls) {
-            window.trayControls.onPlayPause?.(() => {
-                audioPlayer.handlePlayPause();
-            });
-
-            window.trayControls.onSetSpeed?.((_event: any, speed: number) => {
-                handlePlaybackRateChange(speed);
-            });
-        }
-    }, [audioPlayer.handlePlayPause]);
-
-    // Update tray with current playing state and book title
-    useEffect(() => {
-        if (window.trayControls && window.trayControls.updatePlayingState) {
-            const bookTitle = book?.book?.name || null;
-            window.trayControls.updatePlayingState(audioPlayer.isPlaying, bookTitle);
-        }
-    }, [audioPlayer.isPlaying, book]);
 
     // Keyboard shortcuts handler
     useEffect(() => {
         const handleKeyPress = (event: KeyboardEvent) => {
-            if (event.target !== document.body) return;
+            if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
+                return;
+            }
 
             switch (event.code) {
                 case 'Space':
                     event.preventDefault();
-                    setShowKeyOverlay(audioPlayer.isPlaying ? 'pause' : 'play');
-                    audioPlayer.handlePlayPause();
+                    setShowKeyOverlay(audio.isPlaying ? 'pause' : 'play');
+                    audio.togglePlayPause();
                     setTimeout(() => setShowKeyOverlay(null), 1000);
                     break;
                 case 'ArrowLeft':
                     event.preventDefault();
-                    audioPlayer.skipBackward();
+                    audio.skipBackward(15);
                     setShowKeyOverlay('backward');
                     setTimeout(() => setShowKeyOverlay(null), 1000);
                     break;
                 case 'ArrowRight':
                     event.preventDefault();
-                    audioPlayer.skipForward();
+                    audio.skipForward(15);
                     setShowKeyOverlay('forward');
                     setTimeout(() => setShowKeyOverlay(null), 1000);
                     break;
@@ -237,15 +306,14 @@ function PlayerView() {
         return () => {
             document.removeEventListener('keydown', handleKeyPress);
         };
-    }, [audioPlayer.handlePlayPause, audioPlayer.skipForward, audioPlayer.skipBackward, audioPlayer.isPlaying]);
+    }, [audio.togglePlayPause, audio.skipForward, audio.skipBackward, audio.isPlaying]);
 
-
-    if (audioPlayer.isLoading || isLoadingBookData) {
-        return <LoadingState message={audioPlayer.isLoading ? t('player.loadingAudio') : t('player.loadingBookData')}/>;
+    if (audio.isLoading || isLoadingBookData || !book) {
+        return <LoadingState message={audio.isLoading ? t('player.loadingAudio') : t('player.loadingBookData')}/>;
     }
 
-    if (error) {
-        return <ErrorState error={error} onRetry={() => navigate('/')}/>;
+    if (error || audio.error) {
+        return <ErrorState error={error || audio.error || ''} onRetry={() => navigate('/')}/>;
     }
 
     return (
@@ -292,16 +360,16 @@ function PlayerView() {
                 </div>
             )}
 
-            <main className="max-w-4xl mx-auto py-2 sm:px-6 lg:px-8 pb-2">
+            <main className="max-w-4xl mx-auto py-2 sm:px-6 lg:px-8 pb-32">
                 <div className="px-2">
                     <div className="rounded-lg shadow-lg overflow-hidden">
                         {/* Book Info */}
                         <BookInfo
                             book={book}
-                            currentChapter={chapters.currentChapter}
-                            chapters={chapters.chapters}
-                            currentTime={audioPlayer.currentTime}
-                            playbackRate={playbackRate}
+                            currentChapter={chapters.currentChapter || audio.currentChapter}
+                            chapters={chapters.chapters.length > 0 ? chapters.chapters : audio.chapters}
+                            currentTime={audio.currentTime}
+                            playbackRate={audio.playbackRate}
                             onShowChaptersModal={() => chapters.setShowChaptersModal(true)}
                             onShowBookmarksModal={() => bookmarks.setShowBookmarksModal(true)}
                             onDownload={handleDownloadClick}
@@ -310,32 +378,20 @@ function PlayerView() {
                             isDownloading={isDownloading}
                         />
 
-                        {/* Audio Element */}
-                        <audio
-                            ref={audioPlayer.audioRef}
-                            src={audioPlayer.audioSrc || undefined}
-                            onTimeUpdate={audioPlayer.handleTimeUpdate}
-                            onLoadedMetadata={audioPlayer.handleLoadedMetadata}
-                            onPlay={audioPlayer.handlePlay}
-                            onPause={audioPlayer.handlePause}
-                            onRateChange={audioPlayer.handleRateChange}
-                            className="hidden"
-                        />
-
                         {/* Player Controls */}
                         <PlayerControls
-                            isPlaying={audioPlayer.isPlaying}
-                            currentTime={audioPlayer.currentTime}
-                            duration={audioPlayer.duration}
-                            volume={audioPlayer.volume}
-                            isMuted={audioPlayer.isMuted}
-                            playbackRate={playbackRate}
-                            onPlayPause={audioPlayer.handlePlayPause}
-                            onSeek={audioPlayer.handleSeek}
-                            onVolumeChange={audioPlayer.handleVolumeChange}
-                            onToggleMute={audioPlayer.toggleMute}
-                            onSkipForward={audioPlayer.skipForward}
-                            onSkipBackward={audioPlayer.skipBackward}
+                            isPlaying={audio.isPlaying}
+                            currentTime={audio.currentTime}
+                            duration={audio.duration}
+                            volume={audio.volume}
+                            isMuted={audio.isMuted}
+                            playbackRate={audio.playbackRate}
+                            onPlayPause={audio.togglePlayPause}
+                            onSeek={audio.seek}
+                            onVolumeChange={audio.setVolume}
+                            onToggleMute={audio.toggleMute}
+                            onSkipForward={() => audio.skipForward(15)}
+                            onSkipBackward={() => audio.skipBackward(15)}
                             onShowGotoModal={gotoModal.openModal}
                             onShowPlaybackSpeedModal={() => setShowPlaybackSpeedModal(true)}
                         />
@@ -343,14 +399,14 @@ function PlayerView() {
                         {/* Modals */}
                         <PlaybackSpeedModal
                             isOpen={showPlaybackSpeedModal}
-                            playbackRate={playbackRate}
+                            playbackRate={audio.playbackRate}
                             onClose={() => setShowPlaybackSpeedModal(false)}
                             onRateChange={handlePlaybackRateChange}
                         />
 
                         <GotoModal
                             isOpen={gotoModal.showGotoModal}
-                            playbackRate={playbackRate}
+                            playbackRate={audio.playbackRate}
                             gotoHours={gotoModal.gotoHours}
                             gotoMinutes={gotoModal.gotoMinutes}
                             gotoSeconds={gotoModal.gotoSeconds}
@@ -363,11 +419,14 @@ function PlayerView() {
 
                         <ChaptersModal
                             isOpen={chapters.showChaptersModal}
-                            chapters={chapters.chapters}
-                            currentTime={audioPlayer.currentTime}
-                            playbackRate={playbackRate}
+                            chapters={chapters.chapters.length > 0 ? chapters.chapters : audio.chapters}
+                            currentTime={audio.currentTime}
+                            playbackRate={audio.playbackRate}
                             onClose={() => chapters.setShowChaptersModal(false)}
-                            onChapterClick={(time) => chapters.handleChapterClick(time, audioPlayer.audioRef)}
+                            onChapterClick={(time) => {
+                                audio.seek(time);
+                                chapters.setShowChaptersModal(false);
+                            }}
                         />
 
                         <BookmarkModals
@@ -375,16 +434,16 @@ function PlayerView() {
                             bookmarks={bookmarks.bookmarks}
                             onCloseBookmarksModal={() => bookmarks.setShowBookmarksModal(false)}
                             onShowCreateBookmarkModal={bookmarks.handleShowCreateBookmarkModal}
-                            onGoToBookmark={(position) => bookmarks.goToBookmark(position, audioPlayer.audioRef)}
+                            onGoToBookmark={(position) => bookmarks.goToBookmark(position, audio.audioRef)}
                             onShowEditBookmarkModal={bookmarks.handleShowEditBookmarkModal}
                             onShowDeleteConfirmModal={bookmarks.handleShowDeleteConfirmModal}
                             showCreateBookmarkModal={bookmarks.showCreateBookmarkModal}
                             newBookmarkNote={bookmarks.newBookmarkNote}
-                            currentTime={audioPlayer.currentTime}
-                            playbackRate={playbackRate}
+                            currentTime={audio.currentTime}
+                            playbackRate={audio.playbackRate}
                             onCloseCreateBookmarkModal={bookmarks.handleCloseCreateBookmarkModal}
                             onNewBookmarkNoteChange={bookmarks.setNewBookmarkNote}
-                            onCreateBookmark={() => bookmarks.createBookmark(audioPlayer.currentTime)}
+                            onCreateBookmark={() => bookmarks.createBookmark(audio.currentTime)}
                             showEditBookmarkModal={bookmarks.showEditBookmarkModal}
                             bookmarkToEdit={bookmarks.bookmarkToEdit}
                             editBookmarkNote={bookmarks.editBookmarkNote}

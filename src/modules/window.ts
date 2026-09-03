@@ -20,11 +20,18 @@ export class WindowManager {
         // Get alwaysOnTop setting from store (default: false)
         const alwaysOnTop = storeManager.get<boolean>('settings.alwaysOnTop') ?? false;
 
+        // Restore window bounds if previously saved
+        const savedBounds = storeManager.get<{ x?: number; y?: number; width: number; height: number }>('window.bounds');
+
         const windowConfig: WindowConfig = {
-            width: 480,
-            height: 800,
-            resizable: this.isDebug,
-            maximizable: this.isDebug,
+            width: savedBounds?.width && savedBounds.width >= 880 ? savedBounds.width : 1280,
+            height: savedBounds?.height && savedBounds.height >= 600 ? savedBounds.height : 800,
+            minWidth: 880,
+            minHeight: 600,
+            x: savedBounds?.x,
+            y: savedBounds?.y,
+            resizable: true,
+            maximizable: true,
             alwaysOnTop
         };
 
@@ -39,7 +46,7 @@ export class WindowManager {
             },
             icon: path.join(__dirname, '../../../assets/icon.png'),
             show: false,
-            backgroundColor: '#000'
+            backgroundColor: '#0A0A0A'
         });
 
         if (this.isDev) {
@@ -63,6 +70,26 @@ export class WindowManager {
         this.mainWindow.once('ready-to-show', () => {
             this.mainWindow?.show();
         });
+
+        // Save window bounds on resize/move
+        let saveTimeout: NodeJS.Timeout | null = null;
+        const saveBounds = () => {
+            if (!this.mainWindow || this.mainWindow.isDestroyed() || this.mainWindow.isMinimized() || this.mainWindow.isMaximized()) return;
+            if (saveTimeout) clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(() => {
+                try {
+                    if (this.mainWindow && !this.mainWindow.isDestroyed()) {
+                        const bounds = this.mainWindow.getBounds();
+                        storeManager.set('window.bounds', bounds);
+                    }
+                } catch (e) {
+                    // Ignore if window was closed in between
+                }
+            }, 500);
+        };
+
+        this.mainWindow.on('resize', saveBounds);
+        this.mainWindow.on('move', saveBounds);
 
         this.mainWindow.on('close', (event) => {
             // @ts-ignore

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import api, { trackAction } from '../utils/api';
 import storage from "../utils/storage";
+import LanguageButton from './LanguageButton';
 
 interface LoginFormProps {
   onLogin: () => void;
@@ -81,6 +82,11 @@ function LoginForm({ onLogin, sessionExpired }: LoginFormProps) {
 
   return (
     <div className="min-h-screen bg-black text-white">
+      {/* Reachable before login: the app may have started in a language the
+          user does not read, and the floating dock is not mounted yet. */}
+      <div className="absolute top-4 right-4 z-10">
+        <LanguageButton variant="ghost" />
+      </div>
       <main className="max-w-4xl mx-auto py-6 px-4">
         <div className="flex items-center justify-center min-h-[calc(100vh-8rem)]">
           <div className="max-w-md w-full space-y-8 p-8 bg-gray-900 rounded-lg shadow-lg border border-gray-800">

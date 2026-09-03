@@ -8,14 +8,16 @@ import fs from "fs";
 import path from "path";
 import axios from "axios";
 import { appLogger } from "./logger";
+import { encryptPassword } from "./passwordCrypt";
 
-// Extend JWT user type. Legacy (email/password) login populates storytelToken
-// and jwt; SSO login populates the sso* fields instead and leaves the legacy
-// ones empty. Email is set in both cases.
+// Extend JWT user type. Legacy (email/password) login populates storytelToken,
+// jwt, and encryptedPassword; SSO login populates the sso* fields instead and
+// leaves the legacy ones empty. Email is set in both cases.
 interface JWTUser {
   email: string;
   storytelToken: string;
   jwt: string;
+  encryptedPassword?: string;
   ssoStorytelSession?: string;
   ssoFirebaseRefreshToken?: string;
   ssoFirebaseApiKey?: string;
@@ -43,6 +45,9 @@ function hydrateStorytelClient(user: JWTUser): StorytelClient {
         jwt: user.jwt ?? "",
       },
     };
+    if (user.email && user.encryptedPassword) {
+      client.setCredentials(user.email, user.encryptedPassword);
+    }
   }
   return client;
 }
@@ -68,12 +73,17 @@ dotenv.config({
   quiet: true,
 });
 
-// Sends 401 when the Storytel session expired, 500 for all other errors.
+// Sends 401 when the Storytel session expired, or appropriate status code for other errors.
 function replyError(reply: FastifyReply, error: any) {
   if (error.isStorytelUnauthorized) {
     return reply.code(401).send({ error: error.message });
   }
-  return reply.code(500).send({ error: error.message });
+  const statusCode =
+    error.status ||
+    error.statusCode ||
+    (error.response && error.response.status) ||
+    500;
+  return reply.code(statusCode).send({ error: error.message });
 }
 
 const JWT_SECRET =
@@ -134,12 +144,14 @@ fastify.post<{
 
     const storytelClient = new StorytelClient();
     const loginData = await storytelClient.login(email, password);
+    const encPwd = encryptPassword(password.trim());
 
     // Create JWT token with storytel client data
     const token = fastify.jwt.sign({
       storytelToken: loginData.accountInfo.singleSignToken,
       jwt: loginData.accountInfo.jwt,
       email: email,
+      encryptedPassword: encPwd,
     });
 
     reply.send({ success: true, message: "Login successful", token });
@@ -207,6 +219,99 @@ fastify.get(
 
       const bookshelf = await storytelClient.getBookshelf();
       reply.send(bookshelf);
+    } catch (error: any) {
+      replyError(reply, error);
+    }
+  },
+);
+
+// Route to search Storytel catalog
+fastify.get<{
+  Querystring: { q?: string; query?: string };
+}>(
+  "/api/search",
+  {
+    preHandler: fastify.authenticate,
+  },
+  async (request, reply) => {
+    try {
+      const q = request.query.q || request.query.query || "";
+      if (!q.trim()) {
+        return reply.send({ results: [] });
+      }
+
+      const storytelClient = hydrateStorytelClient(request.user);
+      const results = await storytelClient.searchCatalog(q);
+      reply.send({ results });
+    } catch (error: any) {
+      replyError(reply, error);
+    }
+  },
+);
+
+// Route to add book to bookshelf
+fastify.post<{
+  Body: { consumableId: string };
+}>(
+  "/api/bookshelf/add",
+  {
+    preHandler: fastify.authenticate,
+  },
+  async (request, reply) => {
+    try {
+      const { consumableId } = request.body;
+      if (!consumableId) {
+        return reply.code(400).send({ error: "Missing consumableId" });
+      }
+
+      const storytelClient = hydrateStorytelClient(request.user);
+      const result = await storytelClient.addToBookshelf(consumableId);
+
+      // The Storytel endpoint answers 200 even when it ignores the write, so
+      // only report success once the book was seen on the bookshelf.
+      if (!result.added) {
+        return reply.code(502).send({
+          code: "ADD_TO_BOOKSHELF_NOT_CONFIRMED",
+          error: "Storytel accepted the request but the book is not on the bookshelf",
+        });
+      }
+
+      reply.send({ success: true, result });
+    } catch (error: any) {
+      replyError(reply, error);
+    }
+  },
+);
+
+// Route to remove a book from the bookshelf
+fastify.post<{
+  Body: { consumableId: string };
+}>(
+  "/api/bookshelf/remove",
+  {
+    preHandler: fastify.authenticate,
+  },
+  async (request, reply) => {
+    try {
+      const { consumableId } = request.body;
+      if (!consumableId) {
+        return reply.code(400).send({ error: "Missing consumableId" });
+      }
+
+      const storytelClient = hydrateStorytelClient(request.user);
+      const result = await storytelClient.removeFromBookshelf(consumableId);
+
+      // Same contract as /bookshelf/add: Storytel answers 200 even when it
+      // ignores the write, so only report success once the book is really gone.
+      if (!result.removed) {
+        return reply.code(502).send({
+          code: "REMOVE_FROM_BOOKSHELF_NOT_CONFIRMED",
+          error:
+            "Storytel accepted the request but the book is still on the bookshelf",
+        });
+      }
+
+      reply.send({ success: true, result });
     } catch (error: any) {
       replyError(reply, error);
     }
@@ -493,51 +598,54 @@ fastify.get(
   },
 );
 
+// Locale loaders keyed by language code. The import paths are written out
+// literally so esbuild can bundle every locale into the server build - a
+// computed `import("./locales/" + code)` is not resolvable at build time.
+//
+// Adding a language? Add the JSON file here and mirror it in
+// `client/src/config/languages.ts` and `src/i18n/languages.ts`.
+const LOCALE_LOADERS = {
+  de: () => import("./locales/de.json"),
+  en: () => import("./locales/en.json"),
+  es: () => import("./locales/es.json"),
+  fr: () => import("./locales/fr.json"),
+  it: () => import("./locales/it.json"),
+  fi: () => import("./locales/fi.json"),
+  sv: () => import("./locales/sv.json"),
+} as const;
+
+type SupportedLanguage = keyof typeof LOCALE_LOADERS;
+
+const SUPPORTED_LANGUAGES = Object.keys(LOCALE_LOADERS) as SupportedLanguage[];
+
+const loadLocale = async (code: SupportedLanguage) =>
+  (await LOCALE_LOADERS[code]()).default;
+
 fastify.get<{
   Querystring: { lang?: string };
 }>("/api/translations", async (request, reply) => {
   try {
     const { lang } = request.query;
-    const supported = ["en", "it", "fr", "es", "de", "sv"];
 
-    if (lang && supported.includes(lang)) {
-      let translations;
-      switch (lang) {
-        case "it":
-          translations = await import("./locales/it.json");
-          break;
-        case "fr":
-          translations = await import("./locales/fr.json");
-          break;
-        case "es":
-          translations = await import("./locales/es.json");
-          break;
-        case "de":
-          translations = await import("./locales/de.json");
-          break;
-        case "sv":
-          translations = await import("./locales/sv.json");
-          break;
-        default:
-          translations = await import("./locales/en.json");
-          break;
-      }
-      reply.send(translations.default);
+    // Accept region variants and odd casing ("sv-FI", "SV", "sv_FI" -> "sv").
+    // Without this a locale like sv-FI fell through to the "every language"
+    // branch below, which i18next then loaded as a single unusable bundle.
+    const requested = (lang ?? "").trim().toLowerCase().replace(/_/g, "-");
+    const base = requested.split("-")[0];
+    const match = SUPPORTED_LANGUAGES.find(
+      (code) => code === requested || code === base,
+    );
+
+    if (match) {
+      const translations = await loadLocale(match);
+      reply.header("Content-Language", match);
+      reply.send(translations);
     } else {
-      const translationsEn = await import("./locales/en.json");
-      const translationsIt = await import("./locales/it.json");
-      const translationsFr = await import("./locales/fr.json");
-      const translationsEs = await import("./locales/es.json");
-      const translationsDe = await import("./locales/de.json");
-      const translationsSv = await import("./locales/sv.json");
-      reply.send({
-        en: translationsEn.default,
-        it: translationsIt.default,
-        fr: translationsFr.default,
-        es: translationsEs.default,
-        de: translationsDe.default,
-        sv: translationsSv.default,
-      });
+      // No usable `lang`: hand back every bundle, keyed by language code.
+      const bundles = await Promise.all(
+        SUPPORTED_LANGUAGES.map(async (code) => [code, await loadLocale(code)] as const),
+      );
+      reply.send(Object.fromEntries(bundles));
     }
   } catch (error: any) {
     reply.code(500).send({ error: "Failed to load translations" });

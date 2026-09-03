@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export interface ModalProps {
   isOpen: boolean;
@@ -19,6 +20,9 @@ const Modal: React.FC<ModalProps> = ({
   maxWidth = 'max-w-md',
   zIndex = 50
 }) => {
+  // Called before the early return so the hook order stays stable.
+  const { t } = useTranslation();
+
   if (!isOpen) return null;
 
   return (
@@ -49,7 +53,7 @@ const Modal: React.FC<ModalProps> = ({
                     <button 
                       onClick={onClose} 
                       className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-800 rounded-md transition-colors"
-                      title="Close"
+                      title={t('common.close', 'Close')}
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

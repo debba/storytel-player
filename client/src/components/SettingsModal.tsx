@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import api from '../utils/api';
 import LogsModal from './LogsModal';
+import LanguageModal from './LanguageModal';
 import Modal from './Modal';
+import { getLanguageState, LanguageState } from '../i18n';
+import { AUTO_LANGUAGE, findLanguage } from '../config/languages';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -16,15 +19,30 @@ function SettingsModal({ isOpen, onClose, onLogout }: SettingsModalProps) {
   const [loading, setLoading] = useState<boolean>(false);
   const [alwaysOnTop, setAlwaysOnTop] = useState<boolean>(false);
   const [showLogsModal, setShowLogsModal] = useState<boolean>(false);
-  const [appLanguage, setAppLanguage] = useState<string>('auto');
+  const [showLanguageModal, setShowLanguageModal] = useState<boolean>(false);
+  const [languageState, setLanguageState] = useState<LanguageState | null>(null);
 
   useEffect(() => {
     if (isOpen) {
       fetchAccountInfo();
       fetchAlwaysOnTopSetting();
-      fetchAppLanguage();
     }
   }, [isOpen]);
+
+  // Also refresh after the picker closes, so the summary line stays accurate.
+  useEffect(() => {
+    if (isOpen && !showLanguageModal) {
+      fetchAppLanguage();
+    }
+  }, [isOpen, showLanguageModal, i18n.language]);
+
+  // "Svenska" for an explicit choice, "Follows the system · Svenska" otherwise.
+  const activeLanguage = findLanguage(languageState?.resolved ?? i18n.language);
+  const activeName = activeLanguage?.nativeName ?? languageState?.resolved ?? i18n.language;
+  const languageSummary =
+    languageState?.mode === AUTO_LANGUAGE
+      ? t('language.autoResolved', { language: activeName })
+      : activeName;
 
   const fetchAccountInfo = async () => {
     try {
@@ -51,10 +69,7 @@ function SettingsModal({ isOpen, onClose, onLogout }: SettingsModalProps) {
   
   const fetchAppLanguage = async () => {
     try {
-      if (window.electronStore) {
-        const lang = await window.electronStore.get('appLanguage');
-        setAppLanguage(lang || 'auto');
-      }
+      setLanguageState(await getLanguageState());
     } catch (error) {
       console.error('Failed to fetch app language setting:', error);
     }
@@ -72,33 +87,6 @@ function SettingsModal({ isOpen, onClose, onLogout }: SettingsModalProps) {
     }
   };
   
-  const handleLanguageChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newLang = e.target.value;
-    setAppLanguage(newLang);
-    
-    try {
-      if (window.electronLocale?.setLocale) {
-        await window.electronLocale.setLocale(newLang);
-        
-        if (newLang === 'auto') {
-          // Re-trigger auto detection in frontend
-          const electronLocale = await window.electronLocale.getLocale();
-          const languageCode = electronLocale.split('-')[0];
-          const supported = ['en', 'it', 'fr', 'es', 'de', 'sv'];
-          if (supported.includes(languageCode)) {
-            i18n.changeLanguage(languageCode);
-          } else {
-            i18n.changeLanguage('en');
-          }
-        } else {
-          i18n.changeLanguage(newLang);
-        }
-      }
-    } catch (error) {
-      console.error('Failed to change language:', error);
-    }
-  };
-
   const handleGithubClick = () => {
     window.open('https://github.com/debba/storytel-player', '_blank', 'noopener,noreferrer');
   };
@@ -144,24 +132,27 @@ function SettingsModal({ isOpen, onClose, onLogout }: SettingsModalProps) {
               </button>
             </div>
             
-            <div className="flex items-center justify-between pt-4 border-t border-gray-700">
-              <div className="text-white font-medium">
-                {t('settings.language', 'Language')}
+            <button
+              onClick={() => setShowLanguageModal(true)}
+              className="w-full flex items-center justify-between gap-4 pt-4 border-t border-gray-700 text-left group"
+            >
+              <div className="min-w-0">
+                <div className="text-white font-medium mb-1">
+                  {t('settings.language')}
+                </div>
+                <div className="text-sm text-gray-400 truncate">
+                  {languageSummary}
+                </div>
               </div>
-              <select
-                value={appLanguage}
-                onChange={handleLanguageChange}
-                className="bg-gray-900 text-white border border-gray-700 rounded px-3 py-1 outline-none focus:border-orange-500"
+              <svg
+                className="w-5 h-5 shrink-0 text-gray-500 group-hover:text-white transition-colors"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                <option value="auto">{t('settings.languageAuto', 'Auto')}</option>
-                <option value="en">English</option>
-                <option value="it">Italiano</option>
-                <option value="fr">Français</option>
-                <option value="es">Español</option>
-                <option value="de">Deutsch</option>
-                <option value="sv">Svenska</option>
-              </select>
-            </div>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
           </div>
         </div>
 
@@ -243,6 +234,11 @@ function SettingsModal({ isOpen, onClose, onLogout }: SettingsModalProps) {
     <LogsModal
       isOpen={showLogsModal}
       onClose={() => setShowLogsModal(false)}
+    />
+
+    <LanguageModal
+      isOpen={showLanguageModal}
+      onClose={() => setShowLanguageModal(false)}
     />
     </>
   );

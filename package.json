@@ -1,8 +1,12 @@
 {
   "name": "storytel-player",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "email": "andrea@debbaweb.it",
   "description": "Storytel Unofficial Player - Storytel audiobook player for desktop",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/debba/storytel-player.git"
+  },
   "main": "dist/electron/main.js",
   "homepage": "./",
   "scripts": {
@@ -33,7 +37,7 @@
     "preelectron": "npm run build && npm run server:build",
     "server:build": "cd server && npm run build",
     "clean": "rm -rf dist; rm -rf server/dist; rm -rf client/build",
-    "version": "node scripts/sync-version.js && conventional-changelog -p angular -i CHANGELOG.md && git add README.md CHANGELOG.md src/version.ts docs/index.html"
+    "version": "node scripts/sync-version.js && conventional-changelog -p angular -i CHANGELOG.md && git add README.md CHANGELOG.md src/version.ts"
   },
   "author": "debba <andrea@debbaweb.it>",
   "license": "MIT",

@@ -18,11 +18,17 @@
   },
   "dashboard": {
     "title": "La mia libreria",
+    "bookCount_one": "{{count}} libro",
+    "bookCount_other": "{{count}} libri",
     "logout": "Esci",
     "settings": "Impostazioni",
-    "search": "Cerca libri...",
+    "search": "Cerca nella mia libreria...",
+    "searchCatalogPrompt": "Cerca nel catalogo Storytel",
+    "exploreCatalog": "Esplora il catalogo (⌘K)",
     "noBooks": "Nessun libro trovato",
     "emptyLibrary": "La tua libreria sembra vuota.",
+    "noFilterMatch": "Nessun libro corrisponde al tuo filtro.",
+    "resetFilters": "Reimposta i filtri",
     "loading": "Caricamento della tua libreria...",
     "loadError": "Impossibile caricare la libreria",
     "filters": {
@@ -36,6 +42,8 @@
     "bookmarks": "Segnalibri",
     "addBookmark": "Aggiungi segnalibro",
     "speed": "Velocità",
+    "skipBackward": "-{{seconds}} secondi",
+    "skipForward": "+{{seconds}} secondi",
     "goTo": "Vai a",
     "goto": "Vai a",
     "playing": "In riproduzione",
@@ -45,7 +53,13 @@
     "loadingBookData": "Caricamento dati libro...",
     "loadError": "Impossibile caricare lo stream audio",
     "loadChaptersError": "Impossibile caricare i capitoli",
-    "loadBookmarksError": "Impossibile caricare i segnalibri"
+    "loadBookmarksError": "Impossibile caricare i segnalibri",
+    "sleepTimer": "Timer di spegnimento",
+    "endOfChapter": "Fine del capitolo",
+    "off": "Disattivato",
+    "expand": "Apri player completo",
+    "volume": "Volume",
+    "chapterOf": "Capitolo {{current}} di {{total}}"
   },
   "bookmarks": {
     "title": "I tuoi Bookmarks",
@@ -78,6 +92,7 @@
     "error": "Errore",
     "cancel": "Annulla",
     "save": "Salva",
+    "saving": "Salvataggio...",
     "delete": "Elimina",
     "close": "Chiudi"
   },
@@ -87,21 +102,40 @@
     "author": "Autore:",
     "narrator": "Narratore:"
   },
+  "bookshelf": {
+    "remove": "Rimuovi dalla libreria",
+    "removeTitle": "Rimuovere il libro?",
+    "removeMessage": "«{{title}}» verrà rimosso dalla tua libreria Storytel. Puoi riaggiungerlo dalla ricerca quando vuoi.",
+    "removeConfirm": "Rimuovi",
+    "removed": "Rimosso dalla tua libreria",
+    "errors": {
+      "removeFailed": "Impossibile rimuovere il libro dalla tua libreria.",
+      "removeNotConfirmed": "Storytel ha accettato la richiesta ma il libro è ancora nella tua libreria."
+    }
+  },
   "bookView": {
     "saved": "Salvato",
+    "addToLibrary": "Aggiungi alla libreria",
+    "inLibrary": "Nella libreria",
+    "savedToLibrary": "Libro aggiunto alla tua libreria!",
     "listen": "Ascolta",
     "language": "Lingua",
     "duration": "Durata",
+    "narrator": "Narratore",
     "category": "Categoria",
+    "description": "Descrizione",
     "noDescription": "Nessuna descrizione disponibile.",
     "showMore": "mostra di più",
     "showLess": "mostra meno",
-    "details": "Dettagli Libro:"
+    "details": "Dettagli Libro:",
+    "loadError": "Impossibile caricare i dettagli del libro"
   },
   "chapters": {
-    "title": "Capitoli",
-    "noChapters": "Nessun capitolo disponibile",
-    "chapter": "Capitolo"
+    "title": "Tracce audio e Capitoli",
+    "noChapters": "Nessuna traccia disponibile",
+    "chapter": "Capitolo",
+    "track": "Traccia",
+    "tracks": "Tracce audio"
   },
   "gotoModal": {
     "title": "Vai al Tempo",
@@ -183,6 +217,16 @@
     "language": "Lingua",
     "languageAuto": "Auto"
   },
+  "language": {
+    "title": "Lingua",
+    "subtitle": "Scegli la lingua dell'interfaccia dell'app.",
+    "auto": "Automatica",
+    "autoDescription": "Segui la lingua di sistema",
+    "autoResolved": "Segue il sistema · {{language}}",
+    "systemPreference": "Lingue di sistema: {{languages}}",
+    "change": "Cambia lingua ({{language}})",
+    "catalogNote": "Questa impostazione cambia solo l'interfaccia dell'app. I libri disponibili, e in quali lingue, dipendono dal paese del tuo account Storytel."
+  },
   "logs": {
     "title": "Log di Sistema",
     "refresh": "Aggiorna",
@@ -196,5 +240,50 @@
     "typeAction": "Azioni Utente",
     "confirmClear": "Sei sicuro di voler svuotare i log? L'operazione non può essere annullata.",
     "details": "Dettagli"
+  },
+  "floatingMenu": {
+    "library": "Libreria",
+    "search": "Cerca nel catalogo Storytel",
+    "player": "Player",
+    "settings": "Impostazioni",
+    "dockLabel": "Barra di navigazione flottante"
+  },
+  "search": {
+    "title": "Cerca nel catalogo Storytel",
+    "placeholder": "Cerca per titolo, autore o narratore...",
+    "results": "Risultati di ricerca",
+    "hitCount_one": "{{count}} risultato",
+    "hitCount_other": "{{count}} risultati",
+    "hitCountFiltered": "{{count}} di {{total}} risultati",
+    "sortLabel": "Ordina:",
+    "sortRelevance": "Più pertinenti",
+    "sortTitle": "Titolo (A–Z)",
+    "sortDuration": "I più lunghi prima",
+    "noResults": "Nessun libro trovato per",
+    "searching": "Ricerca in corso...",
+    "initialPrompt": "Cerca tra migliaia di audiolibri ed ebook su Storytel",
+    "selectBookHint": "Seleziona un libro per l'anteprima",
+    "play": "Ascolta",
+    "details": "Dettagli",
+    "addToBookshelf": "Aggiungi alla libreria",
+    "addedToBookshelf": "Aggiunto alla libreria",
+    "audiobook": "Audiolibro",
+    "ebook": "E-book",
+    "hours": "h",
+    "minutes": "min",
+    "shortcut": "Premi ⌘K / Ctrl+K in qualsiasi momento",
+    "allLanguages": "Tutti",
+    "filterByLanguage": "Lingua",
+    "filterByLength": "Durata",
+    "allLengths": "Tutte le durate",
+    "autoFilterHint": "Preselezionato in base alle tue lingue. Scegli «Tutti» per vedere tutti i risultati.",
+    "noResultsHint": "Controlla l'ortografia o prova un altro termine di ricerca",
+    "noResultsInLanguages": "Nessun risultato in {{languages}}.",
+    "noFilterMatch": "Nessun risultato con i filtri selezionati",
+    "showAllLanguages": "Mostra tutte le lingue ({{total}})",
+    "errors": {
+      "addToBookshelfFailed": "Impossibile aggiungere il libro alla libreria. Potrebbe non essere disponibile nella regione del tuo account.",
+      "addToBookshelfNotConfirmed": "Storytel ha accettato la richiesta ma il libro non è comparso nella tua libreria. Potrebbe non essere incluso nel tuo abbonamento."
+    }
   }
 }

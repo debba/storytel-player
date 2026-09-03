@@ -77,6 +77,24 @@ storytel-player/
   2. Add translations to all other language files (`it.json`, etc.)
   3. Use the key in your component with `t('your.new.key')`
 
+- **Adding a New Language**: the supported-language list exists once per build
+  target, because the renderer (Vite), the Electron main process (tsc) and the
+  server (esbuild) do not share a module graph. Update all four in lockstep:
+  1. `server/locales/<code>.json` — full key parity with `en.json`
+  2. `server/fastify-common.ts` — add the loader to `LOCALE_LOADERS`
+  3. `client/src/config/languages.ts` — add code + endonym to `APP_LANGUAGES`
+  4. `src/i18n/languages.ts` — add the code to `SUPPORTED_LANGUAGES`
+
+- **UI Language vs. Catalog Language**: they are unrelated and must not be
+  conflated. The UI language is the user's own choice (or their OS locale);
+  which books exist, and in which languages, is decided by the country of the
+  logged-in Storytel account. Never derive one from the other — a `sv-FI`
+  system locale means "Swedish speaker in Finland", not "Finnish catalog".
+  Language *names* shown in the UI are produced locally with
+  `Intl.DisplayNames` (see `localizedLanguageName` in `client/src/utils/helpers.ts`);
+  the `languageName` the Storytel API returns is localized for the account's
+  market, not for the app UI, so it is only a last-resort fallback.
+
 ### Code Style
 
 - **TypeScript**: Strict mode enabled, use proper typing

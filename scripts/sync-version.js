@@ -5,7 +5,6 @@ import { resolve } from 'path';
 const paths = {
   package: resolve('package.json'),
   appVersion: resolve('src/version.ts'),
-  website: resolve('docs/index.html'),
   readme: resolve('README.md')
 };
 
@@ -20,15 +19,7 @@ const versionContent = `export const APP_VERSION = "${newVersion}";\n`;
 writeFileSync(paths.appVersion, versionContent);
 console.log('✅ Updated src/version.ts');
 
-// 3. Update website/index.html
-let website = readFileSync(paths.website, 'utf-8');
-
-// Update version badge: <span class="badge version">v0.6.0</span>
-website = website.replace(
-  /<span class="badge version">v.*?<\/span>/,
-  `<span class="badge version">v${newVersion}</span>`
-);
-
+// 3. Update README.md (the website in docs/ reads the version from the GitHub API at runtime)
 let readme = readFileSync(paths.readme, 'utf-8');
 
 // Update download links in README
@@ -43,10 +34,12 @@ readme = readme.replace(
   `Storytel-Player-Setup-${newVersion}`
 );
 
-// Update macOS and Linux filenames: Storytel-Player-X.Y.Z.dmg and Storytel-Player-X.Y.Z.AppImage
+// Update macOS and Linux filenames, keeping any arch suffix:
+// Storytel-Player-X.Y.Z-mac-x64.dmg, Storytel-Player-X.Y.Z-mac-arm64.dmg,
+// Storytel-Player-X.Y.Z.AppImage, Storytel-Player-X.Y.Z-arm64.AppImage
 readme = readme.replace(
-  /Storytel-Player-(\d+\.\d+\.\d+)\.(dmg|AppImage)/g,
-  `Storytel-Player-${newVersion}.$2`
+  /Storytel-Player-\d+\.\d+\.\d+((?:-[a-z0-9]+)*)\.(dmg|AppImage)/g,
+  `Storytel-Player-${newVersion}$1.$2`
 );
 
 writeFileSync(paths.readme, readme);

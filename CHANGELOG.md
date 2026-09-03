@@ -1,3 +1,19 @@
+# [1.4.0](https://github.com/debba/storytel-player/compare/v1.3.0...v1.4.0) (2026-09-03)
+
+
+### Bug Fixes
+
+* **auth:** add static token caching, automatic session refresh, and transparent 401 retry ([be8a022](https://github.com/debba/storytel-player/commit/be8a02281541995f55678cfa29d6687e376ba414))
+* **player:** fix switching audiobooks from search results while playing ([66c2979](https://github.com/debba/storytel-player/commit/66c29798ed08acdc6ab20e249f8af7616aaf127b))
+* **release:** restore docs site and fix macOS download links ([87bc555](https://github.com/debba/storytel-player/commit/87bc5553d59b6cc70c100321e2b4a6422f438897))
+
+
+### Features
+
+* add audio tracks support, market-scoped search, clean playback teardown, and ebook filtering ([8a6b35d](https://github.com/debba/storytel-player/commit/8a6b35d7ae191927e11bb16a8c24b8e5b75dca06))
+* modern UI redesign, global background playback, and catalog search ([3ef3904](https://github.com/debba/storytel-player/commit/3ef3904ccf22866e05aa3dfd45b84b04a3a628c1))
+* **ui:** implement modern desktop layout, 3-column catalog search, and 1280x800 window sizing ([22abfdb](https://github.com/debba/storytel-player/commit/22abfdb062f079a0200878d136d1fc6d1315d5cb))
+
 # [1.3.0](https://github.com/debba/storytel-player/compare/v1.2.16...v1.3.0) (2026-07-15)
 
 

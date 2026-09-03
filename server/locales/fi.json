@@ -1,0 +1,289 @@
+{
+  "login": {
+    "title": "Kirjaudu Storyteliin",
+    "subtitle": "Käytä äänikirjakirjastoasi",
+    "email": "Sähköpostiosoite",
+    "password": "Salasana",
+    "signIn": "Kirjaudu sisään",
+    "signingIn": "Kirjaudutaan sisään...",
+    "ssoDivider": "tai",
+    "ssoGoogle": "Jatka Googlella",
+    "ssoApple": "Jatka Applella",
+    "ssoOpening": "Avataan Storytel-kirjautumista...",
+    "errors": {
+      "required": "Anna sekä sähköpostiosoite että salasana",
+      "failed": "Kirjautuminen epäonnistui",
+      "sessionExpired": "Istuntosi on vanhentunut. Kirjaudu sisään uudelleen."
+    }
+  },
+  "dashboard": {
+    "title": "Kirjastoni",
+    "bookCount_one": "{{count}} kirja",
+    "bookCount_other": "{{count}} kirjaa",
+    "logout": "Kirjaudu ulos",
+    "settings": "Asetukset",
+    "search": "Hae kirjastostani...",
+    "searchCatalogPrompt": "Hae Storytelin valikoimasta",
+    "exploreCatalog": "Selaa katalogia (⌘K)",
+    "noBooks": "Kirjoja ei löytynyt",
+    "emptyLibrary": "Kirjastosi näyttää olevan tyhjä.",
+    "noFilterMatch": "Yksikään kirja ei vastaa suodatinta.",
+    "resetFilters": "Nollaa suodattimet",
+    "loading": "Ladataan kirjastoasi...",
+    "loadError": "Kirjahyllyn lataaminen epäonnistui",
+    "filters": {
+      "notStarted": "Ei aloitettu",
+      "started": "Aloitettu",
+      "concluded": "Kuunneltu"
+    }
+  },
+  "player": {
+    "chapters": "Luvut",
+    "bookmarks": "Kirjanmerkit",
+    "addBookmark": "Lisää kirjanmerkki",
+    "speed": "Nopeus",
+    "skipBackward": "-{{seconds}} sekuntia",
+    "skipForward": "+{{seconds}} sekuntia",
+    "goTo": "Siirry kohtaan",
+    "goto": "Siirry",
+    "playing": "Toistetaan",
+    "paused": "Tauolla",
+    "nowPlaying": "Toistetaan nyt:",
+    "loadingAudio": "Ladataan ääntä...",
+    "loadingBookData": "Ladataan kirjan tietoja...",
+    "loadError": "Äänivirran lataus epäonnistui",
+    "loadChaptersError": "Lukujen lataaminen epäonnistui",
+    "loadBookmarksError": "Kirjanmerkkien lataaminen epäonnistui",
+    "sleepTimer": "Uniajastin",
+    "endOfChapter": "Luvun loppuun",
+    "off": "Pois",
+    "expand": "Avaa koko soitin",
+    "volume": "Äänenvoimakkuus",
+    "chapterOf": "Luku {{current}} / {{total}}"
+  },
+  "bookmarks": {
+    "title": "Kirjanmerkkisi",
+    "noBookmarks": "Ei tallennettuja kirjanmerkkejä",
+    "createNew": "Luo uusi kirjanmerkki",
+    "createTitle": "Luo uusi kirjanmerkki",
+    "editTitle": "Muokkaa kirjanmerkkiä",
+    "deleteTitle": "Poista kirjanmerkki",
+    "deleteConfirm": "Haluatko varmasti poistaa tämän kirjanmerkin?",
+    "deleteWarning": "Tätä toimintoa ei voi kumota.",
+    "currentPosition": "Nykyinen kohta:",
+    "position": "Kohta:",
+    "note": "Muistiinpano",
+    "noteOptional": "Muistiinpano (valinnainen)",
+    "notePlaceholderCreate": "Lisää muistiinpano tähän kirjanmerkkiin...",
+    "notePlaceholderEdit": "Muokkaa kirjanmerkin muistiinpanoa...",
+    "save": "Tallenna kirjanmerkki",
+    "saveChanges": "Tallenna muutokset",
+    "tooltipEdit": "Muokkaa kirjanmerkkiä",
+    "tooltipDelete": "Poista kirjanmerkki"
+  },
+  "errorState": {
+    "title": "Jokin meni pieleen",
+    "tryAgain": "Yritä uudelleen",
+    "logoutHint": "Jos ongelma toistuu, kirjaudu ulos",
+    "logout": "Kirjaudu ulos"
+  },
+  "common": {
+    "loading": "Ladataan...",
+    "error": "Virhe",
+    "cancel": "Peruuta",
+    "save": "Tallenna",
+    "saving": "Tallennetaan...",
+    "delete": "Poista",
+    "close": "Sulje"
+  },
+  "bookCard": {
+    "completed": "Kuunneltu",
+    "remaining": "jäljellä",
+    "author": "Kirjailija:",
+    "narrator": "Lukija:"
+  },
+  "bookshelf": {
+    "remove": "Poista kirjahyllystä",
+    "removeTitle": "Poistetaanko kirja?",
+    "removeMessage": "”{{title}}” poistetaan Storytel-kirjahyllystäsi. Voit lisätä sen takaisin haun kautta milloin tahansa.",
+    "removeConfirm": "Poista",
+    "removed": "Poistettu kirjahyllystäsi",
+    "errors": {
+      "removeFailed": "Kirjan poistaminen kirjahyllystä ei onnistunut.",
+      "removeNotConfirmed": "Storytel hyväksyi pyynnön, mutta kirja on yhä kirjahyllyssäsi."
+    }
+  },
+  "bookView": {
+    "saved": "Tallennettu",
+    "addToLibrary": "Lisää kirjastoon",
+    "inLibrary": "Kirjastossa",
+    "savedToLibrary": "Kirja lisätty kirjastoosi!",
+    "listen": "Kuuntele",
+    "language": "Kieli",
+    "duration": "Kesto",
+    "narrator": "Lukija",
+    "category": "Kategoria",
+    "description": "Kuvaus",
+    "noDescription": "Ei kuvausta saatavilla.",
+    "showMore": "näytä enemmän",
+    "showLess": "näytä vähemmän",
+    "details": "Kirjan tiedot:",
+    "loadError": "Kirjan tietojen lataaminen epäonnistui"
+  },
+  "chapters": {
+    "title": "Ääniraidat ja luvut",
+    "noChapters": "Ei ääniraitoja saatavilla",
+    "chapter": "Luku",
+    "track": "Ääniraita",
+    "tracks": "Ääniraidat"
+  },
+  "gotoModal": {
+    "title": "Siirry aikaan",
+    "description": "Syötä haluamasi aika (ottaen huomioon {{speed}}x nopeus)",
+    "hours": "Tunnit",
+    "minutes": "Min",
+    "seconds": "Sek",
+    "cancel": "Peruuta",
+    "go": "Siirry"
+  },
+  "playbackSpeed": {
+    "title": "Toistonopeus",
+    "presets": "Esiasetetut nopeudet",
+    "custom": "Mukautettu nopeus",
+    "confirm": "Vahvista"
+  },
+  "tray": {
+    "noBookPlaying": "Ei kirjaa toistossa",
+    "showApp": "Näytä sovellus",
+    "play": "Toista",
+    "pause": "Tauko",
+    "playPause": "Toista/Tauko",
+    "playbackSpeed": "Toistonopeus",
+    "logout": "Kirjaudu ulos",
+    "quit": "Lopeta"
+  },
+  "logout": {
+    "confirmTitle": "Vahvista uloskirjautuminen",
+    "confirmMessage": "Haluatko varmasti kirjautua ulos?",
+    "confirmButton": "Kirjaudu ulos",
+    "cancelButton": "Peruuta"
+  },
+  "download": {
+    "cancelTitle": "Peruuta lataus",
+    "cancelMessage": "Haluatko varmasti peruuttaa meneillään olevan latauksen?",
+    "cancelWarning": "Osittain ladattu tiedosto poistetaan.",
+    "cancelButton": "Peruuta lataus",
+    "continueButton": "Jatka latausta",
+    "deleteTitle": "Poista ladattu tiedosto",
+    "deleteMessage": "Haluatko varmasti poistaa ladatun tiedoston?",
+    "deleteWarning": "Sinun on ladattava se uudelleen kuunnellaksesi ilman verkkoyhteyttä.",
+    "deleteButton": "Poista tiedosto",
+    "keepButton": "Säilytä tiedosto"
+  },
+  "updater": {
+    "available": {
+      "title": "Päivitys saatavilla",
+      "message": "Uusi versio on saatavilla:",
+      "download": "Lataa",
+      "later": "Myöhemmin"
+    },
+    "ready": {
+      "title": "Päivitys valmis",
+      "message": "Päivitys ladattu. Käynnistä uudelleen asentaaksesi version:",
+      "restart": "Käynnistä uudelleen",
+      "later": "Myöhemmin"
+    }
+  },
+  "welcome": {
+    "title": "Tervetuloa Storytel Playeriin!",
+    "message": "Kiitos, että käytät Storytel Playeria, avoimen lähdekoodin työpöytäsovellusta äänikirjoillesi. Liity yhteisöömme pysyäksesi ajan tasalla ja jakaaksesi palautetta!",
+    "starGithub": "Anna tähti GitHubissa",
+    "joinDiscord": "Liity Discordiin",
+    "getStarted": "Aloita"
+  },
+  "settings": {
+    "title": "Asetukset",
+    "community": "Yhteisö",
+    "githubRepo": "GitHub-repositorio",
+    "discordCommunity": "Liity Discordiin",
+    "appearance": "Ulkoasu",
+    "alwaysOnTop": "Pidä ikkuna aina päällimmäisenä",
+    "alwaysOnTopDescription": "Ikkuna pysyy muiden ikkunoiden päällä",
+    "account": "Tili",
+    "email": "Sähköposti",
+    "logout": "Kirjaudu ulos",
+    "developer": "Kehittäjä",
+    "viewLogs": "Näytä istuntolokit",
+    "language": "Kieli",
+    "languageAuto": "Automaattinen"
+  },
+  "language": {
+    "title": "Kieli",
+    "subtitle": "Valitse sovelluksen käyttöliittymän kieli.",
+    "auto": "Automaattinen",
+    "autoDescription": "Käytä järjestelmän kieltä",
+    "autoResolved": "Seuraa järjestelmää · {{language}}",
+    "systemPreference": "Järjestelmän kielet: {{languages}}",
+    "change": "Vaihda kieltä ({{language}})",
+    "catalogNote": "Tämä muuttaa vain sovelluksen käyttöliittymää. Storytel-tilisi maa ratkaisee, mitä kirjoja ja millä kielillä löydät."
+  },
+  "logs": {
+    "title": "Sovelluslokit",
+    "refresh": "Päivitä",
+    "clear": "Tyhjennä",
+    "empty": "Lokeja ei löytynyt.",
+    "export": "Vie",
+    "search": "Hae lokeista...",
+    "typeAll": "Kaikki tapahtumat",
+    "typeError": "Virheet",
+    "typeHttp": "HTTP-liikenne",
+    "typeAction": "Käyttäjän toiminnot",
+    "confirmClear": "Haluatko varmasti tyhjentää kaikki lokit? Tätä toimintoa ei voi kumota.",
+    "details": "Tiedot"
+  },
+  "floatingMenu": {
+    "library": "Kirjasto",
+    "search": "Hae Storytelin valikoimasta",
+    "player": "Soitin",
+    "settings": "Asetukset",
+    "dockLabel": "Kelluva navigointipalkki"
+  },
+  "search": {
+    "title": "Hae Storytelistä",
+    "placeholder": "Hae nimeä, kirjailijaa tai lukijaa...",
+    "results": "Hakutulokset",
+    "hitCount_one": "{{count}} osuma",
+    "hitCount_other": "{{count}} osumaa",
+    "hitCountFiltered": "{{count}}/{{total}} osumaa",
+    "sortLabel": "Järjestä:",
+    "sortRelevance": "Osuvimmat",
+    "sortTitle": "Nimi (A–Ö)",
+    "sortDuration": "Pisimmät ensin",
+    "noResults": "Kirjoja ei löytynyt haulle",
+    "searching": "Haetaan...",
+    "initialPrompt": "Kirjoita hakeaksesi Storytelin laajasta äänikirjavalikoimasta",
+    "selectBookHint": "Valitse kirja esikatselua varten",
+    "play": "Kuuntele",
+    "details": "Tiedot",
+    "addToBookshelf": "Lisää kirjastoon",
+    "addedToBookshelf": "Lisätty kirjastoon",
+    "audiobook": "Äänikirja",
+    "ebook": "E-kirja",
+    "hours": "t",
+    "minutes": "min",
+    "shortcut": "Paina ⌘K / Ctrl+K milloin tahansa",
+    "allLanguages": "Kaikki",
+    "filterByLanguage": "Kieli",
+    "filterByLength": "Pituus",
+    "allLengths": "Kaikki pituudet",
+    "autoFilterHint": "Esivalittu lukemiesi kielten perusteella. Valitse ”Kaikki” nähdäksesi kaikki tulokset.",
+    "noResultsHint": "Tarkista kirjoitusasu tai kokeile toista hakusanaa",
+    "noResultsInLanguages": "Ei tuloksia kielillä {{languages}}.",
+    "noFilterMatch": "Ei osumia valituilla suodattimilla",
+    "showAllLanguages": "Näytä kaikki kielet ({{total}})",
+    "errors": {
+      "addToBookshelfFailed": "Kirjaa ei voitu lisätä kirjastoon. Se ei välttämättä ole saatavilla tilisi alueella.",
+      "addToBookshelfNotConfirmed": "Storytel vastaanotti pyynnön, mutta kirja ei ilmestynyt kirjastoosi. Se ei välttämättä sisälly tilaukseesi."
+    }
+  }
+}

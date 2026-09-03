@@ -1,8 +1,17 @@
 .idea
 node_modules
+client/node_modules
+server/node_modules
 .env
 build
+client/build
 dist
+server/dist
 downloads
 !download/.gitkeep
 app.log
+*.log
+.DS_Store
+conversation*.md
+notes/
+.claude/

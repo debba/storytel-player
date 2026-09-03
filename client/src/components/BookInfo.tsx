@@ -50,7 +50,7 @@ const BookInfo: React.FC<BookInfoProps> = ({
                 <div className="text-center max-w-full px-4 py-2">
                     <h2 className="text-lg font-bold text-white mb-0.5 break-words">{book.book.name}</h2>
                     <p className="text-sm text-gray-300 mb-0 break-words">
-                        {t('bookCard.author')} {book.book.authorsAsString} • {t('bookCard.narrator')} {book.abook.narratorAsString}
+                        {t('bookCard.author')} {book.book.authorsAsString} • {t('bookCard.narrator')} {book.abook?.narratorAsString || '—'}
                     </p>
                 </div>
             </div>

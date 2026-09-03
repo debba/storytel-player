@@ -18,11 +18,17 @@
   },
   "dashboard": {
     "title": "My Library",
+    "bookCount_one": "{{count}} book",
+    "bookCount_other": "{{count}} books",
     "logout": "Logout",
     "settings": "Settings",
-    "search": "Search books...",
+    "search": "Search my library...",
+    "searchCatalogPrompt": "Search Storytel catalog",
+    "exploreCatalog": "Explore the catalog (⌘K)",
     "noBooks": "No books found",
     "emptyLibrary": "Your library appears to be empty.",
+    "noFilterMatch": "No books matched your filter.",
+    "resetFilters": "Reset filters",
     "loading": "Loading your library...",
     "loadError": "Failed to load bookshelf",
     "filters": {
@@ -36,6 +42,8 @@
     "bookmarks": "Bookmarks",
     "addBookmark": "Add bookmark",
     "speed": "Speed",
+    "skipBackward": "-{{seconds}} seconds",
+    "skipForward": "+{{seconds}} seconds",
     "goTo": "Go to",
     "goto": "Goto",
     "playing": "Playing",
@@ -45,7 +53,13 @@
     "loadingBookData": "Loading book data...",
     "loadError": "Failed to load audio stream",
     "loadChaptersError": "Failed to load chapters",
-    "loadBookmarksError": "Failed to load bookmarks"
+    "loadBookmarksError": "Failed to load bookmarks",
+    "sleepTimer": "Sleep Timer",
+    "endOfChapter": "End of chapter",
+    "off": "Off",
+    "expand": "Open full player",
+    "volume": "Volume",
+    "chapterOf": "Chapter {{current}} of {{total}}"
   },
   "bookmarks": {
     "title": "Your Bookmarks",
@@ -78,6 +92,7 @@
     "error": "Error",
     "cancel": "Cancel",
     "save": "Save",
+    "saving": "Saving...",
     "delete": "Delete",
     "close": "Close"
   },
@@ -87,21 +102,40 @@
     "author": "Author:",
     "narrator": "Narrator:"
   },
+  "bookshelf": {
+    "remove": "Remove from library",
+    "removeTitle": "Remove book?",
+    "removeMessage": "“{{title}}” will be removed from your Storytel library. You can add it back from search at any time.",
+    "removeConfirm": "Remove",
+    "removed": "Removed from your library",
+    "errors": {
+      "removeFailed": "Could not remove the book from your library.",
+      "removeNotConfirmed": "Storytel accepted the request but the book is still in your library."
+    }
+  },
   "bookView": {
     "saved": "Saved",
+    "addToLibrary": "Add to Library",
+    "inLibrary": "In Library",
+    "savedToLibrary": "Book added to your library!",
     "listen": "Listen",
     "language": "Language",
     "duration": "Duration",
+    "narrator": "Narrator",
     "category": "Category",
+    "description": "Description",
     "noDescription": "No description available.",
     "showMore": "show more",
     "showLess": "show less",
-    "details": "Book Details:"
+    "details": "Book Details:",
+    "loadError": "Failed to load book details"
   },
   "chapters": {
-    "title": "Chapters",
-    "noChapters": "No chapters available",
-    "chapter": "Chapter"
+    "title": "Audio Tracks & Chapters",
+    "noChapters": "No tracks available",
+    "chapter": "Chapter",
+    "track": "Track",
+    "tracks": "Tracks"
   },
   "gotoModal": {
     "title": "Go to Time",
@@ -183,6 +217,16 @@
     "language": "Language",
     "languageAuto": "Auto"
   },
+  "language": {
+    "title": "Language",
+    "subtitle": "Choose the language of the app interface.",
+    "auto": "Automatic",
+    "autoDescription": "Follow the system language",
+    "autoResolved": "Follows the system · {{language}}",
+    "systemPreference": "System languages: {{languages}}",
+    "change": "Change language ({{language}})",
+    "catalogNote": "This changes the app interface only. Which books you can find, and in which languages, is decided by the country of your Storytel account."
+  },
   "logs": {
     "title": "Application Logs",
     "refresh": "Refresh",
@@ -196,5 +240,50 @@
     "typeAction": "User Actions",
     "confirmClear": "Are you sure you want to clear all logs? This cannot be undone.",
     "details": "Details"
+  },
+  "floatingMenu": {
+    "library": "Library",
+    "search": "Search Storytel catalog",
+    "player": "Player",
+    "settings": "Settings",
+    "dockLabel": "Floating navigation dock"
+  },
+  "search": {
+    "title": "Search Storytel",
+    "placeholder": "Search by title, author, or narrator...",
+    "results": "Search results",
+    "hitCount_one": "{{count}} result",
+    "hitCount_other": "{{count}} results",
+    "hitCountFiltered": "{{count}} of {{total}} results",
+    "sortLabel": "Sort:",
+    "sortRelevance": "Most relevant",
+    "sortTitle": "Title (A–Z)",
+    "sortDuration": "Longest first",
+    "noResults": "No books found for",
+    "searching": "Searching...",
+    "initialPrompt": "Type to search Storytel's vast catalog of audiobooks",
+    "selectBookHint": "Select a book to preview",
+    "play": "Play",
+    "details": "Details",
+    "addToBookshelf": "Add to Library",
+    "addedToBookshelf": "Added to Library",
+    "audiobook": "Audiobook",
+    "ebook": "E-book",
+    "hours": "h",
+    "minutes": "min",
+    "shortcut": "Press ⌘K / Ctrl+K anytime",
+    "allLanguages": "All",
+    "filterByLanguage": "Language",
+    "filterByLength": "Length",
+    "allLengths": "All lengths",
+    "autoFilterHint": "Pre-selected the languages you read. Choose “All” to see every result.",
+    "noResultsHint": "Check the spelling or try another search term",
+    "noResultsInLanguages": "No results in {{languages}}.",
+    "noFilterMatch": "No matches with the selected filters",
+    "showAllLanguages": "Show all languages ({{total}})",
+    "errors": {
+      "addToBookshelfFailed": "Could not add book to library. It may not be available in your account's region.",
+      "addToBookshelfNotConfirmed": "Storytel accepted the request but the book did not appear in your library. It may not be included in your subscription."
+    }
   }
 }
