@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Storytel Player — Open Graph Image</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html,
+      body {
+        background: #111;
+      }
+
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Helvetica,
+          Arial,
+          sans-serif;
+      }
+
+      /* ──────────────────────────────
+       Export hint bar (hidden on print)
+    ────────────────────────────── */
+      #export-hint {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: rgba(10, 10, 10, 0.92);
+        backdrop-filter: blur(6px);
+        color: rgba(255, 255, 255, 0.85);
+        font-size: 12.5px;
+        text-align: center;
+        padding: 9px 16px;
+        z-index: 9999;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        line-height: 1.5;
+      }
+      #export-hint kbd {
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 4px;
+        padding: 1px 6px;
+        font-family: monospace;
+        font-size: 11.5px;
+      }
+      #export-hint strong {
+        color: #e84f10;
+      }
+
+      /* ──────────────────────────────
+       OG Canvas — exactly 1280×640
+    ────────────────────────────── */
+      .og-canvas {
+        position: relative;
+        width: 1280px;
+        height: 640px;
+        overflow: hidden;
+        background: linear-gradient(
+          140deg,
+          #1e0b02 0%,
+          #0d0d0d 46%,
+          #07101e 100%
+        );
+        display: flex;
+        margin-top: 44px; /* push below hint bar */
+      }
+
+      /* Subtle dot-grid texture */
+      .og-canvas::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(
+          rgba(255, 255, 255, 0.045) 1px,
+          transparent 1px
+        );
+        background-size: 28px 28px;
+        pointer-events: none;
+      }
+
+      /* Glow blobs */
+      .glow {
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+      }
+      .glow-1 {
+        width: 520px;
+        height: 520px;
+        background: radial-gradient(
+          circle,
+          rgba(232, 79, 16, 0.2) 0%,
+          transparent 68%
+        );
+        top: -180px;
+        left: -80px;
+      }
+      .glow-2 {
+        width: 280px;
+        height: 280px;
+        background: radial-gradient(
+          circle,
+          rgba(232, 79, 16, 0.1) 0%,
+          transparent 70%
+        );
+        bottom: -60px;
+        left: 380px;
+      }
+
+      /* ──────────────────────────────
+       LEFT PANEL
+    ────────────────────────────── */
+      .left-panel {
+        position: relative;
+        width: 530px;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 52px 54px;
+        z-index: 2;
+      }
+
+      /* Logo + name */
+      .logo-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 34px;
+      }
+      .app-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 13px;
+        background: rgba(232, 79, 16, 0.1);
+        border: 1.5px solid rgba(232, 79, 16, 0.28);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        padding: 5px;
+      }
+      .app-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+      .app-name {
+        font-size: 21px;
+        font-weight: 700;
+        color: #fff;
+        letter-spacing: -0.4px;
+        line-height: 1.2;
+      }
+      .app-meta {
+        font-size: 10px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.32);
+        text-transform: uppercase;
+        letter-spacing: 1.6px;
+        margin-top: 3px;
+      }
+
+      /* Tagline */
+      .tagline {
+        font-size: 40px;
+        font-weight: 800;
+        color: #fff;
+        line-height: 1.11;
+        letter-spacing: -1.8px;
+        margin-bottom: 18px;
+      }
+      .tagline .hl {
+        color: #e84f10;
+      }
+
+      /* Sub-headline */
+      .sub {
+        font-size: 14px;
+        font-weight: 400;
+        color: rgba(255, 255, 255, 0.46);
+        line-height: 1.65;
+        margin-bottom: 32px;
+        max-width: 370px;
+      }
+
+      /* Feature list */
+      .features {
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+        margin-bottom: 28px;
+      }
+      .feat {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.72);
+        line-height: 1.45;
+      }
+      .feat-bullet {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: #e84f10;
+        flex-shrink: 0;
+        margin-top: 5px;
+      }
+
+      /* Platform pills */
+      .platforms {
+        display: flex;
+        gap: 7px;
+        flex-wrap: wrap;
+      }
+      .pill {
+        padding: 4px 12px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        font-size: 10.5px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.4);
+        letter-spacing: 0.2px;
+      }
+
+      /* ──────────────────────────────
+       VERTICAL DIVIDER
+    ────────────────────────────── */
+      .vdivider {
+        position: absolute;
+        left: 520px;
+        top: 7%;
+        height: 86%;
+        width: 1px;
+        background: linear-gradient(
+          to bottom,
+          transparent 0%,
+          rgba(232, 79, 16, 0.45) 25%,
+          rgba(232, 79, 16, 0.45) 75%,
+          transparent 100%
+        );
+        z-index: 4;
+      }
+
+      /* ──────────────────────────────
+       RIGHT PANEL — screenshot fan
+    ────────────────────────────── */
+      .right-panel {
+        position: absolute;
+        left: 530px;
+        top: 0;
+        right: 0;
+        height: 640px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2;
+        padding: 24px 28px 24px 48px;
+      }
+
+      /* Bottom fade to blend screenshots into background */
+      .right-panel::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 110px;
+        background: linear-gradient(to top, #0d0d0d 0%, transparent 100%);
+        z-index: 5;
+        pointer-events: none;
+      }
+
+      .screenshots-fan {
+        position: relative;
+        width: 680px;
+        height: 580px;
+      }
+
+      .sc-wrap {
+        position: absolute;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow:
+          0 28px 70px rgba(0, 0, 0, 0.75),
+          0 0 0 1px rgba(255, 255, 255, 0.07);
+      }
+      .sc-wrap img {
+        display: block;
+        height: 100%;
+        width: auto;
+      }
+
+      /* Screenshot 1 — library view, left, behind */
+      .sc-1 {
+        left: 0px;
+        top: 62px;
+        height: 448px;
+        z-index: 1;
+        transform: perspective(1600px) rotateY(14deg) rotateZ(-1.5deg);
+        transform-origin: left center;
+        opacity: 0.78;
+      }
+
+      /* Screenshot 2 — player view, centre, front */
+      .sc-2 {
+        left: 165px;
+        top: 18px;
+        height: 528px;
+        z-index: 3;
+        transform: perspective(1600px) rotateY(3deg);
+      }
+
+      /* Screenshot 3 — book details, right, behind */
+      .sc-3 {
+        left: 388px;
+        top: 72px;
+        height: 448px;
+        z-index: 2;
+        transform: perspective(1600px) rotateY(-8deg) rotateZ(1.5deg);
+        transform-origin: right center;
+        opacity: 0.78;
+      }
+
+      /* Screenshot label captions */
+      .sc-label {
+        position: absolute;
+        bottom: -28px;
+        left: 50%;
+        transform: translateX(-50%);
+        white-space: nowrap;
+        font-size: 10px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.28);
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+      }
+
+      /* ──────────────────────────────
+       Print / export styles
+    ────────────────────────────── */
+      @media print {
+        #export-hint {
+          display: none !important;
+        }
+        html,
+        body {
+          background: transparent;
+        }
+        .og-canvas {
+          margin-top: 0;
+        }
+        @page {
+          size: 1280px 640px;
+          margin: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Export instructions -->
+    <div id="export-hint">
+      To export at <strong>1280 × 640 px</strong>: open DevTools
+      <kbd>F12</kbd> → Toggle Device Toolbar → enter <kbd>1280</kbd> ×
+      <kbd>640</kbd> → click <kbd>⋮</kbd> menu → <em>Capture screenshot</em>
+    </div>
+
+    <!-- ── OG Canvas ── -->
+    <div class="og-canvas">
+      <!-- Background decorations -->
+      <div class="glow glow-1"></div>
+      <div class="glow glow-2"></div>
+
+      <!-- LEFT: branding + copy -->
+      <div class="left-panel">
+        <div class="logo-row">
+          <div class="app-icon">
+            <img src="assets/icon.png" alt="Storytel Player icon" />
+          </div>
+          <div>
+            <div class="app-name">Storytel Player</div>
+            <div class="app-meta">Unofficial Desktop App</div>
+          </div>
+        </div>
+
+        <div class="tagline">
+          Your audiobooks,<br />
+          <span class="hl">your desktop.</span>
+        </div>
+
+        <p class="sub">
+          A free, open-source desktop player for Storytel.<br />
+          Stream or download your audiobooks on Windows, macOS and Linux.
+        </p>
+
+        <div class="features">
+          <div class="feat">
+            <span class="feat-bullet"></span>
+            Browse your full library — filter by status, genre &amp; more
+          </div>
+          <div class="feat">
+            <span class="feat-bullet"></span>
+            Rich player with chapter navigation, speed control &amp; sleep timer
+          </div>
+          <div class="feat">
+            <span class="feat-bullet"></span>
+            Offline playback via built-in audiobook downloader
+          </div>
+          <div class="feat">
+            <span class="feat-bullet"></span>
+            System tray, always-on-top &amp; auto-start at login
+          </div>
+          <div class="feat">
+            <span class="feat-bullet"></span>
+            Multi-language UI &nbsp;·&nbsp; MIT licensed &nbsp;·&nbsp;
+            Auto-updates
+          </div>
+        </div>
+
+        <div class="platforms">
+          <span class="pill">Windows</span>
+          <span class="pill">macOS</span>
+          <span class="pill">Linux</span>
+          <span class="pill">Open Source</span>
+          <span class="pill">Electron</span>
+        </div>
+      </div>
+
+      <!-- Vertical accent line -->
+      <div class="vdivider"></div>
+
+      <!-- RIGHT: screenshots fan -->
+      <div class="right-panel">
+        <div class="screenshots-fan">
+          <div class="sc-wrap sc-1">
+            <img src="assets/screenshot-1.png" alt="Library view" />
+            <span class="sc-label">Library</span>
+          </div>
+
+          <div class="sc-wrap sc-2">
+            <img src="assets/screenshot-2.png" alt="Now Playing" />
+            <span class="sc-label">Now Playing</span>
+          </div>
+
+          <div class="sc-wrap sc-3">
+            <img src="assets/screenshot-3.png" alt="Book Details" />
+            <span class="sc-label">Book Details</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
