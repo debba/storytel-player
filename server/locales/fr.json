@@ -160,6 +160,8 @@
     "pause": "Pause",
     "playPause": "Lecture/Pause",
     "playbackSpeed": "Vitesse de lecture",
+    "about": "À propos",
+    "help": "Aide",
     "logout": "Se déconnecter",
     "quit": "Quitter"
   },
@@ -179,7 +181,9 @@
     "deleteMessage": "Êtes-vous sûr de vouloir supprimer le fichier téléchargé ?",
     "deleteWarning": "Vous devrez le télécharger à nouveau pour écouter hors ligne.",
     "deleteButton": "Supprimer le fichier",
-    "keepButton": "Conserver le fichier"
+    "keepButton": "Conserver le fichier",
+    "failed": "Échec du téléchargement",
+    "operationFailed": "Impossible de mettre à jour le fichier téléchargé"
   },
   "updater": {
     "available": {

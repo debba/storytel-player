@@ -1,6 +1,10 @@
 import React from 'react';
 
-function LoadingState({ message = "Loading..." }) {
+interface LoadingStateProps {
+  message: string;
+}
+
+function LoadingState({ message }: LoadingStateProps) {
   return (
     <div className="min-h-screen bg-black flex items-center justify-center">
       <div className="text-center">

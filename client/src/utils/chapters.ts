@@ -11,7 +11,7 @@ export function normalizeChapters(rawChapters: any[] = []): Chapter[] {
   }
 
   let cumulativeTime = 0;
-  const chapterPrefix = i18n.t('chapters.track', { defaultValue: i18n.t('chapters.chapter', { defaultValue: 'Ljudspår' }) });
+  const chapterPrefix = i18n.t('chapters.track');
 
   return rawChapters.map((raw, index) => {
     const number = Number(raw.number ?? raw.order ?? raw.chapterNumber ?? raw.index ?? index + 1);
@@ -133,7 +133,7 @@ export function generateAudioTracks(totalDurationInSeconds: number): Chapter[] {
     segmentDuration = 900;
   }
 
-  const trackPrefix = i18n.t('chapters.track', { defaultValue: 'Ljudspår' });
+  const trackPrefix = i18n.t('chapters.track');
   const tracks: Chapter[] = [];
   let currentTime = 0;
   let trackNumber = 1;

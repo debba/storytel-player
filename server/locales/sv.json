@@ -160,6 +160,8 @@
     "pause": "Pausa",
     "playPause": "Spela/Pausa",
     "playbackSpeed": "Uppspelningshastighet",
+    "about": "Om",
+    "help": "Hjälp",
     "logout": "Logga ut",
     "quit": "Avsluta"
   },
@@ -179,7 +181,9 @@
     "deleteMessage": "Är du säker på att du vill ta bort den nedladdade filen?",
     "deleteWarning": "Du måste ladda ner den igen för att lyssna offline.",
     "deleteButton": "Ta bort fil",
-    "keepButton": "Behåll fil"
+    "keepButton": "Behåll fil",
+    "failed": "Nedladdningen misslyckades",
+    "operationFailed": "Det gick inte att uppdatera den nedladdade filen"
   },
   "updater": {
     "available": {

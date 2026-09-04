@@ -132,9 +132,9 @@ export function SearchFilterRail({
         <div className="space-y-1">
           {[
             { id: 'all' as DurationFilter, label: t('search.allLengths', 'All lengths') },
-            { id: 'under5' as DurationFilter, label: '< 5 h' },
-            { id: '5to15' as DurationFilter, label: '5–15 h' },
-            { id: 'over15' as DurationFilter, label: '> 15 h' },
+            { id: 'under5' as DurationFilter, label: `< 5 ${t('search.hours')}` },
+            { id: '5to15' as DurationFilter, label: `5–15 ${t('search.hours')}` },
+            { id: 'over15' as DurationFilter, label: `> 15 ${t('search.hours')}` },
           ].map((dur) => {
             const isSelected = selectedDuration === dur.id;
             return (

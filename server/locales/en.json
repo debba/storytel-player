@@ -160,6 +160,8 @@
     "pause": "Pause",
     "playPause": "Play/Pause",
     "playbackSpeed": "Playback Speed",
+    "about": "About",
+    "help": "Help",
     "logout": "Logout",
     "quit": "Quit"
   },
@@ -179,7 +181,9 @@
     "deleteMessage": "Are you sure you want to delete the downloaded file?",
     "deleteWarning": "You will need to download it again to listen offline.",
     "deleteButton": "Delete File",
-    "keepButton": "Keep File"
+    "keepButton": "Keep File",
+    "failed": "Download failed",
+    "operationFailed": "Could not update the downloaded file"
   },
   "updater": {
     "available": {

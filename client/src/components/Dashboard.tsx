@@ -54,7 +54,7 @@ export function Dashboard({ onLogout, triggerLogout, setTriggerLogout }: Dashboa
         const offline = await api.get<BookShelfResponse>('/offline/bookshelf');
         setBooks(offline.data?.books || []);
       } catch {
-        setError(err.response?.data?.error || t('dashboard.loadError', 'Failed to load bookshelf'));
+        setError(err.response?.data?.error || t('dashboard.loadError'));
       }
     } finally {
       setIsLoading(false);

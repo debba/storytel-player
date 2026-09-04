@@ -14,6 +14,7 @@ import { BookShelfEntity, BookMetaData } from '../interfaces/books';
 import { Chapter } from '../interfaces/chapters';
 import { BookmarkPositional } from '../interfaces/bookmarks';
 import { extractChaptersFromResponse, generateAudioTracks } from '../utils/chapters';
+import i18n from '../i18n';
 
 interface LocalPosition {
   position: number;
@@ -384,7 +385,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       } catch (err: any) {
         if (requestId !== loadRequestIdRef.current) return;
         console.error('Failed to load audio stream:', err);
-        setError(err.response?.data?.error || err.message || 'Failed to load audio');
+        setError(err.response?.data?.error || err.message || i18n.t('player.loadError'));
         setIsLoading(false);
       }
     },

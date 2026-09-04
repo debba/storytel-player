@@ -231,13 +231,13 @@ function PlayerView() {
                 setIsDownloaded(true);
             } else {
                 if ((response as any)?.data?.error !== 'Download cancelled') {
-                    setError((response as any)?.data?.error || 'Download failed');
+                    setError((response as any)?.data?.error || t('download.failed'));
                 }
             }
         } catch (err: any) {
             const errorMsg = err?.data?.error || err?.response?.data?.error;
             if (errorMsg !== 'Download cancelled' && errorMsg !== 'canceled') {
-                setError(errorMsg || err.message || 'Download failed');
+                setError(errorMsg || err.message || t('download.failed'));
             }
         } finally {
             setIsDownloading(false);
@@ -261,7 +261,7 @@ function PlayerView() {
                 setIsDownloaded(false);
             }
         } catch (err: any) {
-            setError(err.response?.data?.error || err.message || 'Operation failed');
+            setError(err.response?.data?.error || err.message || t('download.operationFailed'));
             setShowDownloadCancelModal(false);
         }
     };
