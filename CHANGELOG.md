@@ -1,3 +1,12 @@
+## [1.4.1](https://github.com/debba/storytel-player/compare/v1.4.0...v1.4.1) (2026-09-27)
+
+
+### Bug Fixes
+
+* **i18n:** localize remaining UI strings ([90b4fea](https://github.com/debba/storytel-player/commit/90b4feac575bcfdc34c76d7443beee7290423994))
+* **i18n:** translate the 'All' library filter pill ([26faa40](https://github.com/debba/storytel-player/commit/26faa40e484733ed922b3de61f140ad71e9d6085))
+* **linux:** use registered freedesktop categories in the desktop entry ([4932233](https://github.com/debba/storytel-player/commit/49322330e49edd3efd6fa542be1948ea0f1490fb))
+
 # [1.4.0](https://github.com/debba/storytel-player/compare/v1.3.0...v1.4.0) (2026-09-03)
 
 
