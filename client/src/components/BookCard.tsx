@@ -118,9 +118,9 @@ export function BookCard({ book, onBookSelect, onRemove, onQuickPlay }: BookCard
               {isFinished
                 ? t('dashboard.filters.concluded', 'Concluded')
                 : isStarted
-                ? `${formatMicrosecondsTime(remainingTime)} ${t('bookCard.remaining', 'remaining')}`
+                ? `${formatMicrosecondsTime(remainingTime, { hours: t('search.hours'), minutes: t('search.minutes') })} ${t('bookCard.remaining', 'remaining')}`
                 : totalDuration > 0
-                ? formatMicrosecondsTime(totalDuration)
+                ? formatMicrosecondsTime(totalDuration, { hours: t('search.hours'), minutes: t('search.minutes') })
                 : t('dashboard.filters.notStarted', 'Not started')}
             </span>
             {isStarted && (

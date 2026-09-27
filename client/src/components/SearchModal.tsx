@@ -492,7 +492,12 @@ export function SearchModal({ isOpen, onClose }: SearchModalProps) {
             const isAdded = addedBooks[book.id];
             const isAdding = addingBookId === book.id;
             const durationText =
-              book.durationMs > 0 ? formatMicrosecondsTime(book.durationMs * 1000) : '';
+              book.durationMs > 0
+                ? formatMicrosecondsTime(book.durationMs * 1000, {
+                    hours: t('search.hours'),
+                    minutes: t('search.minutes'),
+                  })
+                : '';
 
             return (
               <div

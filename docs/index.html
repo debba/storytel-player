@@ -33,8 +33,9 @@
     <section class="hero">
         <div class="hero-content">
             <h2>Your Audiobooks, On Your Desktop</h2>
-            <p class="lead">A powerful, cross-platform desktop application for enjoying your Storytel audiobooks with
-                enhanced features and native desktop integration.</p>
+            <p class="lead">A modern, cross-platform desktop application for your Storytel audiobooks: a dark interface
+                designed for the big screen, full catalog search and background playback with native desktop
+                integration.</p>
 
             <div class="badges">
                 <img src="https://img.shields.io/github/release/debba/storytel-player.svg?style=flat-square"
@@ -112,52 +113,57 @@
         <h2>Features</h2>
         <div class="feature-grid">
             <div class="feature-card">
-                <div class="feature-icon">💻</div>
-                <h3>Native Desktop App</h3>
-                <p>Cross-platform application with system tray integration and single instance lock for a seamless
-                    experience.</p>
+                <div class="feature-icon">🎨</div>
+                <h3>Modern Desktop Interface</h3>
+                <p>A deep dark theme with Storytel Orange accents, rounded cards and filter pills, laid out for a 1280×800 desktop window instead of a stretched phone screen.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🔎</div>
+                <h3>Catalog Search</h3>
+                <p>Search the whole Storytel catalog by title, author or narrator. Filters, results and a live preview sit side by side; add to your library or start listening in one click.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🎧</div>
+                <h3>Background Playback</h3>
+                <p>Audio keeps playing while you browse. A persistent mini-player keeps play/pause, skip, speed, chapters and sleep timer always within reach.</p>
             </div>
 
             <div class="feature-card">
                 <div class="feature-icon">📚</div>
                 <h3>Audiobook Library</h3>
-                <p>Browse your entire Storytel library with beautiful cover art and automatic progress tracking.</p>
+                <p>Browse your entire Storytel bookshelf with cover art, progress tracking and status filters (started, not started, concluded).</p>
             </div>
 
             <div class="feature-card">
                 <div class="feature-icon">🎵</div>
                 <h3>Advanced Audio Player</h3>
-                <p>HTML5 audio player with full playback controls, bookmarks, and resume functionality.</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">🔒</div>
-                <h3>Secure Sessions</h3>
-                <p>Secure authentication with persistent storage using electron-store for automatic login.</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">🌍</div>
-                <h3>Multi-Language Support</h3>
-                <p>Internationalization with automatic language detection powered by i18next.</p>
+                <p>Chapters, bookmarks, playback speed, sleep timer, multiple audio tracks and automatic resume where you left off.</p>
             </div>
 
             <div class="feature-card">
                 <div class="feature-icon">📥</div>
                 <h3>Offline Listening</h3>
-                <p>Download your favorite audiobooks for offline playback when you're on the go.</p>
+                <p>Download your favorite audiobooks for offline playback when you are on the go.</p>
             </div>
 
             <div class="feature-card">
-                <div class="feature-icon">⚡</div>
-                <h3>Fast & Lightweight</h3>
-                <p>Built with modern technologies for optimal performance on all platforms.</p>
+                <div class="feature-icon">🌍</div>
+                <h3>Multi-Language Interface</h3>
+                <p>Available in English, Italian, German, Spanish, French, Swedish and Finnish, with automatic detection of your system language.</p>
             </div>
 
             <div class="feature-card">
-                <div class="feature-icon">🔄</div>
-                <h3>Auto Updates</h3>
-                <p>Automatic updates ensure you always have the latest features and bug fixes.</p>
+                <div class="feature-icon">🔒</div>
+                <h3>Seamless Sessions</h3>
+                <p>Secure login with persistent storage, automatic session refresh and transparent retry: you simply stay logged in.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">💻</div>
+                <h3>Native Desktop App</h3>
+                <p>System tray integration, single instance lock and automatic updates on Windows, macOS and Linux.</p>
             </div>
         </div>
     </section>
@@ -166,9 +172,9 @@
     <section class="screenshots">
         <h2>Screenshots</h2>
         <div class="screenshot-grid">
-            <img src="assets/screenshot-1.png" alt="Storytel Player Screenshot 1">
-            <img src="assets/screenshot-2.png" alt="Storytel Player Screenshot 2">
-            <img src="assets/screenshot-3.png" alt="Storytel Player Screenshot 3">
+            <img src="assets/screenshot-1.png" alt="Your Storytel library in the new dark desktop interface">
+            <img src="assets/screenshot-2.png" alt="Catalog search with filters, results and live preview">
+            <img src="assets/screenshot-3.png" alt="Book details with the persistent mini-player">
         </div>
     </section>
 
@@ -183,7 +189,7 @@
                 <strong>Backend:</strong> Fastify 5, TypeScript
             </div>
             <div class="tech-item">
-                <strong>Desktop:</strong> Electron 38+
+                <strong>Desktop:</strong> Electron 43
             </div>
             <div class="tech-item">
                 <strong>Build:</strong> electron-builder, esbuild
@@ -197,8 +203,12 @@
         <p>Storytel Player for Desktop is an <strong>unofficial, open-source</strong> desktop application that provides
             a native experience for enjoying Storytel audiobooks. This project is not affiliated with or endorsed by
             Storytel.</p>
-        <p>The application features a compact UI optimized for desktop use, with system tray integration and support for
-            all major platforms including Windows, macOS (Intel & Apple Silicon), and Linux (x64, ARM64, ARMv7).</p>
+        <p>The application features a modern dark interface designed for desktop use, with catalog search, background
+            playback, system tray integration and support for all major platforms including Windows, macOS (Intel &
+            Apple Silicon), and Linux (x64, ARM64, ARMv7).</p>
+        <p>The 1.4.0 redesign, catalog search and background playback were contributed by
+            <a href="https://github.com/frassfenin" target="_blank" rel="noopener">Tobias Andtfolk (@frassfenin)</a>.
+            Thank you!</p>
 
         <div class="disclaimer">
             ⚠️ <strong>Important:</strong> This is an independent project and is not affiliated with Storytel. A valid

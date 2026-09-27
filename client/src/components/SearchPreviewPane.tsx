@@ -34,7 +34,12 @@ export function SearchPreviewPane({
   }
 
   const durationText =
-    book.durationMs > 0 ? formatMicrosecondsTime(book.durationMs * 1000) : '—';
+    book.durationMs > 0
+      ? formatMicrosecondsTime(book.durationMs * 1000, {
+          hours: t('search.hours'),
+          minutes: t('search.minutes'),
+        })
+      : '—';
   const languageLabel = book.language
     ? localizedLanguageName(book.language, i18n.language, book.languageName)
     : (book.languageName ? (book.languageName.charAt(0).toUpperCase() + book.languageName.slice(1)) : '—');
