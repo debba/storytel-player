@@ -109,7 +109,7 @@
       }
     },
     "linux": {
-      "category": "multimedia",
+      "category": "AudioVideo;Audio;Player",
       "target": [
         "AppImage",
         "deb"
