@@ -60,7 +60,12 @@
     "off": "Disattivato",
     "expand": "Apri player completo",
     "volume": "Volume",
-    "chapterOf": "Capitolo {{current}} di {{total}}"
+    "chapterOf": "Capitolo {{current}} di {{total}}",
+    "timeUnits": {
+      "hours": "h",
+      "minutes": "min",
+      "seconds": "s"
+    }
   },
   "bookmarks": {
     "title": "I tuoi Bookmarks",

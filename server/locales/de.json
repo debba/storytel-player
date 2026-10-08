@@ -60,7 +60,12 @@
     "off": "Aus",
     "expand": "Vollständigen Player öffnen",
     "volume": "Lautstärke",
-    "chapterOf": "Kapitel {{current}} von {{total}}"
+    "chapterOf": "Kapitel {{current}} von {{total}}",
+    "timeUnits": {
+      "hours": "Std.",
+      "minutes": "Min.",
+      "seconds": "Sek."
+    }
   },
   "bookmarks": {
     "title": "Ihre Lesezeichen",

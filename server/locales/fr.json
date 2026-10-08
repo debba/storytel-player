@@ -60,7 +60,12 @@
     "off": "Désactivé",
     "expand": "Ouvrir le lecteur complet",
     "volume": "Volume",
-    "chapterOf": "Chapitre {{current}} sur {{total}}"
+    "chapterOf": "Chapitre {{current}} sur {{total}}",
+    "timeUnits": {
+      "hours": "h",
+      "minutes": "min",
+      "seconds": "s"
+    }
   },
   "bookmarks": {
     "title": "Vos Marque-pages",
