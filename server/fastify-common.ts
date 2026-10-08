@@ -6,6 +6,7 @@ import fastifyJWT from "@fastify/jwt";
 import fastifyCors from "@fastify/cors";
 import fs from "fs";
 import path from "path";
+import { pathToFileURL } from "url";
 import axios from "axios";
 import { appLogger } from "./logger";
 import { encryptPassword } from "./passwordCrypt";
@@ -96,6 +97,46 @@ const DOWNLOADS_DIR = process.env.IS_ELECTRON
 // Ensure downloads directory exists
 if (!fs.existsSync(DOWNLOADS_DIR)) {
   fs.mkdirSync(DOWNLOADS_DIR, { recursive: true });
+}
+
+// Downloaded files are named "<title> [<bookId>].mp3" so they are recognizable
+// in a file manager. The bookId suffix stays the lookup key, because most
+// routes only know the bookId. Older downloads are named "<bookId>.mp3" and
+// are still found by findDownloadedFile.
+const MAX_TITLE_LENGTH = 120;
+
+function isValidBookId(bookId: unknown): bookId is string {
+  return typeof bookId === "string" && /^\d+$/.test(bookId);
+}
+
+function sanitizeFileTitle(title: string): string {
+  return title
+    .replace(/[<>:"/\\|?*#%\x00-\x1f]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, MAX_TITLE_LENGTH)
+    .replace(/[. ]+$/, ""); // Windows rejects trailing dots and spaces
+}
+
+function buildDownloadPath(bookId: string, title?: string): string {
+  const safeTitle = title ? sanitizeFileTitle(title) : "";
+  const fileName = safeTitle
+    ? `${safeTitle} [${bookId}].mp3`
+    : `${bookId}.mp3`;
+  return path.join(DOWNLOADS_DIR, fileName);
+}
+
+function findDownloadedFile(bookId: string): string | null {
+  if (!isValidBookId(bookId)) return null;
+
+  const legacyPath = path.join(DOWNLOADS_DIR, `${bookId}.mp3`);
+  if (fs.existsSync(legacyPath)) return legacyPath;
+
+  const suffix = ` [${bookId}].mp3`;
+  const match = fs
+    .readdirSync(DOWNLOADS_DIR)
+    .find((name) => name.endsWith(suffix));
+  return match ? path.join(DOWNLOADS_DIR, match) : null;
 }
 
 const activeDownloads = new Map<
@@ -329,10 +370,10 @@ fastify.post<{
   async (request, reply) => {
     try {
       const { bookId, consumableId } = request.body;
-      const localFilePath = path.join(DOWNLOADS_DIR, `${bookId}.mp3`);
+      const localFilePath = findDownloadedFile(bookId);
 
       // Check if file exists locally
-      if (fs.existsSync(localFilePath)) {
+      if (localFilePath) {
         // Use custom protocol for Electron, fallback to HTTP for browser
         const isElectron =
           request.headers["user-agent"]?.includes("Electron") ||
@@ -342,7 +383,8 @@ fastify.post<{
           // Use file:// protocol directly for Electron
           console.log(localFilePath);
           reply.send({
-            streamUrl: `file://${localFilePath}`,
+            // pathToFileURL escapes spaces and other characters in titles
+            streamUrl: pathToFileURL(localFilePath).href,
             remote: false,
           });
         } else {
@@ -654,7 +696,11 @@ fastify.get<{
 
 // Route per scaricare il file audio da remoto
 fastify.post<{
-  Body: { bookId: string; consumableId?: string };
+  Body: {
+    bookId: string;
+    consumableId?: string;
+    book?: { book?: { name?: string } };
+  };
 }>(
   "/api/download",
   {
@@ -662,11 +708,14 @@ fastify.post<{
   },
   async (request, reply) => {
     try {
-      const { bookId, consumableId } = request.body;
-      const localFilePath = path.join(DOWNLOADS_DIR, `${bookId}.mp3`);
+      const { bookId, consumableId, book } = request.body;
+
+      if (!isValidBookId(bookId)) {
+        return reply.code(400).send({ error: "Invalid bookId" });
+      }
 
       // Check if already exists
-      if (fs.existsSync(localFilePath)) {
+      if (findDownloadedFile(bookId)) {
         return reply.send({
           success: true,
           message: "File already downloaded",
@@ -686,15 +735,20 @@ fastify.post<{
         ? await storytelClient.getAudioStreamUrl(consumableId)
         : await storytelClient.getStreamUrl(bookId);
 
+      // Download to a temporary file and rename it on completion, so a
+      // partial download is never picked up by findDownloadedFile.
+      const localFilePath = buildDownloadPath(bookId, book?.book?.name);
+      const partFilePath = `${localFilePath}.part`;
+
       // Create AbortController for this download
       const controller = new AbortController();
-      const writer = fs.createWriteStream(localFilePath);
+      const writer = fs.createWriteStream(partFilePath);
 
       // Track this download
       activeDownloads.set(bookId, {
         controller,
         writer,
-        filePath: localFilePath,
+        filePath: partFilePath,
       });
 
       try {
@@ -734,6 +788,8 @@ fastify.post<{
           });
         });
 
+        fs.renameSync(partFilePath, localFilePath);
+
         // Clean up
         activeDownloads.delete(bookId);
 
@@ -747,8 +803,8 @@ fastify.post<{
         activeDownloads.delete(bookId);
 
         // Remove partial file
-        if (fs.existsSync(localFilePath)) {
-          fs.unlinkSync(localFilePath);
+        if (fs.existsSync(partFilePath)) {
+          fs.unlinkSync(partFilePath);
         }
 
         if (error.message === "Download cancelled") {
@@ -816,9 +872,9 @@ fastify.get<{ Params: { bookId: string } }>(
   async (request, reply) => {
     try {
       const { bookId } = request.params;
-      const filePath = path.join(DOWNLOADS_DIR, `${bookId}.mp3`);
+      const filePath = findDownloadedFile(bookId);
 
-      if (!fs.existsSync(filePath)) {
+      if (!filePath) {
         return reply.code(404).send({ error: "File not found" });
       }
 
@@ -874,9 +930,9 @@ fastify.get<{
   async (request, reply) => {
     try {
       const { bookId } = request.params;
-      const localFilePath = path.join(DOWNLOADS_DIR, `${bookId}.mp3`);
+      const localFilePath = findDownloadedFile(bookId);
 
-      if (!fs.existsSync(localFilePath)) {
+      if (!localFilePath) {
         return reply.code(404).send({ error: "File not found" });
       }
 
@@ -899,10 +955,7 @@ fastify.get<{
   async (request, reply) => {
     try {
       const { bookId } = request.params;
-      const localFilePath = path.join(DOWNLOADS_DIR, `${bookId}.mp3`);
-
-      const exists = fs.existsSync(localFilePath);
-      reply.send({ downloaded: exists });
+      reply.send({ downloaded: findDownloadedFile(bookId) !== null });
     } catch (error: any) {
       replyError(reply, error);
     }
@@ -920,9 +973,9 @@ fastify.delete<{
   async (request, reply) => {
     try {
       const { bookId } = request.params;
-      const localFilePath = path.join(DOWNLOADS_DIR, `${bookId}.mp3`);
+      const localFilePath = findDownloadedFile(bookId);
 
-      if (!fs.existsSync(localFilePath)) {
+      if (!localFilePath) {
         return reply.code(404).send({ error: "File not found" });
       }
 
