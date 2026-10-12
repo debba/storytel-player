@@ -60,7 +60,12 @@
     "off": "Off",
     "expand": "Open full player",
     "volume": "Volume",
-    "chapterOf": "Chapter {{current}} of {{total}}"
+    "chapterOf": "Chapter {{current}} of {{total}}",
+    "timeUnits": {
+      "hours": "h",
+      "minutes": "min",
+      "seconds": "s"
+    }
   },
   "bookmarks": {
     "title": "Your Bookmarks",

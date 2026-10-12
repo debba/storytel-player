@@ -60,7 +60,12 @@
     "off": "Pois",
     "expand": "Avaa koko soitin",
     "volume": "Äänenvoimakkuus",
-    "chapterOf": "Luku {{current}} / {{total}}"
+    "chapterOf": "Luku {{current}} / {{total}}",
+    "timeUnits": {
+      "hours": "t",
+      "minutes": "min",
+      "seconds": "s"
+    }
   },
   "bookmarks": {
     "title": "Kirjanmerkkisi",

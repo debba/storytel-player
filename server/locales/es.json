@@ -60,7 +60,12 @@
     "off": "Desactivado",
     "expand": "Abrir reproductor completo",
     "volume": "Volumen",
-    "chapterOf": "Capítulo {{current}} de {{total}}"
+    "chapterOf": "Capítulo {{current}} de {{total}}",
+    "timeUnits": {
+      "hours": "h",
+      "minutes": "min",
+      "seconds": "s"
+    }
   },
   "bookmarks": {
     "title": "Tus Marcadores",

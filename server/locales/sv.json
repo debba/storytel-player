@@ -60,7 +60,12 @@
     "off": "Av",
     "expand": "Öppna full spelare",
     "volume": "Volym",
-    "chapterOf": "Kapitel {{current}} av {{total}}"
+    "chapterOf": "Kapitel {{current}} av {{total}}",
+    "timeUnits": {
+      "hours": "tim",
+      "minutes": "min",
+      "seconds": "s"
+    }
   },
   "bookmarks": {
     "title": "Dina bokmärken",
