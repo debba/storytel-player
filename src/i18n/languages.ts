@@ -9,7 +9,7 @@
 export const AUTO_LANGUAGE = 'auto';
 export const FALLBACK_LANGUAGE = 'en';
 
-export const SUPPORTED_LANGUAGES = ['de', 'en', 'es', 'fr', 'it', 'fi', 'sv'] as const;
+export const SUPPORTED_LANGUAGES = ['de', 'en', 'es', 'fr', 'it', 'pl', 'fi', 'sv'] as const;
 
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 
