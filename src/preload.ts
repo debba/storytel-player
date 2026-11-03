@@ -33,8 +33,9 @@ contextBridge.exposeInMainWorld('trayControls', {
   onPlayPause: (callback: () => void): void => {
     ipcRenderer.on('tray-play-pause', callback);
   },
-  onSetSpeed: (callback: (_event: IpcRendererEvent, speed: number) => void): void => {
+  onSetSpeed: (callback: (_event: IpcRendererEvent, speed: number) => void): (() => void) => {
     ipcRenderer.on('tray-set-speed', callback);
+    return () => { ipcRenderer.removeListener('tray-set-speed', callback); };
   },
   onLogout: (callback: () => void): void => {
     ipcRenderer.on('tray-logout', callback);
