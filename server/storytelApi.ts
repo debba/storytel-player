@@ -232,25 +232,23 @@ class StorytelClient {
           !error.config._isRetry
         ) {
           error.config._isRetry = true;
-          try {
-            if (this.ssoSession) {
-              const cacheKey = `${this.ssoSession.firebaseApiKey}:${this.ssoSession.firebaseRefreshToken}`;
-              StorytelClient.firebaseTokenCache.delete(cacheKey);
-              const freshBearer = await this.ensureFirebaseIdToken();
-              error.config.headers = error.config.headers || {};
-              error.config.headers.Authorization = `Bearer ${freshBearer}`;
-              return await this.client.request(error.config);
-            } else if (this.savedEmail && this.savedEncryptedPassword) {
-              const cacheKey = `${this.savedEmail}:${this.savedEncryptedPassword}`;
-              StorytelClient.legacyLoginCache.delete(cacheKey);
-              await this.refreshLegacyLogin();
-              const freshBearer = this.loginData.accountInfo.jwt;
-              error.config.headers = error.config.headers || {};
-              error.config.headers.Authorization = `Bearer ${freshBearer}`;
-              return await this.client.request(error.config);
-            }
-          } catch {
-            // Ignore retry error and fall through to propagate 401
+          // Propagate renewal and retry errors instead of replacing them with
+          // the original 401, which would force logout even for an access denial.
+          if (this.ssoSession) {
+            const cacheKey = `${this.ssoSession.firebaseApiKey}:${this.ssoSession.firebaseRefreshToken}`;
+            StorytelClient.firebaseTokenCache.delete(cacheKey);
+            const freshBearer = await this.ensureFirebaseIdToken();
+            error.config.headers = error.config.headers || {};
+            error.config.headers.Authorization = `Bearer ${freshBearer}`;
+            return this.client.request(error.config);
+          } else if (this.savedEmail && this.savedEncryptedPassword) {
+            const cacheKey = `${this.savedEmail}:${this.savedEncryptedPassword}`;
+            StorytelClient.legacyLoginCache.delete(cacheKey);
+            await this.refreshLegacyLogin();
+            const freshBearer = this.loginData.accountInfo.jwt;
+            error.config.headers = error.config.headers || {};
+            error.config.headers.Authorization = `Bearer ${freshBearer}`;
+            return this.client.request(error.config);
           }
         }
 
