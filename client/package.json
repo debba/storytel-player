@@ -22,6 +22,7 @@
   "scripts": {
     "start": "vite",
     "build": "tsc && cross-env VITE_REACT_APP_USE_MEMORY_ROUTER=true vite build",
+    "test": "tsx --test tests/*.test.tsx",
     "preview": "vite preview"
   },
   "eslintConfig": {
@@ -46,11 +47,14 @@
     "@types/node": "^24.6.0",
     "@types/react": "^19.1.16",
     "@types/react-dom": "^19.1.9",
+    "@types/react-test-renderer": "^18.3.1",
     "autoprefixer": "^10.4.14",
     "baseline-browser-mapping": "^2.10.0",
     "cross-env": "^10.1.0",
     "postcss": "^8.4.21",
+    "react-test-renderer": "^18.3.1",
     "tailwindcss": "^3.2.7",
+    "tsx": "^4.23.15",
     "typescript": "^5.9.2",
     "vite": "^7.1.8"
   }

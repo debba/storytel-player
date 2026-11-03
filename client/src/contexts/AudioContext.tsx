@@ -15,6 +15,7 @@ import { Chapter } from '../interfaces/chapters';
 import { BookmarkPositional } from '../interfaces/bookmarks';
 import { extractChaptersFromResponse, generateAudioTracks } from '../utils/chapters';
 import i18n from '../i18n';
+import { usePlaybackRate } from '../hooks/usePlaybackRate';
 
 interface LocalPosition {
   position: number;
@@ -107,7 +108,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [playbackRate, setPlaybackRate] = useState(1.0);
+  const { playbackRate, setRate, applyPlaybackRate } = usePlaybackRate(audioRef);
   const [volume, setVolumeState] = useState(1.0);
   const [isMuted, setIsMuted] = useState(false);
   const [previousVolume, setPreviousVolume] = useState(1.0);
@@ -468,13 +469,6 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     [activeBookId, activeConsumableId]
   );
 
-  const setRate = useCallback((rate: number) => {
-    setPlaybackRate(rate);
-    if (audioRef.current) {
-      audioRef.current.playbackRate = rate;
-    }
-  }, []);
-
   const cyclePlaybackRate = useCallback(() => {
     const currentIndex = PLAYBACK_RATES.indexOf(playbackRate);
     const nextRate = PLAYBACK_RATES[(currentIndex + 1) % PLAYBACK_RATES.length] || 1.0;
@@ -555,8 +549,8 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       }
       await goToPosition(cid);
       setIsLoading(false);
-      audioRef.current.playbackRate = playbackRate;
-      if (shouldAutoPlayRef.current) {
+      await applyPlaybackRate();
+      if (shouldAutoPlayRef.current && audioRef.current) {
         audioRef.current.play().catch(console.error);
       }
     }
