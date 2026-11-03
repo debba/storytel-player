@@ -18,7 +18,7 @@
     "dev": "concurrently \"npm run server:dev\" \"npm run client\"",
     "server:dev": "cd server && npm install && npm run dev",
     "install-all": "npm install && cd server && npm install && cd ../client && npm install",
-    "test": "npm --prefix client test",
+    "test": "npm --prefix client test && npm --prefix server test",
     "electron:build": "tsc -p tsconfig.electron.json",
     "electron": "npm run electron:build && electron .",
     "electron:dev": "npm run server:build && npm run electron:build && cross-env NODE_ENV=development electron .",

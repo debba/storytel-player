@@ -53,6 +53,7 @@
     "loadingAudio": "Loading audio...",
     "loadingBookData": "Loading book data...",
     "loadError": "Failed to load audio stream",
+    "accessDenied": "Storytel denied access to this audiobook. Check whether it plays in the official Storytel app. If you signed in with Apple or Google, try signing in with your Storytel email and password.",
     "loadChaptersError": "Failed to load chapters",
     "loadBookmarksError": "Failed to load bookmarks",
     "sleepTimer": "Sleep Timer",

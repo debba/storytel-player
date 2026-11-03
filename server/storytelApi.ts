@@ -1343,7 +1343,9 @@ class StorytelClient {
       if (error.isStorytelUnauthorized) throw error;
       const location = error.response?.headers?.location;
       if (location) return location;
-      throw new Error(`Failed to get audio stream URL: ${error.message}`);
+      throw Object.assign(new Error(`Failed to get audio stream URL: ${error.message}`), {
+        statusCode: error.response?.status,
+      });
     }
   }
 
@@ -1360,7 +1362,9 @@ class StorytelClient {
       if (error.response && error.response.headers.location) {
         return error.response.headers.location;
       }
-      throw new Error(`Failed to get stream URL: ${error.message}`);
+      throw Object.assign(new Error(`Failed to get stream URL: ${error.message}`), {
+        statusCode: error.response?.status,
+      });
     }
   }
 
