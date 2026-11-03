@@ -1,0 +1,303 @@
+{
+  "login": {
+    "title": "Zaloguj się do Storytel",
+    "subtitle": "Uzyskaj dostęp do biblioteki audiobooków",
+    "email": "Adres e-mail",
+    "password": "Hasło",
+    "signIn": "Zaloguj się",
+    "signingIn": "Logowanie...",
+    "ssoDivider": "lub",
+    "ssoGoogle": "Kontynuuj z Google",
+    "ssoApple": "Kontynuuj z Apple",
+    "ssoOpening": "Otwieranie strony logowania Storytel...",
+    "errors": {
+      "required": "Wprowadź adres e-mail i hasło",
+      "failed": "Logowanie nie powiodło się",
+      "sessionExpired": "Sesja wygasła. Zaloguj się ponownie."
+    }
+  },
+  "dashboard": {
+    "title": "Moja biblioteka",
+    "bookCount_one": "{{count}} książka",
+    "bookCount_other": "{{count}} książki",
+    "logout": "Wyloguj się",
+    "settings": "Ustawienia",
+    "search": "Szukaj w bibliotece...",
+    "searchCatalogPrompt": "Szukaj w katalogu Storytel",
+    "exploreCatalog": "Przeglądaj katalog (⌘K)",
+    "noBooks": "Nie znaleziono książek",
+    "emptyLibrary": "Twoja biblioteka jest pusta.",
+    "noFilterMatch": "Żadna książka nie pasuje do wybranych filtrów.",
+    "resetFilters": "Resetuj filtry",
+    "loading": "Ładowanie biblioteki...",
+    "loadError": "Nie udało się załadować biblioteki",
+    "filters": {
+      "all": "Wszystkie",
+      "notStarted": "Nierozpoczęte",
+      "started": "Rozpoczęte",
+      "concluded": "Ukończone"
+    },
+    "bookCount_few": "{{count}} książki",
+    "bookCount_many": "{{count}} książek"
+  },
+  "player": {
+    "chapters": "Rozdziały",
+    "bookmarks": "Zakładki",
+    "addBookmark": "Dodaj zakładkę",
+    "speed": "Prędkość",
+    "skipBackward": "−{{seconds}} s",
+    "skipForward": "+{{seconds}} s",
+    "goTo": "Przejdź do",
+    "goto": "Przejdź do",
+    "playing": "Odtwarzanie",
+    "paused": "Wstrzymano",
+    "nowPlaying": "Teraz odtwarzane:",
+    "loadingAudio": "Ładowanie dźwięku...",
+    "loadingBookData": "Ładowanie danych książki...",
+    "loadError": "Nie udało się załadować strumienia audio",
+    "loadChaptersError": "Nie udało się załadować rozdziałów",
+    "loadBookmarksError": "Nie udało się załadować zakładek",
+    "sleepTimer": "Wyłącznik czasowy",
+    "endOfChapter": "Koniec rozdziału",
+    "off": "Wyłączony",
+    "expand": "Otwórz pełny odtwarzacz",
+    "volume": "Głośność",
+    "chapterOf": "Rozdział {{current}} z {{total}}",
+    "timeUnits": {
+      "hours": "godz.",
+      "minutes": "min",
+      "seconds": "s"
+    }
+  },
+  "bookmarks": {
+    "title": "Twoje zakładki",
+    "noBookmarks": "Brak zapisanych zakładek",
+    "createNew": "Utwórz zakładkę",
+    "createTitle": "Utwórz zakładkę",
+    "editTitle": "Edytuj zakładkę",
+    "deleteTitle": "Usuń zakładkę",
+    "deleteConfirm": "Czy na pewno chcesz usunąć tę zakładkę?",
+    "deleteWarning": "Tej operacji nie można cofnąć.",
+    "currentPosition": "Bieżąca pozycja:",
+    "position": "Pozycja:",
+    "note": "Notatka",
+    "noteOptional": "Notatka (opcjonalnie)",
+    "notePlaceholderCreate": "Dodaj notatkę do zakładki...",
+    "notePlaceholderEdit": "Edytuj notatkę do zakładki...",
+    "save": "Zapisz zakładkę",
+    "saveChanges": "Zapisz zmiany",
+    "tooltipEdit": "Edytuj zakładkę",
+    "tooltipDelete": "Usuń zakładkę"
+  },
+  "errorState": {
+    "title": "Coś poszło nie tak",
+    "tryAgain": "Spróbuj ponownie",
+    "logoutHint": "Jeśli problem się powtarza, wyloguj się",
+    "logout": "Wyloguj się"
+  },
+  "common": {
+    "loading": "Ładowanie...",
+    "error": "Błąd",
+    "cancel": "Anuluj",
+    "save": "Zapisz",
+    "saving": "Zapisywanie...",
+    "delete": "Usuń",
+    "close": "Zamknij"
+  },
+  "bookCard": {
+    "completed": "Ukończona",
+    "remaining": "pozostało",
+    "author": "Autor:",
+    "narrator": "Lektor:"
+  },
+  "bookshelf": {
+    "remove": "Usuń z biblioteki",
+    "removeTitle": "Usunąć książkę?",
+    "removeMessage": "Książka „{{title}}” zostanie usunięta z biblioteki Storytel. Możesz ją ponownie dodać z wyników wyszukiwania.",
+    "removeConfirm": "Usuń",
+    "removed": "Usunięto z biblioteki",
+    "errors": {
+      "removeFailed": "Nie udało się usunąć książki z biblioteki.",
+      "removeNotConfirmed": "Storytel przyjął żądanie, ale książka nadal jest w bibliotece."
+    }
+  },
+  "bookView": {
+    "saved": "Zapisano",
+    "addToLibrary": "Dodaj do biblioteki",
+    "inLibrary": "W bibliotece",
+    "savedToLibrary": "Dodano książkę do biblioteki!",
+    "listen": "Słuchaj",
+    "language": "Język",
+    "duration": "Czas trwania",
+    "narrator": "Lektor",
+    "category": "Kategoria",
+    "description": "Opis",
+    "noDescription": "Brak opisu.",
+    "showMore": "pokaż więcej",
+    "showLess": "pokaż mniej",
+    "details": "Szczegóły książki:",
+    "loadError": "Nie udało się załadować szczegółów książki"
+  },
+  "chapters": {
+    "title": "Ścieżki audio i rozdziały",
+    "noChapters": "Brak dostępnych ścieżek",
+    "chapter": "Rozdział",
+    "track": "Ścieżka",
+    "tracks": "Ścieżki"
+  },
+  "gotoModal": {
+    "title": "Przejdź do czasu",
+    "description": "Wprowadź czas docelowy (z uwzględnieniem prędkości {{speed}}×)",
+    "hours": "Godziny",
+    "minutes": "Min",
+    "seconds": "Sek",
+    "cancel": "Anuluj",
+    "go": "Przejdź"
+  },
+  "playbackSpeed": {
+    "title": "Prędkość odtwarzania",
+    "presets": "Gotowe prędkości",
+    "custom": "Własna prędkość",
+    "confirm": "Zatwierdź"
+  },
+  "tray": {
+    "noBookPlaying": "Żadna książka nie jest teraz odtwarzana",
+    "showApp": "Pokaż aplikację",
+    "play": "Odtwórz",
+    "pause": "Wstrzymaj",
+    "playPause": "Odtwórz/Wstrzymaj",
+    "playbackSpeed": "Prędkość odtwarzania",
+    "about": "O aplikacji",
+    "help": "Pomoc",
+    "logout": "Wyloguj się",
+    "quit": "Zakończ"
+  },
+  "logout": {
+    "confirmTitle": "Potwierdź wylogowanie",
+    "confirmMessage": "Czy na pewno chcesz się wylogować?",
+    "confirmButton": "Wyloguj się",
+    "cancelButton": "Anuluj"
+  },
+  "download": {
+    "cancelTitle": "Anuluj pobieranie",
+    "cancelMessage": "Czy na pewno chcesz anulować trwające pobieranie?",
+    "cancelWarning": "Częściowo pobrany plik zostanie usunięty.",
+    "cancelButton": "Anuluj pobieranie",
+    "continueButton": "Kontynuuj pobieranie",
+    "deleteTitle": "Usuń pobrany plik",
+    "deleteMessage": "Czy na pewno chcesz usunąć pobrany plik?",
+    "deleteWarning": "Aby słuchać offline, trzeba będzie pobrać go ponownie.",
+    "deleteButton": "Usuń plik",
+    "keepButton": "Zachowaj plik",
+    "failed": "Pobieranie nie powiodło się",
+    "operationFailed": "Nie udało się zaktualizować pobranego pliku"
+  },
+  "updater": {
+    "available": {
+      "title": "Dostępna aktualizacja",
+      "message": "Dostępna jest nowa wersja:",
+      "download": "Pobierz",
+      "later": "Później"
+    },
+    "ready": {
+      "title": "Aktualizacja gotowa",
+      "message": "Aktualizacja została pobrana. Uruchom aplikację ponownie, aby zainstalować wersję:",
+      "restart": "Uruchom ponownie",
+      "later": "Później"
+    }
+  },
+  "welcome": {
+    "title": "Witaj w Storytel Player!",
+    "message": "Dziękujemy za korzystanie ze Storytel Player — aplikacji komputerowej o otwartym kodzie źródłowym do słuchania audiobooków. Dołącz do społeczności, aby śledzić nowości i dzielić się opiniami!",
+    "starGithub": "Dodaj gwiazdkę na GitHubie",
+    "joinDiscord": "Dołącz do Discorda",
+    "getStarted": "Zaczynamy"
+  },
+  "settings": {
+    "title": "Ustawienia",
+    "community": "Społeczność",
+    "githubRepo": "Repozytorium na GitHubie",
+    "discordCommunity": "Dołącz do Discorda",
+    "appearance": "Wygląd",
+    "alwaysOnTop": "Okno zawsze na wierzchu",
+    "alwaysOnTopDescription": "Okno pozostanie nad innymi oknami",
+    "account": "Konto",
+    "email": "E-mail",
+    "logout": "Wyloguj się",
+    "developer": "Narzędzia programistyczne",
+    "viewLogs": "Pokaż dziennik sesji",
+    "language": "Język",
+    "languageAuto": "Automatycznie"
+  },
+  "language": {
+    "title": "Język",
+    "subtitle": "Wybierz język interfejsu aplikacji.",
+    "auto": "Automatyczny",
+    "autoDescription": "Używaj języka systemowego",
+    "autoResolved": "Zgodnie z systemem · {{language}}",
+    "systemPreference": "Języki systemowe: {{languages}}",
+    "change": "Zmień język ({{language}})",
+    "catalogNote": "To ustawienie zmienia tylko język interfejsu. Dostępność książek i ich języków zależy od kraju konta Storytel."
+  },
+  "logs": {
+    "title": "Dziennik aplikacji",
+    "refresh": "Odśwież",
+    "clear": "Wyczyść",
+    "empty": "Brak wpisów w dzienniku.",
+    "export": "Eksportuj",
+    "search": "Szukaj w dzienniku...",
+    "typeAll": "Wszystkie zdarzenia",
+    "typeError": "Błędy",
+    "typeHttp": "Ruch HTTP",
+    "typeAction": "Działania użytkownika",
+    "confirmClear": "Czy na pewno chcesz usunąć wszystkie wpisy z dziennika? Tej operacji nie można cofnąć.",
+    "details": "Szczegóły"
+  },
+  "floatingMenu": {
+    "library": "Biblioteka",
+    "search": "Szukaj w katalogu Storytel",
+    "player": "Odtwarzacz",
+    "settings": "Ustawienia",
+    "dockLabel": "Pływający pasek nawigacji"
+  },
+  "search": {
+    "title": "Szukaj w Storytel",
+    "placeholder": "Szukaj według tytułu, autora lub lektora...",
+    "results": "Wyniki wyszukiwania",
+    "hitCount_one": "{{count}} wynik",
+    "hitCount_other": "{{count}} wyniku",
+    "hitCountFiltered": "{{count}} z {{total}} wyników",
+    "sortLabel": "Sortuj:",
+    "sortRelevance": "Trafność",
+    "sortTitle": "Tytuł (A–Z)",
+    "sortDuration": "Najdłuższe najpierw",
+    "noResults": "Nie znaleziono książek dla",
+    "searching": "Wyszukiwanie...",
+    "initialPrompt": "Wpisz hasło, aby przeszukać bogaty katalog audiobooków Storytel",
+    "selectBookHint": "Wybierz książkę, aby zobaczyć podgląd",
+    "play": "Odtwórz",
+    "details": "Szczegóły",
+    "addToBookshelf": "Dodaj do biblioteki",
+    "addedToBookshelf": "Dodano do biblioteki",
+    "audiobook": "Audiobook",
+    "ebook": "E-book",
+    "hours": "godz.",
+    "minutes": "min",
+    "shortcut": "Naciśnij ⌘K / Ctrl+K w dowolnym momencie",
+    "allLanguages": "Wszystkie",
+    "filterByLanguage": "Język",
+    "filterByLength": "Długość",
+    "allLengths": "Dowolna długość",
+    "autoFilterHint": "Wstępnie wybrano języki Twoich książek. Wybierz „Wszystkie”, aby zobaczyć wszystkie wyniki.",
+    "noResultsHint": "Sprawdź pisownię lub spróbuj innego hasła",
+    "noResultsInLanguages": "Brak wyników w wybranych językach: {{languages}}.",
+    "noFilterMatch": "Brak wyników dla wybranych filtrów",
+    "showAllLanguages": "Pokaż wszystkie języki ({{total}})",
+    "errors": {
+      "addToBookshelfFailed": "Nie udało się dodać książki do biblioteki. Może być niedostępna w regionie Twojego konta.",
+      "addToBookshelfNotConfirmed": "Storytel przyjął żądanie, ale książka nie pojawiła się w bibliotece. Może nie być objęta Twoim abonamentem."
+    },
+    "hitCount_few": "{{count}} wyniki",
+    "hitCount_many": "{{count}} wyników"
+  }
+}

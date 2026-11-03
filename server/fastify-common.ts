@@ -652,6 +652,7 @@ const LOCALE_LOADERS = {
   es: () => import("./locales/es.json"),
   fr: () => import("./locales/fr.json"),
   it: () => import("./locales/it.json"),
+  pl: () => import("./locales/pl.json"),
   fi: () => import("./locales/fi.json"),
   sv: () => import("./locales/sv.json"),
 } as const;
