@@ -1,3 +1,21 @@
+# [1.5.0](https://github.com/debba/storytel-player/compare/v1.4.1...v1.5.0) (2026-11-03)
+
+### Features
+
+* **download:** name downloaded files after the audiobook title ([#44](https://github.com/debba/storytel-player/pull/44))
+* **i18n:** add Polish language support ([#45](https://github.com/debba/storytel-player/pull/45))
+
+### Bug Fixes
+
+* **auth:** preserve errors returned after token renewal and avoid unnecessary logout ([#48](https://github.com/debba/storytel-player/pull/48))
+* **i18n:** translate remaining chapter time in the player ([#43](https://github.com/debba/storytel-player/pull/43))
+* **player:** persist playback speed across restarts and handle tray speed changes ([#46](https://github.com/debba/storytel-player/pull/46))
+* **player:** preserve audio access denials and provide translated recovery guidance ([#47](https://github.com/debba/storytel-player/pull/47))
+
+### Tests
+
+* Add 20 automated player and API/authentication regression tests and run them with all three builds in CI.
+
 ## [1.4.1](https://github.com/debba/storytel-player/compare/v1.4.0...v1.4.1) (2026-09-27)
 
 

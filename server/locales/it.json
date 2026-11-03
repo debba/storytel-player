@@ -53,6 +53,7 @@
     "loadingAudio": "Caricamento audio...",
     "loadingBookData": "Caricamento dati libro...",
     "loadError": "Impossibile caricare lo stream audio",
+    "accessDenied": "Storytel ha negato l'accesso a questo audiolibro. Verifica se viene riprodotto nell'app ufficiale Storytel. Se hai effettuato l'accesso con Apple o Google, prova a usare email e password del tuo account Storytel.",
     "loadChaptersError": "Impossibile caricare i capitoli",
     "loadBookmarksError": "Impossibile caricare i segnalibri",
     "sleepTimer": "Timer di spegnimento",
@@ -60,7 +61,12 @@
     "off": "Disattivato",
     "expand": "Apri player completo",
     "volume": "Volume",
-    "chapterOf": "Capitolo {{current}} di {{total}}"
+    "chapterOf": "Capitolo {{current}} di {{total}}",
+    "timeUnits": {
+      "hours": "h",
+      "minutes": "min",
+      "seconds": "s"
+    }
   },
   "bookmarks": {
     "title": "I tuoi Bookmarks",

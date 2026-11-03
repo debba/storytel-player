@@ -235,6 +235,10 @@ function PlayerView() {
                 }
             }
         } catch (err: any) {
+            if (err?.response?.status === 403) {
+                setError(t('player.accessDenied'));
+                return;
+            }
             const errorMsg = err?.data?.error || err?.response?.data?.error;
             if (errorMsg !== 'Download cancelled' && errorMsg !== 'canceled') {
                 setError(errorMsg || err.message || t('download.failed'));

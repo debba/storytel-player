@@ -1,0 +1,30 @@
+name: Checks
+
+on:
+  pull_request:
+  push:
+    branches: [develop]
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            client/package-lock.json
+            server/package-lock.json
+      - run: npm ci --ignore-scripts
+      - run: npm ci --prefix client --ignore-scripts
+      - run: npm ci --prefix server --ignore-scripts
+      - run: npm test
+      - run: npm run build
+      - run: npm run server:build
+      - run: npm run electron:build

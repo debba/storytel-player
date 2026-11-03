@@ -53,6 +53,7 @@
     "loadingAudio": "Laddar ljud...",
     "loadingBookData": "Laddar bokdata...",
     "loadError": "Kunde inte ladda ljudström",
+    "accessDenied": "Storytel nekade åtkomst till den här ljudboken. Kontrollera om den går att spela i den officiella Storytel-appen. Om du loggade in med Apple eller Google kan du prova att logga in med din e-postadress och ditt lösenord för Storytel.",
     "loadChaptersError": "Kunde inte ladda kapitel",
     "loadBookmarksError": "Kunde inte ladda bokmärken",
     "sleepTimer": "Sovtimer",
@@ -60,7 +61,12 @@
     "off": "Av",
     "expand": "Öppna full spelare",
     "volume": "Volym",
-    "chapterOf": "Kapitel {{current}} av {{total}}"
+    "chapterOf": "Kapitel {{current}} av {{total}}",
+    "timeUnits": {
+      "hours": "tim",
+      "minutes": "min",
+      "seconds": "s"
+    }
   },
   "bookmarks": {
     "title": "Dina bokmärken",

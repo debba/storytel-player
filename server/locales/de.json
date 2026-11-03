@@ -53,6 +53,7 @@
     "loadingAudio": "Audio wird geladen...",
     "loadingBookData": "Buchdaten werden geladen...",
     "loadError": "Audiostream konnte nicht geladen werden",
+    "accessDenied": "Storytel hat den Zugriff auf dieses Hörbuch verweigert. Prüfe, ob es in der offiziellen Storytel-App abgespielt wird. Wenn du dich mit Apple oder Google angemeldet hast, versuche es mit deiner Storytel-E-Mail-Adresse und deinem Passwort.",
     "loadChaptersError": "Kapitel konnten nicht geladen werden",
     "loadBookmarksError": "Lesezeichen konnten nicht geladen werden",
     "sleepTimer": "Schlaf-Timer",
@@ -60,7 +61,12 @@
     "off": "Aus",
     "expand": "Vollständigen Player öffnen",
     "volume": "Lautstärke",
-    "chapterOf": "Kapitel {{current}} von {{total}}"
+    "chapterOf": "Kapitel {{current}} von {{total}}",
+    "timeUnits": {
+      "hours": "Std.",
+      "minutes": "Min.",
+      "seconds": "Sek."
+    }
   },
   "bookmarks": {
     "title": "Ihre Lesezeichen",

@@ -53,6 +53,7 @@
     "loadingAudio": "Cargando audio...",
     "loadingBookData": "Cargando datos del libro...",
     "loadError": "Error al cargar el flujo de audio",
+    "accessDenied": "Storytel ha denegado el acceso a este audiolibro. Comprueba si se reproduce en la aplicación oficial de Storytel. Si has iniciado sesión con Apple o Google, prueba a usar el correo electrónico y la contraseña de tu cuenta de Storytel.",
     "loadChaptersError": "Error al cargar los capítulos",
     "loadBookmarksError": "Error al cargar los marcadores",
     "sleepTimer": "Temporizador de apagado",
@@ -60,7 +61,12 @@
     "off": "Desactivado",
     "expand": "Abrir reproductor completo",
     "volume": "Volumen",
-    "chapterOf": "Capítulo {{current}} de {{total}}"
+    "chapterOf": "Capítulo {{current}} de {{total}}",
+    "timeUnits": {
+      "hours": "h",
+      "minutes": "min",
+      "seconds": "s"
+    }
   },
   "bookmarks": {
     "title": "Tus Marcadores",

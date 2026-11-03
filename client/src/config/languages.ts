@@ -33,6 +33,7 @@ export const APP_LANGUAGES: readonly AppLanguage[] = [
     {code: 'es', nativeName: 'Español'},
     {code: 'fr', nativeName: 'Français'},
     {code: 'it', nativeName: 'Italiano'},
+    {code: 'pl', nativeName: 'Polski'},
     {code: 'fi', nativeName: 'Suomi'},
     {code: 'sv', nativeName: 'Svenska'},
 ];
