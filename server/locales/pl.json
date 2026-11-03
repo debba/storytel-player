@@ -55,6 +55,7 @@
     "loadingAudio": "Ładowanie dźwięku...",
     "loadingBookData": "Ładowanie danych książki...",
     "loadError": "Nie udało się załadować strumienia audio",
+    "accessDenied": "Storytel odmówił dostępu do tego audiobooka. Sprawdź, czy można go odtworzyć w oficjalnej aplikacji Storytel. Jeśli zalogowano się przez Apple lub Google, spróbuj zalogować się adresem e-mail i hasłem konta Storytel.",
     "loadChaptersError": "Nie udało się załadować rozdziałów",
     "loadBookmarksError": "Nie udało się załadować zakładek",
     "sleepTimer": "Wyłącznik czasowy",

@@ -53,6 +53,7 @@
     "loadingAudio": "Ladataan ääntä...",
     "loadingBookData": "Ladataan kirjan tietoja...",
     "loadError": "Äänivirran lataus epäonnistui",
+    "accessDenied": "Storytel esti tämän äänikirjan käytön. Tarkista, voiko sen toistaa virallisessa Storytel-sovelluksessa. Jos kirjauduit Applen tai Googlen kautta, kokeile kirjautua Storytel-tilisi sähköpostiosoitteella ja salasanalla.",
     "loadChaptersError": "Lukujen lataaminen epäonnistui",
     "loadBookmarksError": "Kirjanmerkkien lataaminen epäonnistui",
     "sleepTimer": "Uniajastin",

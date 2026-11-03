@@ -53,6 +53,7 @@
     "loadingAudio": "Chargement de l'audio...",
     "loadingBookData": "Chargement des données du livre...",
     "loadError": "Échec du chargement du flux audio",
+    "accessDenied": "Storytel a refusé l'accès à ce livre audio. Vérifiez s'il peut être lu dans l'application officielle Storytel. Si vous vous êtes connecté avec Apple ou Google, essayez avec l'adresse e-mail et le mot de passe de votre compte Storytel.",
     "loadChaptersError": "Échec du chargement des chapitres",
     "loadBookmarksError": "Échec du chargement des marque-pages",
     "sleepTimer": "Minuteur de sommeil",

@@ -4,6 +4,7 @@
   "description": "Storytel Web Server",
   "main": "server.ts",
   "scripts": {
+    "test": "tsx --test tests/*.test.ts",
     "start": "node dist/server.js",
     "dev": "tsx watch server.ts",
     "build": "tsx build.ts",
