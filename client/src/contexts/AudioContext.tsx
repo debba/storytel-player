@@ -16,6 +16,7 @@ import { BookmarkPositional } from '../interfaces/bookmarks';
 import { extractChaptersFromResponse, generateAudioTracks } from '../utils/chapters';
 import i18n from '../i18n';
 import { usePlaybackRate } from '../hooks/usePlaybackRate';
+import { SKIP_BACKWARD_SECONDS, SKIP_FORWARD_SECONDS } from '../config/player';
 
 interface LocalPosition {
   position: number;
@@ -448,7 +449,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const skipForward = useCallback(
-    (seconds: number = 30) => {
+    (seconds: number = SKIP_FORWARD_SECONDS) => {
       if (audioRef.current) {
         const nextTime = Math.min(audioRef.current.currentTime + seconds, duration || audioRef.current.duration || Infinity);
         audioRef.current.currentTime = nextTime;
@@ -460,7 +461,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   );
 
   const skipBackward = useCallback(
-    (seconds: number = 15) => {
+    (seconds: number = SKIP_BACKWARD_SECONDS) => {
       if (audioRef.current) {
         const nextTime = Math.max(audioRef.current.currentTime - seconds, 0);
         audioRef.current.currentTime = nextTime;
