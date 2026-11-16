@@ -17,6 +17,7 @@ import {useBookmarks} from "../hooks/useBookmarks";
 import {useChapters} from "../hooks/useChapters";
 import {useGotoModal} from "../hooks/useGotoModal";
 import {truncateTitle} from '../utils/helpers';
+import {SKIP_BACKWARD_SECONDS, SKIP_FORWARD_SECONDS} from '../config/player';
 import "../types/window.d.ts";
 import api, { trackAction } from "../utils/api";
 
@@ -292,13 +293,13 @@ function PlayerView() {
                     break;
                 case 'ArrowLeft':
                     event.preventDefault();
-                    audio.skipBackward(15);
+                    audio.skipBackward(SKIP_BACKWARD_SECONDS);
                     setShowKeyOverlay('backward');
                     setTimeout(() => setShowKeyOverlay(null), 1000);
                     break;
                 case 'ArrowRight':
                     event.preventDefault();
-                    audio.skipForward(15);
+                    audio.skipForward(SKIP_FORWARD_SECONDS);
                     setShowKeyOverlay('forward');
                     setTimeout(() => setShowKeyOverlay(null), 1000);
                     break;
@@ -394,8 +395,8 @@ function PlayerView() {
                             onSeek={audio.seek}
                             onVolumeChange={audio.setVolume}
                             onToggleMute={audio.toggleMute}
-                            onSkipForward={() => audio.skipForward(15)}
-                            onSkipBackward={() => audio.skipBackward(15)}
+                            onSkipForward={() => audio.skipForward(SKIP_FORWARD_SECONDS)}
+                            onSkipBackward={() => audio.skipBackward(SKIP_BACKWARD_SECONDS)}
                             onShowGotoModal={gotoModal.openModal}
                             onShowPlaybackSpeedModal={() => setShowPlaybackSpeedModal(true)}
                         />

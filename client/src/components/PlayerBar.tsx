@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAudioContext } from '../contexts/AudioContext';
 import { buildCoverUrl, formatTime } from '../utils/helpers';
+import { SKIP_BACKWARD_SECONDS, SKIP_FORWARD_SECONDS } from '../config/player';
 import ChaptersPopover from './ChaptersPopover';
 
 export function PlayerBar() {
@@ -144,17 +145,17 @@ export function PlayerBar() {
       <div className="flex-1 max-w-xl mx-2 flex flex-col items-center justify-center gap-1">
         {/* Transport Row (gap 18px) */}
         <div className="flex items-center gap-[18px]">
-          {/* Skip -15s */}
+          {/* Skip backward */}
           <button
             type="button"
-            onClick={() => skipBackward(15)}
-            title={t('player.skipBackward', { seconds: 15 })}
+            onClick={() => skipBackward(SKIP_BACKWARD_SECONDS)}
+            title={t('player.skipBackward', { seconds: SKIP_BACKWARD_SECONDS })}
             className="text-gray-400 hover:text-white p-1 rounded-full hover:bg-white/10 transition-all active:scale-95 flex items-center justify-center relative"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0019 16V8a1 1 0 00-1.6-.8l-5.334 4zM4.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0011 16V8a1 1 0 00-1.6-.8l-5.334 4z" />
             </svg>
-            <span className="text-[9px] font-bold absolute -bottom-1">15</span>
+            <span className="text-[9px] font-bold absolute -bottom-1">{SKIP_BACKWARD_SECONDS}</span>
           </button>
 
           {/* Play/Pause 40px Accent Circle */}
@@ -180,17 +181,17 @@ export function PlayerBar() {
             )}
           </button>
 
-          {/* Skip +30s */}
+          {/* Skip forward */}
           <button
             type="button"
-            onClick={() => skipForward(30)}
-            title={t('player.skipForward', { seconds: 30 })}
+            onClick={() => skipForward(SKIP_FORWARD_SECONDS)}
+            title={t('player.skipForward', { seconds: SKIP_FORWARD_SECONDS })}
             className="text-gray-400 hover:text-white p-1 rounded-full hover:bg-white/10 transition-all active:scale-95 flex items-center justify-center relative"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.933 12.8a1 1 0 000-1.6L6.6 7.2A1 1 0 005 8v8a1 1 0 001.6.8l5.333-4zM19.933 12.8a1 1 0 000-1.6l-5.333-4A1 1 0 0013 8v8a1 1 0 001.6.8l5.333-4z" />
             </svg>
-            <span className="text-[9px] font-bold absolute -bottom-1">30</span>
+            <span className="text-[9px] font-bold absolute -bottom-1">{SKIP_FORWARD_SECONDS}</span>
           </button>
         </div>
 

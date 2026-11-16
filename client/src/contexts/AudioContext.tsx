@@ -16,6 +16,8 @@ import { BookmarkPositional } from '../interfaces/bookmarks';
 import { extractChaptersFromResponse, generateAudioTracks } from '../utils/chapters';
 import i18n from '../i18n';
 import { usePlaybackRate } from '../hooks/usePlaybackRate';
+import { buildCoverUrl } from '../utils/helpers';
+import { SKIP_BACKWARD_SECONDS, SKIP_FORWARD_SECONDS } from '../config/player';
 
 interface LocalPosition {
   position: number;
@@ -448,7 +450,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const skipForward = useCallback(
-    (seconds: number = 30) => {
+    (seconds: number = SKIP_FORWARD_SECONDS) => {
       if (audioRef.current) {
         const nextTime = Math.min(audioRef.current.currentTime + seconds, duration || audioRef.current.duration || Infinity);
         audioRef.current.currentTime = nextTime;
@@ -460,7 +462,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   );
 
   const skipBackward = useCallback(
-    (seconds: number = 15) => {
+    (seconds: number = SKIP_BACKWARD_SECONDS) => {
       if (audioRef.current) {
         const nextTime = Math.max(audioRef.current.currentTime - seconds, 0);
         audioRef.current.currentTime = nextTime;
@@ -571,6 +573,41 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       });
     }
   }, [togglePlayPause]);
+
+  // Hardware media keys (back/forward) and the OS "Now Playing" controls.
+  // Without these handlers, Chromium ignores the previous/next track keys.
+  useEffect(() => {
+    if (!('mediaSession' in navigator)) return;
+
+    const back = () => skipBackward(SKIP_BACKWARD_SECONDS);
+    const forward = () => skipForward(SKIP_FORWARD_SECONDS);
+    const handlers: [MediaSessionAction, MediaSessionActionHandler][] = [
+      ['previoustrack', back],
+      ['seekbackward', back],
+      ['nexttrack', forward],
+      ['seekforward', forward],
+    ];
+
+    handlers.forEach(([action, handler]) => navigator.mediaSession.setActionHandler(action, handler));
+    return () => {
+      handlers.forEach(([action]) => navigator.mediaSession.setActionHandler(action, null));
+    };
+  }, [skipBackward, skipForward]);
+
+  // Title, author and cover shown in the OS "Now Playing" widget.
+  useEffect(() => {
+    if (!('mediaSession' in navigator)) return;
+
+    const book = activeBook?.book;
+    const cover = buildCoverUrl(book?.largeCover || book?.largeCoverE);
+    navigator.mediaSession.metadata = book
+      ? new MediaMetadata({
+          title: book.name,
+          artist: book.authorsAsString || activeBook?.abook?.narratorAsString || '',
+          artwork: cover ? [{ src: cover }] : [],
+        })
+      : null;
+  }, [activeBook]);
 
   // Cleanup on unmount & save on window close
   useEffect(() => {
