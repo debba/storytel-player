@@ -573,6 +573,26 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     }
   }, [togglePlayPause]);
 
+  // Hardware media keys (back/forward) and the OS "Now Playing" controls.
+  // Without these handlers, Chromium ignores the previous/next track keys.
+  useEffect(() => {
+    if (!('mediaSession' in navigator)) return;
+
+    const back = () => skipBackward(SKIP_BACKWARD_SECONDS);
+    const forward = () => skipForward(SKIP_FORWARD_SECONDS);
+    const handlers: [MediaSessionAction, MediaSessionActionHandler][] = [
+      ['previoustrack', back],
+      ['seekbackward', back],
+      ['nexttrack', forward],
+      ['seekforward', forward],
+    ];
+
+    handlers.forEach(([action, handler]) => navigator.mediaSession.setActionHandler(action, handler));
+    return () => {
+      handlers.forEach(([action]) => navigator.mediaSession.setActionHandler(action, null));
+    };
+  }, [skipBackward, skipForward]);
+
   // Cleanup on unmount & save on window close
   useEffect(() => {
     const handleBeforeUnload = () => {
