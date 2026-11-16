@@ -16,6 +16,7 @@ import { BookmarkPositional } from '../interfaces/bookmarks';
 import { extractChaptersFromResponse, generateAudioTracks } from '../utils/chapters';
 import i18n from '../i18n';
 import { usePlaybackRate } from '../hooks/usePlaybackRate';
+import { buildCoverUrl } from '../utils/helpers';
 import { SKIP_BACKWARD_SECONDS, SKIP_FORWARD_SECONDS } from '../config/player';
 
 interface LocalPosition {
@@ -592,6 +593,21 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       handlers.forEach(([action]) => navigator.mediaSession.setActionHandler(action, null));
     };
   }, [skipBackward, skipForward]);
+
+  // Title, author and cover shown in the OS "Now Playing" widget.
+  useEffect(() => {
+    if (!('mediaSession' in navigator)) return;
+
+    const book = activeBook?.book;
+    const cover = buildCoverUrl(book?.largeCover || book?.largeCoverE);
+    navigator.mediaSession.metadata = book
+      ? new MediaMetadata({
+          title: book.name,
+          artist: book.authorsAsString || activeBook?.abook?.narratorAsString || '',
+          artwork: cover ? [{ src: cover }] : [],
+        })
+      : null;
+  }, [activeBook]);
 
   // Cleanup on unmount & save on window close
   useEffect(() => {
